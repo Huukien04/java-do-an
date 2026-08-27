@@ -59,7 +59,11 @@ public class TopicServiceImpl implements TopicService {
 
         topic = topicRepository.save(topic);
 
-        // Add Advisors (1 to 2 advisors)
+        // Validate Advisor Uniqueness first
+        if (dto.getSecondaryAdvisorId() != null && dto.getSecondaryAdvisorId().equals(dto.getPrimaryAdvisorId())) {
+            throw new BusinessException("GVHD 1 và GVHD 2 không được là cùng một người.");
+        }
+
         Teacher primaryAdvisor = teacherRepository.findById(dto.getPrimaryAdvisorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Giảng viên hướng dẫn 1", "id", dto.getPrimaryAdvisorId()));
 
@@ -68,13 +72,9 @@ public class TopicServiceImpl implements TopicService {
                 .teacher(primaryAdvisor)
                 .advisorRole(AdvisorRole.PRIMARY)
                 .build();
-        topicAdvisorRepository.save(ta1);
         topic.getAdvisors().add(ta1);
 
         if (dto.getSecondaryAdvisorId() != null) {
-            if (dto.getSecondaryAdvisorId().equals(dto.getPrimaryAdvisorId())) {
-                throw new BusinessException("GVHD 1 và GVHD 2 không được là cùng một người.");
-            }
             Teacher secondaryAdvisor = teacherRepository.findById(dto.getSecondaryAdvisorId())
                     .orElseThrow(() -> new ResourceNotFoundException("Giảng viên hướng dẫn 2", "id", dto.getSecondaryAdvisorId()));
             TopicAdvisor ta2 = TopicAdvisor.builder()
@@ -82,10 +82,10 @@ public class TopicServiceImpl implements TopicService {
                     .teacher(secondaryAdvisor)
                     .advisorRole(AdvisorRole.SECONDARY)
                     .build();
-            topicAdvisorRepository.save(ta2);
             topic.getAdvisors().add(ta2);
         }
 
+        topic = topicRepository.save(topic);
         return mapToDTO(topic);
     }
 
@@ -102,6 +102,10 @@ public class TopicServiceImpl implements TopicService {
             throw new BusinessException("Đề tài đã được duyệt hoặc đã phân công không thể chỉnh sửa.");
         }
 
+        if (dto.getSecondaryAdvisorId() != null && dto.getSecondaryAdvisorId().equals(dto.getPrimaryAdvisorId())) {
+            throw new BusinessException("GVHD 1 và GVHD 2 không được là cùng một người.");
+        }
+
         Department department = departmentRepository.findById(dto.getDepartmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Bộ môn", "id", dto.getDepartmentId()));
 
@@ -111,9 +115,9 @@ public class TopicServiceImpl implements TopicService {
         topic.setDepartment(department);
         topic.setStatus(TopicStatus.PENDING_APPROVAL);
 
-        // Clear and rebuild advisors
-        topicAdvisorRepository.deleteByTopicId(topic.getId());
+        // Clear existing advisors and flush to trigger orphanRemoval immediately in database
         topic.getAdvisors().clear();
+        topicRepository.saveAndFlush(topic);
 
         Teacher primaryAdvisor = teacherRepository.findById(dto.getPrimaryAdvisorId())
                 .orElseThrow(() -> new ResourceNotFoundException("GVHD 1", "id", dto.getPrimaryAdvisorId()));
@@ -122,13 +126,9 @@ public class TopicServiceImpl implements TopicService {
                 .teacher(primaryAdvisor)
                 .advisorRole(AdvisorRole.PRIMARY)
                 .build();
-        topicAdvisorRepository.save(ta1);
         topic.getAdvisors().add(ta1);
 
         if (dto.getSecondaryAdvisorId() != null) {
-            if (dto.getSecondaryAdvisorId().equals(dto.getPrimaryAdvisorId())) {
-                throw new BusinessException("GVHD 1 và GVHD 2 không được là cùng một người.");
-            }
             Teacher secondaryAdvisor = teacherRepository.findById(dto.getSecondaryAdvisorId())
                     .orElseThrow(() -> new ResourceNotFoundException("GVHD 2", "id", dto.getSecondaryAdvisorId()));
             TopicAdvisor ta2 = TopicAdvisor.builder()
@@ -136,7 +136,6 @@ public class TopicServiceImpl implements TopicService {
                     .teacher(secondaryAdvisor)
                     .advisorRole(AdvisorRole.SECONDARY)
                     .build();
-            topicAdvisorRepository.save(ta2);
             topic.getAdvisors().add(ta2);
         }
 

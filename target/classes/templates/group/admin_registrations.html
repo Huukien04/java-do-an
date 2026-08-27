@@ -14,7 +14,7 @@
 
     <!-- Filter -->
     <div class="card card-custom p-3 mb-4">
-        <form th:action="@{/student/group/admin/registrations}" method="get" class="row g-2 align-items-center">
+        <form th:action="@{/admin/registrations}" method="get" class="row g-2 align-items-center">
             <div class="col-md-8">
                 <select name="periodId" class="form-select" onchange="this.form.submit()">
                     <option value="">-- Tất cả các Đợt đăng ký --</option>
@@ -63,10 +63,10 @@
                         </td>
                         <td class="text-end">
                             <div th:if="${r.status.name() == 'PENDING'}" class="btn-group btn-group-sm">
-                                <form th:action="@{/student/group/admin/registrations/{id}/approve(id=${r.id})}" method="post" class="d-inline">
+                                <form th:action="@{/admin/registrations/{id}/approve(id=${r.id})}" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-success me-1"><i class="bi bi-check-lg"></i> Phê duyệt</button>
                                 </form>
-                                <form th:action="@{/student/group/admin/registrations/{id}/reject(id=${r.id})}" method="post" class="d-inline">
+                                <form th:action="@{/admin/registrations/{id}/reject(id=${r.id})}" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-danger"><i class="bi bi-x-lg"></i> Từ chối</button>
                                 </form>
                             </div>

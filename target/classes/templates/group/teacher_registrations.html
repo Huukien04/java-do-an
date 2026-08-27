@@ -3,22 +3,26 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main}">
 <head>
-    <title>Phê duyệt Đăng ký Nhóm SV - Admin</title>
+    <title>Duyệt Đăng ký Nhóm SV - Giảng viên</title>
 </head>
 <body>
 <div layout:fragment="content">
     <div class="mb-4">
-        <h3 class="fw-bold mb-1">PHÊ DUYỆT ĐĂNG KÝ NGUYỆN VỌNG CỦA NHÓM SV</h3>
-        <p class="text-muted mb-0">Duyệt hoặc từ chối đề tài do các nhóm Sinh viên đăng ký trong Phase 2</p>
+        <h3 class="fw-bold mb-1">Duyệt ĐĂNG KÝ NGUYỆN VỌNG CỦA NHÓM SV</h3>
+        <p class="text-muted mb-0">Duyệt hoặc từ chối nguyện vọng đăng ký đề tài của các nhóm Sinh viên</p>
     </div>
 
     <!-- Filter -->
     <div class="card card-custom p-3 mb-4">
-        <form th:action="@{/student/group/admin/registrations}" method="get" class="row g-2 align-items-center">
+        <form th:action="@{/teacher/registrations}" method="get" class="row g-2 align-items-center">
             <div class="col-md-8">
                 <select name="periodId" class="form-select" onchange="this.form.submit()">
                     <option value="">-- Tất cả các Đợt đăng ký --</option>
-                    <option th:each="p : ${periods}" th:value="${p.id}" th:text="${p.name}"></option>
+                    <option th:each="p : ${periods}" 
+                            th:value="${p.id}" 
+                            th:text="${p.name}" 
+                            th:selected="${p.id == selectedPeriodId}">
+                    </option>
                 </select>
             </div>
         </form>
@@ -40,7 +44,7 @@
                 </thead>
                 <tbody>
                     <tr th:if="${registrations.empty}">
-                        <td colspan="7" class="text-center py-4 text-muted">Chưa có yêu cầu đăng ký nào.</td>
+                        <td colspan="7" class="text-center py-4 text-muted">Chưa có yêu cầu đăng ký đề tài nào cho các đề tài của bạn.</td>
                     </tr>
                     <tr th:each="r, stat : ${registrations}">
                         <td th:text="${stat.count}">1</td>
@@ -63,10 +67,10 @@
                         </td>
                         <td class="text-end">
                             <div th:if="${r.status.name() == 'PENDING'}" class="btn-group btn-group-sm">
-                                <form th:action="@{/student/group/admin/registrations/{id}/approve(id=${r.id})}" method="post" class="d-inline">
+                                <form th:action="@{/teacher/registrations/{id}/approve(id=${r.id})}" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-success me-1"><i class="bi bi-check-lg"></i> Phê duyệt</button>
                                 </form>
-                                <form th:action="@{/student/group/admin/registrations/{id}/reject(id=${r.id})}" method="post" class="d-inline">
+                                <form th:action="@{/teacher/registrations/{id}/reject(id=${r.id})}" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-danger"><i class="bi bi-x-lg"></i> Từ chối</button>
                                 </form>
                             </div>

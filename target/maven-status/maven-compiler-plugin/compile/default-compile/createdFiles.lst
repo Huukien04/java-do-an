@@ -34,6 +34,7 @@ com/hcmute/topicmanagement/enums/RoleName.class
 com/hcmute/topicmanagement/entity/Score.class
 com/hcmute/topicmanagement/entity/FinalResult$FinalResultBuilder.class
 com/hcmute/topicmanagement/dto/ReviewCouncilDTO.class
+com/hcmute/topicmanagement/controller/TeacherGroupRegistrationController.class
 com/hcmute/topicmanagement/enums/TopicRegistrationStatus.class
 com/hcmute/topicmanagement/entity/GroupMember.class
 com/hcmute/topicmanagement/entity/Department.class

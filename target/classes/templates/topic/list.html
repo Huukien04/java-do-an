@@ -55,7 +55,15 @@
                 </div>
 
                 <div class="pt-3 border-top d-flex justify-content-between align-items-center">
-                    <a th:href="@{/topics/{id}(id=${t.id})}" class="btn btn-sm btn-outline-primary">Xem Chi tiết</a>
+                    <div>
+                        <a th:href="@{/topics/{id}(id=${t.id})}" class="btn btn-sm btn-outline-primary me-1">Xem Chi tiết</a>
+                        <a sec:authorize="hasRole('TEACHER')" 
+                           th:if="${currentTeacherId != null and currentTeacherId == t.createdByTeacherId and t.status.name() != 'APPROVED' and t.status.name() != 'ASSIGNED'}"
+                           th:href="@{/topics/{id}/edit(id=${t.id})}" 
+                           class="btn btn-sm btn-outline-secondary">
+                           <i class="bi bi-pencil me-1"></i>Sửa
+                        </a>
+                    </div>
                     
                     <!-- Admin Approval Controls -->
                     <div sec:authorize="hasRole('ADMIN')" th:if="${t.status.name() == 'PENDING_APPROVAL'}" class="btn-group btn-group-sm">

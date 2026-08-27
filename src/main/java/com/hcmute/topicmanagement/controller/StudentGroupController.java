@@ -34,6 +34,7 @@ public class StudentGroupController {
         model.addAttribute("activePeriods", activePeriods);
 
         Long selectedPeriodId = (periodId != null) ? periodId : (!activePeriods.isEmpty() ? activePeriods.get(0).getId() : null);
+        model.addAttribute("selectedPeriodId", selectedPeriodId);
 
         if (selectedPeriodId != null) {
             StudentGroupDTO myGroup = groupService.getMyGroupByPeriod(studentId, selectedPeriodId);
@@ -54,6 +55,7 @@ public class StudentGroupController {
         model.addAttribute("activePeriods", activePeriods);
 
         Long selectedPeriodId = (periodId != null) ? periodId : (!activePeriods.isEmpty() ? activePeriods.get(0).getId() : null);
+        model.addAttribute("selectedPeriodId", selectedPeriodId);
 
         if (selectedPeriodId != null) {
             StudentGroupDTO myGroup = groupService.getMyGroupByPeriod(studentId, selectedPeriodId);
@@ -67,9 +69,13 @@ public class StudentGroupController {
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('STUDENT')")
-    public String createGroup(@RequestParam Long periodId,
+    public String createGroup(@RequestParam(required = false) Long periodId,
                               @AuthenticationPrincipal CustomUserDetails userDetails,
                               RedirectAttributes redirectAttributes) {
+        if (periodId == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy đợt đăng ký phù hợp để tạo nhóm.");
+            return "redirect:/student/group";
+        }
         try {
             groupService.createGroup(userDetails.getStudent().getId(), periodId);
             redirectAttributes.addFlashAttribute("successMessage", "Tạo nhóm mới thành công!");
@@ -102,38 +108,10 @@ public class StudentGroupController {
                                 RedirectAttributes redirectAttributes) {
         try {
             groupService.registerTopic(groupId, topicId, userDetails.getStudent().getId());
-            redirectAttributes.addFlashAttribute("successMessage", "Đăng ký đề tài cho nhóm thành công! Chờ Khoa duyệt.");
+            redirectAttributes.addFlashAttribute("successMessage", "Đăng ký đề tài cho nhóm thành công! Chờ duyệt.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/student/group";
-    }
-
-    @GetMapping("/admin/registrations")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String viewRegistrations(@RequestParam(required = false) Long periodId, Model model) {
-        model.addAttribute("periods", periodService.getAllPeriods());
-        if (periodId != null) {
-            model.addAttribute("registrations", registrationRepository.findByGroupPeriodId(periodId));
-        } else {
-            model.addAttribute("registrations", registrationRepository.findAll());
-        }
-        return "group/admin_registrations";
-    }
-
-    @PostMapping("/admin/registrations/{id}/approve")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String approveRegistration(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        groupService.approveTopicRegistration(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Đã duyệt đề tài cho nhóm thành công.");
-        return "redirect:/student/group/admin/registrations";
-    }
-
-    @PostMapping("/admin/registrations/{id}/reject")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String rejectRegistration(@PathVariable Long id, @RequestParam(required = false) String reason, RedirectAttributes redirectAttributes) {
-        groupService.rejectTopicRegistration(id, reason);
-        redirectAttributes.addFlashAttribute("successMessage", "Đã từ chối đăng ký đề tài của nhóm.");
-        return "redirect:/student/group/admin/registrations";
     }
 }

@@ -1,7 +1,7 @@
 package com.hcmute.topicmanagement.enums;
 
 public enum TopicRegistrationStatus {
-    PENDING("Chờ Khoa duyệt"),
+    PENDING("Chờ duyệt"),
     APPROVED("Đã phê duyệt"),
     REJECTED("Từ chối"),
     CANCELLED("Hủy đăng ký");

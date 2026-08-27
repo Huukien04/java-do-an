@@ -65,6 +65,7 @@ public class DashboardController {
                 model.addAttribute("myTopicsCount", myTopics.size());
                 model.addAttribute("myTopics", myTopics);
                 model.addAttribute("myCouncils", councilService.getCouncilsByTeacher(teacherId));
+                model.addAttribute("pendingRegistrationsCount", registrationRepository.countByTopicCreatedByTeacherIdAndStatus(teacherId, TopicRegistrationStatus.PENDING));
             }
             model.addAttribute("activePeriods", periodService.getActivePeriodsForTeacher());
             model.addAttribute("notifications", notificationService.getNotificationsForRole("ROLE_TEACHER"));

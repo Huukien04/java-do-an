@@ -16,6 +16,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.hcmute.topicmanagement.enums.TopicStatus;
+import com.hcmute.topicmanagement.exception.BusinessException;
+
 @Controller
 @RequestMapping("/topics")
 @RequiredArgsConstructor
@@ -27,13 +30,18 @@ public class TopicController {
     private final TeacherRepository teacherRepository;
 
     @GetMapping
-    public String listTopics(@RequestParam(required = false) Long periodId, Model model) {
+    public String listTopics(@RequestParam(required = false) Long periodId,
+                             @AuthenticationPrincipal CustomUserDetails userDetails,
+                             Model model) {
         model.addAttribute("periods", periodService.getAllPeriods());
         if (periodId != null) {
             model.addAttribute("topics", topicService.getTopicsByPeriod(periodId));
             model.addAttribute("selectedPeriodId", periodId);
         } else {
             model.addAttribute("topics", topicService.getAllTopics());
+        }
+        if (userDetails != null && userDetails.getTeacher() != null) {
+            model.addAttribute("currentTeacherId", userDetails.getTeacher().getId());
         }
         return "topic/list";
     }
@@ -63,7 +71,7 @@ public class TopicController {
         }
         try {
             topicService.createTopic(topicDTO, userDetails.getTeacher().getId());
-            redirectAttributes.addFlashAttribute("successMessage", "Đăng ký đề tài mới thành công! Chờ Khoa duyệt.");
+            redirectAttributes.addFlashAttribute("successMessage", "Đăng ký đề tài mới thành công! Chờ duyệt.");
             return "redirect:/dashboard";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -75,9 +83,78 @@ public class TopicController {
     }
 
     @GetMapping("/{id}")
-    public String viewTopic(@PathVariable Long id, Model model) {
-        model.addAttribute("topic", topicService.getTopicById(id));
+    public String viewTopic(@PathVariable Long id,
+                            @AuthenticationPrincipal CustomUserDetails userDetails,
+                            Model model) {
+        TopicDTO topic = topicService.getTopicById(id);
+        model.addAttribute("topic", topic);
+        if (userDetails != null && userDetails.getTeacher() != null) {
+            model.addAttribute("currentTeacherId", userDetails.getTeacher().getId());
+        }
         return "topic/detail";
+    }
+
+    @GetMapping("/{id}/edit")
+    @PreAuthorize("hasRole('TEACHER')")
+    public String editForm(@PathVariable Long id,
+                           @AuthenticationPrincipal CustomUserDetails userDetails,
+                           Model model) {
+        TopicDTO topic = topicService.getTopicById(id);
+        Long currentTeacherId = userDetails.getTeacher().getId();
+
+        if (!topic.getCreatedByTeacherId().equals(currentTeacherId)) {
+            throw new BusinessException("Bạn không có quyền chỉnh sửa đề tài của người khác.");
+        }
+        if (topic.getStatus() == TopicStatus.APPROVED || topic.getStatus() == TopicStatus.ASSIGNED) {
+            throw new BusinessException("Đề tài đã được duyệt hoặc đã phân công không thể chỉnh sửa.");
+        }
+
+        model.addAttribute("topicDTO", topic);
+        model.addAttribute("periods", periodService.getActivePeriodsForTeacher());
+        model.addAttribute("departments", departmentRepository.findAll());
+        model.addAttribute("teachers", teacherRepository.findAll());
+        return "topic/edit";
+    }
+
+    @PostMapping("/{id}/edit")
+    @PreAuthorize("hasRole('TEACHER')")
+    public String updateTopic(@PathVariable Long id,
+                              @Valid @ModelAttribute("topicDTO") TopicDTO topicDTO,
+                              BindingResult result,
+                              @AuthenticationPrincipal CustomUserDetails userDetails,
+                              Model model,
+                              RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            model.addAttribute("periods", periodService.getActivePeriodsForTeacher());
+            model.addAttribute("departments", departmentRepository.findAll());
+            model.addAttribute("teachers", teacherRepository.findAll());
+            return "topic/edit";
+        }
+        try {
+            topicService.updateTopic(id, topicDTO, userDetails.getTeacher().getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật đề tài thành công!");
+            return "redirect:/topics";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("periods", periodService.getActivePeriodsForTeacher());
+            model.addAttribute("departments", departmentRepository.findAll());
+            model.addAttribute("teachers", teacherRepository.findAll());
+            return "topic/edit";
+        }
+    }
+
+    @PostMapping("/{id}/delete")
+    @PreAuthorize("hasRole('TEACHER')")
+    public String deleteTopic(@PathVariable Long id,
+                              @AuthenticationPrincipal CustomUserDetails userDetails,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            topicService.deleteTopic(id, userDetails.getTeacher().getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Xóa đề tài thành công.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/topics";
     }
 
     @PostMapping("/{id}/approve")

@@ -9,6 +9,7 @@
 /home/hoangan/JobNgoai/java-do-an/src/main/java/com/hcmute/topicmanagement/controller/ScoreController.java
 /home/hoangan/JobNgoai/java-do-an/src/main/java/com/hcmute/topicmanagement/controller/StudentGroupController.java
 /home/hoangan/JobNgoai/java-do-an/src/main/java/com/hcmute/topicmanagement/controller/SubmissionController.java
+/home/hoangan/JobNgoai/java-do-an/src/main/java/com/hcmute/topicmanagement/controller/TeacherGroupRegistrationController.java
 /home/hoangan/JobNgoai/java-do-an/src/main/java/com/hcmute/topicmanagement/controller/TopicController.java
 /home/hoangan/JobNgoai/java-do-an/src/main/java/com/hcmute/topicmanagement/dto/NotificationDTO.java
 /home/hoangan/JobNgoai/java-do-an/src/main/java/com/hcmute/topicmanagement/dto/RegistrationPeriodDTO.java

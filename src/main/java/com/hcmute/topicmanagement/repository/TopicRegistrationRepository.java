@@ -14,6 +14,9 @@ public interface TopicRegistrationRepository extends JpaRepository<TopicRegistra
     Optional<TopicRegistration> findByTopicId(Long topicId);
     List<TopicRegistration> findByStatus(TopicRegistrationStatus status);
     List<TopicRegistration> findByGroupPeriodId(Long periodId);
+    List<TopicRegistration> findByTopicCreatedByTeacherId(Long teacherId);
+    List<TopicRegistration> findByTopicCreatedByTeacherIdAndGroupPeriodId(Long teacherId, Long periodId);
+    long countByTopicCreatedByTeacherIdAndStatus(Long teacherId, TopicRegistrationStatus status);
     boolean existsByGroupId(Long groupId);
     boolean existsByTopicId(Long topicId);
 }

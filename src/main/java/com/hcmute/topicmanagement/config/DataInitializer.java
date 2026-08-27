@@ -24,6 +24,7 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final TeacherRepository teacherRepository;
     private final StudentRepository studentRepository;
+    private final RegistrationPeriodRepository periodRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -70,6 +71,23 @@ public class DataInitializer implements CommandLineRunner {
         seedStudentIfAbsent("sv_lethih", "Lê Thị H", "sv.lethih@student.hcmute.edu.vn", "SV2003", "ĐH KTPM16A", "2022-2026", ktpm, studentRole);
         seedStudentIfAbsent("sv_phamvani", "Phạm Văn I", "sv.phamvani@student.hcmute.edu.vn", "SV2004", "ĐH HTTT16A", "2022-2026", httt, studentRole);
         seedStudentIfAbsent("sv_hoangvank", "Hoàng Văn K", "sv.hoangvank@student.hcmute.edu.vn", "SV2005", "ĐH HTTT16A", "2022-2026", httt, studentRole);
+
+        // 6. Seed Default Registration Period if none exists
+        if (periodRepository.count() == 0) {
+            RegistrationPeriod defaultPeriod = RegistrationPeriod.builder()
+                    .name("Đợt đăng ký khóa luận tốt nghiệp lần 1 (2026-2027)")
+                    .periodType(com.hcmute.topicmanagement.enums.PeriodType.KLTN)
+                    .teacherStartDate(java.time.LocalDateTime.now().minusDays(10))
+                    .teacherEndDate(java.time.LocalDateTime.now().plusDays(10))
+                    .studentStartDate(java.time.LocalDateTime.now().minusDays(5))
+                    .studentEndDate(java.time.LocalDateTime.now().plusDays(15))
+                    .reviewSubmissionDeadline(java.time.LocalDateTime.now().plusDays(25))
+                    .councilReportDate(java.time.LocalDateTime.now().plusDays(30))
+                    .status(com.hcmute.topicmanagement.enums.PeriodStatus.PHASE2_STUDENT_REG)
+                    .build();
+            periodRepository.save(defaultPeriod);
+            log.info("Created default active Registration Period for testing.");
+        }
 
         log.info("Data initial seeding completed successfully!");
     }

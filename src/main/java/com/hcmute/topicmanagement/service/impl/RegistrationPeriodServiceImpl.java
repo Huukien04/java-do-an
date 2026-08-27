@@ -91,7 +91,7 @@ public class RegistrationPeriodServiceImpl implements RegistrationPeriodService 
     @Transactional(readOnly = true)
     public List<RegistrationPeriodDTO> getActivePeriodsForStudent() {
         return periodRepository.findAll().stream()
-                .filter(p -> p.getStatus() == PeriodStatus.PHASE2_STUDENT_REG || p.getStatus() == PeriodStatus.PUBLISHED_TOPICS)
+                .filter(p -> p.getStatus() != PeriodStatus.COMPLETED)
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -100,7 +100,7 @@ public class RegistrationPeriodServiceImpl implements RegistrationPeriodService 
     @Transactional(readOnly = true)
     public List<RegistrationPeriodDTO> getActivePeriodsForTeacher() {
         return periodRepository.findAll().stream()
-                .filter(p -> p.getStatus() == PeriodStatus.PHASE1_TEACHER_REG)
+                .filter(p -> p.getStatus() != PeriodStatus.COMPLETED)
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
