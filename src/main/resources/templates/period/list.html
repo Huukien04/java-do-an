@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Quản lý Đợt đăng ký - Admin</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">QUẢN LÝ ĐỢT ĐĂNG KÝ</h3>
+            <p class="text-muted mb-0">Danh sách tất cả các đợt đăng ký môn học/NCKH/TLCN/KLTN trong Khoa</p>
+        </div>
+        <a href="/admin/periods/create" class="btn btn-primary shadow-sm rounded-pill px-3">
+            <i class="bi bi-plus-circle me-1"></i> Tạo Đợt đăng ký mới
+        </a>
+    </div>
+
+    <div class="card card-custom p-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Tên Đợt</th>
+                        <th>Loại Hình</th>
+                        <th>Thời gian GV Đăng ký</th>
+                        <th>Thời gian SV Đăng ký</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${periods.empty}">
+                        <td colspan="7" class="text-center py-4 text-muted">Chưa có đợt đăng ký nào được tạo.</td>
+                    </tr>
+                    <tr th:each="p, stat : ${periods}">
+                        <td th:text="${stat.count}">1</td>
+                        <td>
+                            <strong th:text="${p.name}">Đợt 1</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary" th:text="${p.periodType.displayName}">KLTN</span>
+                        </td>
+                        <td>
+                            <small class="d-block" th:text="${#temporals.format(p.teacherStartDate, 'dd/MM/yyyy HH:mm')}">Start</small>
+                            <small class="text-muted" th:text="${#temporals.format(p.teacherEndDate, 'dd/MM/yyyy HH:mm')}">End</small>
+                        </td>
+                        <td>
+                            <small class="d-block" th:text="${#temporals.format(p.studentStartDate, 'dd/MM/yyyy HH:mm')}">Start</small>
+                            <small class="text-muted" th:text="${#temporals.format(p.studentEndDate, 'dd/MM/yyyy HH:mm')}">End</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary" th:text="${p.status.displayName}">DRAFT</span>
+                        </td>
+                        <td class="text-end">
+                            <a th:href="@{/admin/periods/{id}/edit(id=${p.id})}" class="btn btn-sm btn-outline-secondary me-1">
+                                <i class="bi bi-pencil"></i> Sửa
+                            </a>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                    Đổi Trạng thái
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
+                                            <input type="hidden" name="status" value="PHASE1_TEACHER_REG">
+                                            <button type="submit" class="dropdown-item">Mở Phase 1 (GV đăng ký)</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
+                                            <input type="hidden" name="status" value="PUBLISHED_TOPICS">
+                                            <button type="submit" class="dropdown-item">Công bố Danh sách Đề tài</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
+                                            <input type="hidden" name="status" value="PHASE2_STUDENT_REG">
+                                            <button type="submit" class="dropdown-item">Mở Phase 2 (SV đăng ký)</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
+                                            <input type="hidden" name="status" value="DEFENSE_EVALUATION">
+                                            <button type="submit" class="dropdown-item">Bắt đầu Chấm Phản biện</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
+                                            <input type="hidden" name="status" value="COMPLETED">
+                                            <button type="submit" class="dropdown-item text-success">Hoàn thành Đợt</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

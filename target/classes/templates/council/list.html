@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Hội đồng Phản biện - Admin</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">QUẢN LÝ HỘI ĐỒNG PHẢN BIỆN</h3>
+            <p class="text-muted mb-0">Thành lập Hội đồng (3-5 GV), phân công Chủ tịch, Thư ký & gán Đề tài</p>
+        </div>
+        <a href="/admin/councils/create" class="btn btn-primary shadow-sm rounded-pill px-3">
+            <i class="bi bi-plus-circle me-1"></i> Thành lập Hội đồng Mới
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div th:if="${councils.empty}" class="col-12 text-center py-5 text-muted">
+            Chưa có Hội đồng phản biện nào được tạo.
+        </div>
+        <div class="col-md-6" th:each="c : ${councils}">
+            <div class="card card-custom p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold text-primary mb-0" th:text="${c.name}">Tên Hội đồng</h5>
+                    <span class="badge bg-secondary" th:text="${c.councilCode}">HD01</span>
+                </div>
+                <small class="text-muted d-block mb-3">
+                    <i class="bi bi-geo-alt text-danger me-1"></i>Địa điểm: <span th:text="${c.location != null ? c.location : 'Chưa xếp'}">H5.1</span> | 
+                    <i class="bi bi-calendar text-primary me-1"></i>Báo cáo: <span th:text="${c.defenseDate != null ? #temporals.format(c.defenseDate, 'dd/MM/yyyy HH:mm') : 'Chưa xếp'}">Time</span>
+                </small>
+
+                <div class="p-3 bg-light rounded-3 mb-3">
+                    <div class="mb-1"><strong><i class="bi bi-award-fill text-warning me-1"></i>Chủ tịch:</strong> <span th:text="${c.chairmanTeacherName}">Chủ tịch</span></div>
+                    <div class="mb-1"><strong><i class="bi bi-journal-check text-info me-1"></i>Thư ký:</strong> <span th:text="${c.secretaryTeacherName}">Thư ký</span></div>
+                    <div><strong><i class="bi bi-people text-secondary me-1"></i>Ủy viên (<span th:text="${c.members.size() - 2}">1</span>):</strong> 
+                        <span th:each="m : ${c.members}" th:if="${m.role == 'MEMBER'}" th:text="${m.fullName + ' '}" class="badge bg-white text-dark border me-1">MEMBER</span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                    <span class="small text-muted">Số Đề tài được gán: <strong th:text="${c.assignedTopics.size()}">0</strong></span>
+                    <a th:href="@{/admin/councils/{id}(id=${c.id})}" class="btn btn-sm btn-outline-primary">Xem Chi tiết</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

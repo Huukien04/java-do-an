@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Phê duyệt Đăng ký Nhóm SV - Admin</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1">PHÊ DUYỆT ĐĂNG KÝ NGUYỆN VỌNG CỦA NHÓM SV</h3>
+        <p class="text-muted mb-0">Duyệt hoặc từ chối đề tài do các nhóm Sinh viên đăng ký trong Phase 2</p>
+    </div>
+
+    <!-- Filter -->
+    <div class="card card-custom p-3 mb-4">
+        <form th:action="@{/student/group/admin/registrations}" method="get" class="row g-2 align-items-center">
+            <div class="col-md-8">
+                <select name="periodId" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- Tất cả các Đợt đăng ký --</option>
+                    <option th:each="p : ${periods}" th:value="${p.id}" th:text="${p.name}"></option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <div class="card card-custom p-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Mã Nhóm</th>
+                        <th>Nhóm trưởng</th>
+                        <th>Tên Đề tài Đăng ký</th>
+                        <th>Thời gian Đăng ký</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${registrations.empty}">
+                        <td colspan="7" class="text-center py-4 text-muted">Chưa có yêu cầu đăng ký nào.</td>
+                    </tr>
+                    <tr th:each="r, stat : ${registrations}">
+                        <td th:text="${stat.count}">1</td>
+                        <td>
+                            <span class="badge bg-primary fs-6" th:text="${r.group.groupCode}">G101</span>
+                        </td>
+                        <td>
+                            <strong th:text="${r.group.leader.user.fullName}">Leader Name</strong>
+                            <small class="text-muted d-block" th:text="${r.group.leader.studentCode}">SV001</small>
+                        </td>
+                        <td>
+                            <strong class="text-dark" th:text="${r.topic.title}">Tên Đề Tài</strong>
+                            <small class="text-muted d-block">Bộ môn: <span th:text="${r.topic.department.name}">KTPM</span></small>
+                        </td>
+                        <td>
+                            <small class="text-muted" th:text="${#temporals.format(r.registeredAt, 'dd/MM/yyyy HH:mm')}">Date</small>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${r.status.name() == 'APPROVED' ? 'bg-success' : (r.status.name() == 'PENDING' ? 'bg-warning text-dark' : 'bg-danger')}" th:text="${r.status.displayName}">PENDING</span>
+                        </td>
+                        <td class="text-end">
+                            <div th:if="${r.status.name() == 'PENDING'}" class="btn-group btn-group-sm">
+                                <form th:action="@{/student/group/admin/registrations/{id}/approve(id=${r.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-success me-1"><i class="bi bi-check-lg"></i> Phê duyệt</button>
+                                </form>
+                                <form th:action="@{/student/group/admin/registrations/{id}/reject(id=${r.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-danger"><i class="bi bi-x-lg"></i> Từ chối</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

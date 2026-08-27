@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Dashboard Quản trị - Trưởng Khoa</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">DASHBOARD QUẢN TRỊ TRƯỞNG KHOA</h3>
+            <p class="text-muted mb-0">Hệ thống Quản lý Đề tài Khoa Công nghệ Thông tin</p>
+        </div>
+        <a href="/admin/periods/create" class="btn btn-primary shadow-sm rounded-pill px-3">
+            <i class="bi bi-plus-circle me-1"></i> Tạo Đợt đăng ký mới
+        </a>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card card-custom card-stat p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium d-block mb-1">Số Đợt đăng ký</span>
+                        <h3 class="fw-bold mb-0 text-primary" th:text="${totalPeriods}">0</h3>
+                    </div>
+                    <div class="bg-primary-subtle text-primary p-3 rounded-circle">
+                        <i class="bi bi-calendar-range fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card card-custom card-stat p-3" style="border-left-color: #f59e0b;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium d-block mb-1">Đề tài Chờ Duyệt</span>
+                        <h3 class="fw-bold mb-0 text-warning" th:text="${pendingTopicsCount}">0</h3>
+                    </div>
+                    <div class="bg-warning-subtle text-warning p-3 rounded-circle">
+                        <i class="bi bi-journal-text fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card card-custom card-stat p-3" style="border-left-color: #10b981;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium d-block mb-1">Đăng ký Nhóm Chờ Duyệt</span>
+                        <h3 class="fw-bold mb-0 text-success" th:text="${pendingRegistrationsCount}">0</h3>
+                    </div>
+                    <div class="bg-success-subtle text-success p-3 rounded-circle">
+                        <i class="bi bi-people fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card card-custom card-stat p-3" style="border-left-color: #8b5cf6;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium d-block mb-1">Hội đồng Phản biện</span>
+                        <h3 class="fw-bold mb-0 text-purple" style="color: #8b5cf6;" th:text="${totalCouncilsCount}">0</h3>
+                    </div>
+                    <div class="bg-purple-subtle p-3 rounded-circle" style="background-color: #f3e8ff; color: #8b5cf6;">
+                        <i class="bi bi-award fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Action Links -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card card-custom p-4 h-100">
+                <h5 class="fw-bold mb-3"><i class="bi bi-lightning-charge text-primary me-2"></i>Thao tác Nhanh</h5>
+                <div class="d-grid gap-2">
+                    <a href="/admin/periods" class="btn btn-outline-primary text-start p-3 rounded-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="d-block">Quản lý Đợt đăng ký</strong>
+                                <small class="text-muted">Cấu hình thời gian Phase 1 (GV), Phase 2 (SV), hạn chót GVPB, ngày báo cáo hội đồng.</small>
+                            </div>
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </a>
+                    <a href="/topics" class="btn btn-outline-primary text-start p-3 rounded-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="d-block">Phê duyệt Đề tài Giảng viên</strong>
+                                <small class="text-muted">Duyệt hoặc từ chối đề tài do giảng viên tạo trong Phase 1.</small>
+                            </div>
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </a>
+                    <a href="/student/group/admin/registrations" class="btn btn-outline-primary text-start p-3 rounded-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="d-block">Duyệt Đăng ký Nhóm Sinh viên</strong>
+                                <small class="text-muted">Xem danh sách đăng ký đề tài của nhóm SV và duyệt chính thức.</small>
+                            </div>
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </a>
+                    <a href="/admin/councils" class="btn btn-outline-primary text-start p-3 rounded-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="d-block">Thành lập Hội đồng Phản biện</strong>
+                                <small class="text-muted">Tạo hội đồng 3-5 giảng viên (Chủ tịch, Thư ký, Ủy viên) & gán đề tài.</small>
+                            </div>
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card card-custom p-4 h-100">
+                <h5 class="fw-bold mb-3"><i class="bi bi-bell text-warning me-2"></i>Thông báo Mới nhất</h5>
+                <div th:if="${notifications.empty}" class="text-muted text-center py-4">Chưa có thông báo nào.</div>
+                <ul class="list-group list-group-flush mb-3" th:unless="${notifications.empty}">
+                    <li class="list-group-item px-0 py-3" th:each="n : ${notifications}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="badge bg-primary me-2" th:text="${n.type.displayName}">GENERAL</span>
+                                <strong th:text="${n.title}">Tiêu đề</strong>
+                                <p class="text-muted mb-0 small mt-1" th:text="${n.content}">Nội dung</p>
+                            </div>
+                            <small class="text-muted" th:text="${#temporals.format(n.createdAt, 'dd/MM/yyyy HH:mm')}">Time</small>
+                        </div>
+                    </li>
+                </ul>
+                <a href="/notifications/create" class="btn btn-light text-primary fw-medium border">
+                    <i class="bi bi-plus-lg me-1"></i> Tạo Thông báo mới
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Dashboard Giảng viên</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">DASHBOARD GIẢNG VIÊN</h3>
+            <p class="text-muted mb-0">Quản lý Đề tài Hướng dẫn & Chấm điểm Hội đồng</p>
+        </div>
+        <a href="/topics/create" class="btn btn-primary shadow-sm rounded-pill px-3">
+            <i class="bi bi-plus-circle me-1"></i> Đăng ký Đề tài mới
+        </a>
+    </div>
+
+    <!-- Active Periods -->
+    <div class="card card-custom p-4 mb-4">
+        <h5 class="fw-bold mb-3"><i class="bi bi-calendar-event text-primary me-2"></i>Đợt Đăng ký Đang Mở Cho GV</h5>
+        <div th:if="${activePeriods.empty}" class="alert alert-info mb-0 border-0">Hiện tại không có đợt nào ở Phase 1 cho Giảng viên đăng ký.</div>
+        <div class="row g-3" th:unless="${activePeriods.empty}">
+            <div class="col-md-6" th:each="p : ${activePeriods}">
+                <div class="p-3 border rounded-3 bg-light">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong class="text-primary" th:text="${p.name}">Tên đợt</strong>
+                        <span class="badge bg-primary" th:text="${p.periodType.displayName}">KLTN</span>
+                    </div>
+                    <small class="text-muted d-block mb-1">
+                        <i class="bi bi-clock me-1"></i>Thời gian GV đăng ký: 
+                        <span th:text="${#temporals.format(p.teacherStartDate, 'dd/MM/yyyy HH:mm')}">Start</span> - 
+                        <span th:text="${#temporals.format(p.teacherEndDate, 'dd/MM/yyyy HH:mm')}">End</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Topics & Council Assignments -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card card-custom p-4 h-100">
+                <h5 class="fw-bold mb-3"><i class="bi bi-journal-bookmark text-primary me-2"></i>Đề tài Của Tôi</h5>
+                <div th:if="${myTopics == null || myTopics.empty}" class="text-muted text-center py-4">Bạn chưa đăng ký đề tài nào.</div>
+                <div class="list-group list-group-flush" th:unless="${myTopics == null || myTopics.empty}">
+                    <a th:href="@{/topics/{id}(id=${t.id})}" class="list-group-item list-group-item-action py-3 px-0 border-bottom" th:each="t : ${myTopics}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong th:text="${t.title}">Tên đề tài</strong>
+                            <span class="badge bg-info text-dark" th:text="${t.status.displayName}">Status</span>
+                        </div>
+                        <small class="text-muted d-block">Bộ môn: <span th:text="${t.departmentName}">KTPM</span></small>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card card-custom p-4 h-100">
+                <h5 class="fw-bold mb-3"><i class="bi bi-award text-success me-2"></i>Hội đồng Phản biện Tham gia</h5>
+                <div th:if="${myCouncils == null || myCouncils.empty}" class="text-muted text-center py-4">Chưa có phân công hội đồng phản biện.</div>
+                <div class="list-group list-group-flush" th:unless="${myCouncils == null || myCouncils.empty}">
+                    <div class="list-group-item py-3 px-0 border-bottom" th:each="c : ${myCouncils}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong class="text-dark" th:text="${c.name}">Hội đồng</strong>
+                            <a th:href="@{/scoring/teacher}" class="btn btn-sm btn-outline-primary">Vào Chấm điểm</a>
+                        </div>
+                        <small class="text-muted d-block mb-1">
+                            <i class="bi bi-geo-alt me-1"></i>Địa điểm: <span th:text="${c.location}">Phòng H5.1</span> | 
+                            Ngày: <span th:text="${#temporals.format(c.defenseDate, 'dd/MM/yyyy HH:mm')}">Date</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

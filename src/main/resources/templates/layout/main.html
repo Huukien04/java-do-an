@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE - Hệ thống Quản lý Đề tài Khoa CNTT">Hệ thống Quản lý Đề tài Khoa CNTT</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #475569;
+            --bg-light: #f8fafc;
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+            --card-shadow-hover: 0 20px 35px -10px rgba(0, 0, 0, 0.12), 0 8px 12px -4px rgba(0, 0, 0, 0.05);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: #0f172a;
+            min-height: 100vh;
+            letter-spacing: -0.01em;
+        }
+
+        /* 👑 Theme 1: Trưởng Khoa (ROLE_ADMIN) - Slate & Royal Purple */
+        body.role-admin {
+            background-color: #f1f5f9;
+        }
+        body.role-admin .navbar-custom {
+            background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 100%);
+            box-shadow: 0 4px 25px rgba(55, 48, 163, 0.25);
+        }
+        body.role-admin .sidebar {
+            border-right: 1px solid #e2e8f0;
+            background: #ffffff;
+        }
+        body.role-admin .sidebar .nav-link:hover, 
+        body.role-admin .sidebar .nav-link.active {
+            color: #3730a3;
+            background: linear-gradient(90deg, #e0e7ff 0%, #eef2ff 100%);
+            font-weight: 600;
+            border-left: 4px solid #4338ca;
+        }
+
+        /* 👨‍🏫 Theme 2: Giảng Viên (ROLE_TEACHER) - Soft Mint & Emerald */
+        body.role-teacher {
+            background-color: #f0fdf4;
+        }
+        body.role-teacher .navbar-custom {
+            background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+            box-shadow: 0 4px 25px rgba(5, 150, 105, 0.25);
+        }
+        body.role-teacher .sidebar {
+            border-right: 1px solid #dcfce7;
+            background: #ffffff;
+        }
+        body.role-teacher .sidebar .nav-link:hover, 
+        body.role-teacher .sidebar .nav-link.active {
+            color: #047857;
+            background: linear-gradient(90deg, #dcfce7 0%, #f0fdf4 100%);
+            font-weight: 600;
+            border-left: 4px solid #059669;
+        }
+
+        /* 🎓 Theme 3: Sinh Viên (ROLE_STUDENT) - Soft Ocean & Cyan */
+        body.role-student {
+            background-color: #f0f9ff;
+        }
+        body.role-student .navbar-custom {
+            background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%);
+            box-shadow: 0 4px 25px rgba(2, 132, 199, 0.25);
+        }
+        body.role-student .sidebar {
+            border-right: 1px solid #e0f2fe;
+            background: #ffffff;
+        }
+        body.role-student .sidebar .nav-link:hover, 
+        body.role-student .sidebar .nav-link.active {
+            color: #0369a1;
+            background: linear-gradient(90deg, #e0f2fe 0%, #f0f9ff 100%);
+            font-weight: 600;
+            border-left: 4px solid #0284c7;
+        }
+
+        /* Layout & UI Components */
+        .navbar-custom {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .sidebar {
+            min-height: calc(100vh - 65px);
+            background-color: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
+        }
+        .sidebar .nav-link {
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.8rem 1.25rem;
+            border-radius: 0.6rem;
+            margin-bottom: 0.35rem;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            border-left: 4px solid transparent;
+        }
+        .sidebar .nav-link i {
+            margin-right: 0.75rem;
+            font-size: 1.15rem;
+            transition: transform 0.2s ease;
+        }
+        .sidebar .nav-link:hover i {
+            transform: scale(1.15);
+        }
+
+        /* Modern Card Styling */
+        .card-custom {
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 1.25rem;
+            box-shadow: var(--card-shadow);
+            background: #ffffff;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .card-custom:hover {
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-3px);
+        }
+        .card-stat {
+            border-left: 5px solid var(--primary-color);
+        }
+
+        /* Buttons & Badges */
+        .btn-pill {
+            border-radius: 50rem;
+            padding: 0.5rem 1.25rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        .badge-status {
+            font-weight: 600;
+            padding: 0.4em 0.75em;
+            border-radius: 0.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        /* Smooth scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body th:classappend="${#authentication != null ? (#strings.contains(#authentication.authorities, 'ROLE_ADMIN') ? 'role-admin' : (#strings.contains(#authentication.authorities, 'ROLE_TEACHER') ? 'role-teacher' : (#strings.contains(#authentication.authorities, 'ROLE_STUDENT') ? 'role-student' : ''))) : ''}">
+
+    <!-- Navbar Fragment -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Fragment -->
+            <div class="col-md-3 col-lg-2 px-0 sidebar d-none d-md-block">
+                <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            </div>
+
+            <!-- Main Content Area -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <!-- Alerts Fragment -->
+                <div th:replace="~{fragments/alert :: alert}"></div>
+
+                <!-- Dynamic Page Content -->
+                <div layout:fragment="content"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <th:block layout:fragment="scripts"></th:block>
+</body>
+</html>
+
+</html>
+

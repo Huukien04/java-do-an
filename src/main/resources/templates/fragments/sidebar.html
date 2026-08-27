@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<div th:fragment="sidebar" class="py-3 px-3">
+    <div class="nav flex-column nav-pills">
+        <a class="nav-link text-dark" href="/dashboard">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+
+        <!-- Admin / Trưởng Khoa -->
+        <div sec:authorize="hasRole('ADMIN')">
+            <div class="text-uppercase fw-bold px-3 py-1 rounded mt-3 mb-2" style="font-size: 0.75rem; background-color: #e0e7ff; color: #3730a3;">
+                <i class="bi bi-shield-lock me-1"></i> QUẢN TRỊ KHOA
+            </div>
+            <a class="nav-link text-dark" href="/admin/periods">
+                <i class="bi bi-calendar-event"></i> Quản lý Đợt đăng ký
+            </a>
+            <a class="nav-link text-dark" href="/topics">
+                <i class="bi bi-journal-bookmark"></i> Phê duyệt Đề tài (GV)
+            </a>
+            <a class="nav-link text-dark" href="/student/group/admin/registrations">
+                <i class="bi bi-person-check"></i> Duyệt Đăng ký Nhóm SV
+            </a>
+            <a class="nav-link text-dark" href="/admin/councils">
+                <i class="bi bi-people-fill"></i> Hội đồng Phản biện
+            </a>
+            <a class="nav-link text-dark" href="/notifications/create">
+                <i class="bi bi-megaphone"></i> Đăng Thông báo
+            </a>
+        </div>
+
+        <!-- Giảng viên -->
+        <div sec:authorize="hasRole('TEACHER')">
+            <div class="text-uppercase fw-bold px-3 py-1 rounded mt-3 mb-2" style="font-size: 0.75rem; background-color: #dcfce7; color: #047857;">
+                <i class="bi bi-person-badge me-1"></i> DÀNH CHO GIẢNG VIÊN
+            </div>
+            <a class="nav-link text-dark" href="/topics/create">
+                <i class="bi bi-plus-circle"></i> Đăng ký Đề tài mới
+            </a>
+            <a class="nav-link text-dark" href="/topics">
+                <i class="bi bi-list-task"></i> Danh sách Đề tài
+            </a>
+            <a class="nav-link text-dark" href="/scoring/teacher">
+                <i class="bi bi-pencil-square"></i> Chấm điểm Hội đồng
+            </a>
+        </div>
+
+        <!-- Sinh viên -->
+        <div sec:authorize="hasRole('STUDENT')">
+            <div class="text-uppercase fw-bold px-3 py-1 rounded mt-3 mb-2" style="font-size: 0.75rem; background-color: #e0f2fe; color: #0369a1;">
+                <i class="bi bi-mortarboard me-1"></i> DÀNH CHO SINH VIÊN
+            </div>
+            <a class="nav-link text-dark" href="/student/group">
+                <i class="bi bi-people"></i> Nhóm của tôi
+            </a>
+            <a class="nav-link text-dark" href="/student/group/register">
+                <i class="bi bi-journal-check"></i> Đăng ký Đề tài
+            </a>
+            <a class="nav-link text-dark" href="/topics">
+                <i class="bi bi-search"></i> Tra cứu Danh sách Đề tài
+            </a>
+            <a class="nav-link text-dark" href="/scoring/results">
+                <i class="bi bi-award"></i> Tra cứu Điểm & Kết quả
+            </a>
+        </div>
+
+
+        <div class="text-uppercase text-muted fw-bold px-3 mt-3 mb-2" style="font-size: 0.75rem;">CHUNG</div>
+        <a class="nav-link text-dark" href="/scoring/results">
+            <i class="bi bi-award"></i> Bảng điểm & Kết quả
+        </a>
+        <a class="nav-link text-dark" href="/notifications">
+            <i class="bi bi-bell"></i> Thông báo Khoa
+        </a>
+
+    </div>
+</div>
+</body>
+</html>
+

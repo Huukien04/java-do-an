@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Chấm điểm Đề tài</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="mb-4">
+        <a href="/scoring/teacher" class="btn btn-sm btn-outline-secondary mb-2"><i class="bi bi-arrow-left"></i> Quay lại Danh sách</a>
+        <h3 class="fw-bold mb-1" th:text="${topic.title}">Tên Đề tài</h3>
+        <p class="text-muted mb-0">Bộ môn: <span th:text="${topic.departmentName}">KTPM</span> | GVHD: <span th:text="${topic.primaryAdvisorName}">GV1</span></p>
+    </div>
+
+    <!-- Rule R-SCORE-01 Constraint Alert -->
+    <div th:if="${isAdvisor}" class="alert alert-danger shadow-sm border-0 p-4 mb-4">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-shield-slash-fill display-5 me-3 text-danger"></i>
+            <div>
+                <h5 class="fw-bold mb-1">R-SCORE-01: VI PHẠM NGUYÊN TẮC BẢO VỆ HỘI ĐỒNG</h5>
+                <p class="mb-0">Bạn là <strong>Giảng viên Hướng dẫn</strong> của đề tài này! Quy định nghiệp vụ Khoa CNTT tuyệt đối <strong>KHÔNG CHO PHÉP</strong> GVHD tự chấm điểm phản biện cho đề tài do mình hướng dẫn.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Score Input Form (If not advisor) -->
+        <div class="col-md-6" th:unless="${isAdvisor}">
+            <div class="card card-custom p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-pencil-fill text-primary me-2"></i>Nhập Điểm Chấm Cá Nhân</h5>
+                <form th:action="@{/scoring/submit}" method="post">
+                    <input type="hidden" name="topicId" th:value="${topic.id}">
+                    
+                    <div class="mb-3">
+                        <label for="scoreValue" class="form-label fw-medium">Điểm số (Thang điểm 10.0) <span class="text-danger">*</span></label>
+                        <input type="number" step="0.25" min="0.0" max="10.0" class="form-control form-control-lg fw-bold text-primary" id="scoreValue" name="scoreValue" th:value="${scoreDTO.scoreValue}" placeholder="Vd: 8.5" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="comments" class="form-label fw-medium">Nhận xét / Đánh giá Đề tài</label>
+                        <textarea class="form-control" id="comments" name="comments" rows="4" placeholder="Nhận xét về nội dung, phương pháp, kết quả đạt được..." th:text="${scoreDTO.comments}"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
+                        <i class="bi bi-send-check me-2"></i> Gửi Điểm Đánh Giá
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Submitted Scores List & Chairman Summary -->
+        <div class="col-md-6" th:classappend="${isAdvisor ? 'col-md-12' : ''}">
+            <div class="card card-custom p-4 mb-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-list-stars text-warning me-2"></i>Bảng Tổng hợp Điểm Thành viên Hội đồng</h5>
+                <div th:if="${existingScores.empty}" class="text-muted py-3">Chưa có thành viên nào nhập điểm.</div>
+                
+                <table class="table table-bordered align-middle mb-0" th:unless="${existingScores.empty}">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Giảng viên Chấm</th>
+                            <th>Điểm số</th>
+                            <th>Thời gian</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="s, stat : ${existingScores}">
+                            <td th:text="${stat.count}">1</td>
+                            <td th:text="${s.teacherName}">GV A</td>
+                            <td><strong class="text-primary fs-5" th:text="${s.scoreValue}">8.5</strong>/10</td>
+                            <td class="small text-muted" th:text="${#temporals.format(s.scoredAt, 'dd/MM HH:mm')}">Date</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Chairman Confirmation Section -->
+            <div sec:authorize="hasAnyRole('TEACHER', 'ADMIN')" class="card card-custom p-4 bg-light border">
+                <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-award me-2"></i>Xác nhận Kết quả Cuối cùng (Chủ tịch Hội đồng)</h5>
+                <form th:action="@{/scoring/chairman/confirm}" method="post">
+                    <input type="hidden" name="topicId" th:value="${topic.id}">
+                    <div class="mb-3">
+                        <label for="chairmanComments" class="form-label fw-medium">Nhận xét Tổng hợp của Chủ tịch Hội đồng</label>
+                        <textarea class="form-control" id="chairmanComments" name="chairmanComments" rows="3" placeholder="Nhận xét tổng quan về buổi bảo vệ của sinh viên..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-calculator me-1"></i> Tính Điểm Trung Bình & Xác nhận Kết quả
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Danh sách Đề tài</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">DANH SÁCH ĐỀ TÀI</h3>
+            <p class="text-muted mb-0">Tra cứu & Quản lý các Đề tài Môn học / NCKH / TLCN / KLTN</p>
+        </div>
+        <a sec:authorize="hasRole('TEACHER')" href="/topics/create" class="btn btn-primary shadow-sm rounded-pill px-3">
+            <i class="bi bi-plus-circle me-1"></i> Đăng ký Đề tài Mới
+        </a>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card card-custom p-3 mb-4">
+        <form th:action="@{/topics}" method="get" class="row g-2 align-items-center">
+            <div class="col-md-8">
+                <select name="periodId" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- Tất cả các Đợt đăng ký --</option>
+                    <option th:each="p : ${periods}" th:value="${p.id}" th:text="${p.name}" th:selected="${p.id == selectedPeriodId}"></option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-outline-primary w-100"><i class="bi bi-funnel me-1"></i> Lọc Đề tài</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Topics Grid -->
+    <div class="row g-4">
+        <div th:if="${topics.empty}" class="col-12 text-center py-5 text-muted">
+            Không tìm thấy đề tài nào phù hợp.
+        </div>
+        <div class="col-md-6 col-lg-4" th:each="t : ${topics}">
+            <div class="card card-custom h-100 p-4 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-primary-subtle text-primary fw-bold" th:text="${t.departmentName}">CNTT</span>
+                        <span class="badge" th:classappend="${t.status.name() == 'APPROVED' ? 'bg-success' : (t.status.name() == 'PENDING_APPROVAL' ? 'bg-warning text-dark' : 'bg-secondary')}" th:text="${t.status.displayName}">APPROVED</span>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2" th:text="${t.title}">Tên đề tài</h5>
+                    <p class="text-muted small mb-3" th:text="${#strings.abbreviate(t.description, 120)}">Mô tả ngắn đề tài</p>
+                    
+                    <div class="bg-light p-2 rounded-3 small mb-3">
+                        <div class="mb-1"><i class="bi bi-person-badge text-primary me-1"></i><strong>GVHD 1:</strong> <span th:text="${t.primaryAdvisorName}">GV 1</span></div>
+                        <div th:if="${t.secondaryAdvisorName}"><i class="bi bi-person-badge-fill text-secondary me-1"></i><strong>GVHD 2:</strong> <span th:text="${t.secondaryAdvisorName}">GV 2</span></div>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                    <a th:href="@{/topics/{id}(id=${t.id})}" class="btn btn-sm btn-outline-primary">Xem Chi tiết</a>
+                    
+                    <!-- Admin Approval Controls -->
+                    <div sec:authorize="hasRole('ADMIN')" th:if="${t.status.name() == 'PENDING_APPROVAL'}" class="btn-group btn-group-sm">
+                        <form th:action="@{/topics/{id}/approve(id=${t.id})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-success me-1"><i class="bi bi-check-lg"></i> Duyệt</button>
+                        </form>
+                        <form th:action="@{/topics/{id}/reject(id=${t.id})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger"><i class="bi bi-x-lg"></i> Từ chối</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

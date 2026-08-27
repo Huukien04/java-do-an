@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Chấm điểm Hội đồng - Giảng viên</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1">CHẤM ĐIỂM HỘI ĐỒNG PHẢN BIỆN</h3>
+        <p class="text-muted mb-0">Danh sách các Đề tài thuộc Hội đồng phản biện mà bạn tham gia</p>
+    </div>
+
+    <div class="row g-4">
+        <div th:if="${councils.empty}" class="col-12 text-center py-5 text-muted">
+            Bạn chưa được phân công vào Hội đồng phản biện nào.
+        </div>
+        <div class="col-12" th:each="c : ${councils}">
+            <div class="card card-custom p-4 mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h4 class="fw-bold text-primary mb-1" th:text="${c.name}">Tên Hội đồng</h4>
+                        <small class="text-muted">
+                            <i class="bi bi-geo-alt me-1"></i>Địa điểm: <span th:text="${c.location}">H5.1</span> | 
+                            <i class="bi bi-clock me-1"></i>Thời gian: <span th:text="${#temporals.format(c.defenseDate, 'dd/MM/yyyy HH:mm')}">Date</span>
+                        </small>
+                    </div>
+                    <span class="badge bg-secondary fs-6" th:text="${c.councilCode}">HD01</span>
+                </div>
+
+                <h6 class="fw-bold text-dark mt-3 mb-2">Đề tài Phân công Chấm điểm:</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Tên Đề tài</th>
+                                <th>GV Hướng dẫn</th>
+                                <th class="text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${c.assignedTopics.empty}">
+                                <td colspan="4" class="text-center py-3 text-muted">Chưa có đề tài gán cho Hội đồng này.</td>
+                            </tr>
+                            <tr th:each="t, stat : ${c.assignedTopics}">
+                                <td th:text="${stat.count}">1</td>
+                                <td>
+                                    <strong class="text-dark" th:text="${t.title}">Tên Đề tài</strong>
+                                </td>
+                                <td>
+                                    <span th:text="${t.primaryAdvisorName}">GVHD 1</span>
+                                    <small th:if="${t.secondaryAdvisorName}" th:text="${' & ' + t.secondaryAdvisorName}" class="text-muted"></small>
+                                </td>
+                                <td class="text-center">
+                                    <a th:href="@{/scoring/topic/{id}(id=${t.id})}" class="btn btn-primary btn-sm px-3">
+                                        <i class="bi bi-pencil-square me-1"></i> Nhập Điểm Chấm
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
