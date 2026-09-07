@@ -1,241 +1,705 @@
 -- ============================================================
--- SCRIPT TẠO CẤU TRÚC CƠ SỞ DỮ LIỆU MYSQL / MARIADB
--- HỆ THỐNG QUẢN LÝ ĐỀ TÀI (TOPIC MANAGEMENT SYSTEM)
+-- 02_seed_data.sql
+-- MYSQL / MARIADB
+-- TOPIC MANAGEMENT SYSTEM
+--
+-- Tài khoản:
+--   admin / admin123
+--   gv_nguyenvana / 123456
+--   gv_tranvanb / 123456
+--   gv_lethic / 123456
+--   gv_phamvand / 123456
+--   gv_hoangvane / 123456
+--   sv_nguyenvanf / 123456
+--   sv_tranvang / 123456
+--   sv_lethih / 123456
+--   sv_phamvani / 123456
+--   sv_hoangvank / 123456
 -- ============================================================
 
-SET FOREIGN_KEY_CHECKS = 0;
 
-DROP TABLE IF EXISTS notifications;
-DROP TABLE IF EXISTS final_results;
-DROP TABLE IF EXISTS scores;
-DROP TABLE IF EXISTS submissions;
-DROP TABLE IF EXISTS council_topics;
-DROP TABLE IF EXISTS council_members;
-DROP TABLE IF EXISTS review_councils;
-DROP TABLE IF EXISTS topic_registrations;
-DROP TABLE IF EXISTS topic_advisors;
-DROP TABLE IF EXISTS topics;
-DROP TABLE IF EXISTS group_members;
-DROP TABLE IF EXISTS student_groups;
-DROP TABLE IF EXISTS registration_periods;
-DROP TABLE IF EXISTS teachers;
-DROP TABLE IF EXISTS students;
-DROP TABLE IF EXISTS departments;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS roles;
+START TRANSACTION;
 
-SET FOREIGN_KEY_CHECKS = 1;
 
--- 1. Roles
-CREATE TABLE roles (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(30) NOT NULL UNIQUE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- ============================================================
+-- 1. ROLES
+-- ============================================================
 
--- 2. Users
-CREATE TABLE users (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    full_name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    phone VARCHAR(20) DEFAULT NULL,
-    enabled BOOLEAN NOT NULL DEFAULT TRUE,
-    role_id BIGINT NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO roles (id, name)
+VALUES
+    (1, 'ROLE_ADMIN'),
+    (2, 'ROLE_HEAD_OF_DEPARTMENT'),
+    (3, 'ROLE_TEACHER'),
+    (4, 'ROLE_STUDENT')
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name);
 
--- 3. Departments
-CREATE TABLE departments (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    code VARCHAR(20) NOT NULL UNIQUE,
-    name VARCHAR(100) NOT NULL,
-    description TEXT DEFAULT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 4. Students
-CREATE TABLE students (
-    id BIGINT PRIMARY KEY,
-    student_code VARCHAR(20) NOT NULL UNIQUE,
-    class_name VARCHAR(50) NOT NULL,
-    academic_year VARCHAR(20) DEFAULT NULL,
-    department_id BIGINT NOT NULL,
-    CONSTRAINT fk_students_user FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_students_department FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- ============================================================
+-- 2. DEPARTMENTS
+-- ============================================================
 
--- 5. Teachers
-CREATE TABLE teachers (
-    id BIGINT PRIMARY KEY,
-    teacher_code VARCHAR(20) NOT NULL UNIQUE,
-    academic_rank VARCHAR(50) DEFAULT NULL,
-    degree VARCHAR(50) DEFAULT NULL,
-    department_id BIGINT NOT NULL,
-    CONSTRAINT fk_teachers_user FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_teachers_department FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO departments
+    (id, code, name, description, created_at)
+VALUES
+    (1, 'KTPM',
+     'Kỹ thuật Phần mềm',
+     'Bộ môn Kỹ thuật Phần mềm',
+     NOW()),
 
--- 6. Registration Periods
-CREATE TABLE registration_periods (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(150) NOT NULL,
-    period_type VARCHAR(20) NOT NULL,
-    teacher_start_date DATETIME NOT NULL,
-    teacher_end_date DATETIME NOT NULL,
-    student_start_date DATETIME NOT NULL,
-    student_end_date DATETIME NOT NULL,
-    review_submission_deadline DATETIME DEFAULT NULL,
-    council_report_date DATETIME DEFAULT NULL,
-    status VARCHAR(30) NOT NULL DEFAULT 'DRAFT',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    (2, 'HTTT',
+     'Hệ thống Thông tin',
+     'Bộ môn Hệ thống Thông tin',
+     NOW()),
 
--- 7. Student Groups
-CREATE TABLE student_groups (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    group_code VARCHAR(30) NOT NULL,
-    period_id BIGINT NOT NULL,
-    leader_student_id BIGINT NOT NULL,
-    status VARCHAR(30) NOT NULL DEFAULT 'FORMING',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_student_groups_period FOREIGN KEY (period_id) REFERENCES registration_periods(id) ON DELETE RESTRICT,
-    CONSTRAINT fk_student_groups_leader FOREIGN KEY (leader_student_id) REFERENCES students(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    (3, 'KHMT',
+     'Khoa học Máy tính',
+     'Bộ môn Khoa học Máy tính',
+     NOW()),
 
--- 8. Group Members
-CREATE TABLE group_members (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    group_id BIGINT NOT NULL,
-    student_id BIGINT NOT NULL,
-    joined_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_group_member UNIQUE (group_id, student_id),
-    CONSTRAINT fk_group_members_group FOREIGN KEY (group_id) REFERENCES student_groups(id) ON DELETE CASCADE,
-    CONSTRAINT fk_group_members_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    (4, 'MMT',
+     'Mạng máy tính & Truyền thông',
+     'Bộ môn Mạng máy tính',
+     NOW()),
 
--- 9. Topics
-CREATE TABLE topics (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
-    requirements TEXT DEFAULT NULL,
-    department_id BIGINT NOT NULL,
-    period_id BIGINT NOT NULL,
-    status VARCHAR(30) NOT NULL DEFAULT 'PENDING_APPROVAL',
-    created_by_teacher_id BIGINT NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_topics_department FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE RESTRICT,
-    CONSTRAINT fk_topics_period FOREIGN KEY (period_id) REFERENCES registration_periods(id) ON DELETE RESTRICT,
-    CONSTRAINT fk_topics_teacher FOREIGN KEY (created_by_teacher_id) REFERENCES teachers(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    (5, 'CNTT',
+     'Công nghệ Thông tin',
+     'Bộ môn Công nghệ Thông tin',
+     NOW())
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    description = VALUES(description);
 
--- 10. Topic Advisors
-CREATE TABLE topic_advisors (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    topic_id BIGINT NOT NULL,
-    teacher_id BIGINT NOT NULL,
-    advisor_role VARCHAR(20) NOT NULL DEFAULT 'PRIMARY',
-    CONSTRAINT uq_topic_advisor UNIQUE (topic_id, teacher_id),
-    CONSTRAINT fk_topic_advisors_topic FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE,
-    CONSTRAINT fk_topic_advisors_teacher FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 11. Topic Registrations
-CREATE TABLE topic_registrations (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    group_id BIGINT NOT NULL UNIQUE,
-    topic_id BIGINT NOT NULL UNIQUE,
-    status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
-    rejection_reason TEXT DEFAULT NULL,
-    registered_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_topic_registrations_group FOREIGN KEY (group_id) REFERENCES student_groups(id) ON DELETE CASCADE,
-    CONSTRAINT fk_topic_registrations_topic FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- ============================================================
+-- 3. USERS
+-- ============================================================
+--
+-- BCrypt:
+-- admin123
+-- $2a$10$GRLdNijSQMUvl/au9ofL.e34LfZueVzhBgeX0GsPId3r5FB3B2Fj6
+--
+-- 123456
+-- $2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a
+-- ============================================================
 
--- 12. Review Councils
-CREATE TABLE review_councils (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    council_code VARCHAR(30) NOT NULL UNIQUE,
-    name VARCHAR(150) NOT NULL,
-    period_id BIGINT NOT NULL,
-    defense_date DATETIME DEFAULT NULL,
-    location VARCHAR(150) DEFAULT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_review_councils_period FOREIGN KEY (period_id) REFERENCES registration_periods(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO users
+    (id, username, password, full_name, email, phone, enabled, role_id, created_at)
+VALUES
 
--- 13. Council Members
-CREATE TABLE council_members (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    council_id BIGINT NOT NULL,
-    teacher_id BIGINT NOT NULL,
-    role VARCHAR(20) NOT NULL DEFAULT 'MEMBER',
-    CONSTRAINT uq_council_member UNIQUE (council_id, teacher_id),
-    CONSTRAINT fk_council_members_council FOREIGN KEY (council_id) REFERENCES review_councils(id) ON DELETE CASCADE,
-    CONSTRAINT fk_council_members_teacher FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    (1,
+     'admin',
+     '$2a$10$GRLdNijSQMUvl/au9ofL.e34LfZueVzhBgeX0GsPId3r5FB3B2Fj6',
+     'GS.TS. Trưởng Khoa CNTT',
+     'truongkhoa@hcmute.edu.vn',
+     '0901234567',
+     TRUE,
+     1,
+     NOW()),
 
--- 14. Council Topics
-CREATE TABLE council_topics (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    council_id BIGINT NOT NULL,
-    topic_id BIGINT NOT NULL UNIQUE,
-    CONSTRAINT fk_council_topics_council FOREIGN KEY (council_id) REFERENCES review_councils(id) ON DELETE CASCADE,
-    CONSTRAINT fk_council_topics_topic FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    (2,
+     'gv_nguyenvana',
+     '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
+     'TS. Nguyễn Văn A',
+     'gv.nguyenvana@hcmute.edu.vn',
+     '0912345678',
+     TRUE,
+     3,
+     NOW()),
 
--- 15. Submissions
-CREATE TABLE submissions (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    group_id BIGINT NOT NULL,
-    file_name VARCHAR(255) NOT NULL,
-    file_path VARCHAR(500) NOT NULL,
-    file_size BIGINT NOT NULL,
-    version_number INT NOT NULL DEFAULT 1,
-    uploaded_by_student_id BIGINT NOT NULL,
-    notes TEXT DEFAULT NULL,
-    uploaded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_submissions_group FOREIGN KEY (group_id) REFERENCES student_groups(id) ON DELETE CASCADE,
-    CONSTRAINT fk_submissions_student FOREIGN KEY (uploaded_by_student_id) REFERENCES students(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    (3,
+     'gv_tranvanb',
+     '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
+     'ThS. Trần Văn B',
+     'gv.tranvanb@hcmute.edu.vn',
+     '0912345679',
+     TRUE,
+     3,
+     NOW()),
 
--- 16. Scores
-CREATE TABLE scores (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    topic_id BIGINT NOT NULL,
-    teacher_id BIGINT NOT NULL,
-    score_value DECIMAL(4,2) NOT NULL,
-    comments TEXT DEFAULT NULL,
-    scored_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_score UNIQUE (topic_id, teacher_id),
-    CONSTRAINT fk_scores_topic FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE,
-    CONSTRAINT fk_scores_teacher FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    (4,
+     'gv_lethic',
+     '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
+     'PGS.TS. Lê Thị C',
+     'gv.lethic@hcmute.edu.vn',
+     '0912345680',
+     TRUE,
+     3,
+     NOW()),
 
--- 17. Final Results
-CREATE TABLE final_results (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    topic_id BIGINT NOT NULL UNIQUE,
-    final_score DECIMAL(4,2) DEFAULT NULL,
-    evaluation_status VARCHAR(20) DEFAULT NULL,
-    chairman_comments TEXT DEFAULT NULL,
-    is_published BOOLEAN NOT NULL DEFAULT FALSE,
-    published_at DATETIME DEFAULT NULL,
-    CONSTRAINT fk_final_results_topic FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    (5,
+     'gv_phamvand',
+     '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
+     'TS. Phạm Văn D',
+     'gv.phamvand@hcmute.edu.vn',
+     '0912345681',
+     TRUE,
+     3,
+     NOW()),
 
--- 18. Notifications
-CREATE TABLE notifications (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
-    content TEXT NOT NULL,
-    type VARCHAR(30) NOT NULL,
-    target_role VARCHAR(30) DEFAULT NULL,
-    period_id BIGINT DEFAULT NULL,
-    created_by_user_id BIGINT NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_notifications_period FOREIGN KEY (period_id) REFERENCES registration_periods(id) ON DELETE SET NULL,
-    CONSTRAINT fk_notifications_user FOREIGN KEY (created_by_user_id) REFERENCES users(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    (6,
+     'gv_hoangvane',
+     '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
+     'ThS. Hoàng Văn E',
+     'gv.hoangvane@hcmute.edu.vn',
+     '0912345682',
+     TRUE,
+     3,
+     NOW()),
+
+    (7,
+     'sv_nguyenvanf',
+     '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
+     'Nguyễn Văn F',
+     'sv.nguyenvanf@student.hcmute.edu.vn',
+     '0987654321',
+     TRUE,
+     4,
+     NOW()),
+
+    (8,
+     'sv_tranvang',
+     '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
+     'Trần Văn G',
+     'sv.tranvang@student.hcmute.edu.vn',
+     '0987654322',
+     TRUE,
+     4,
+     NOW()),
+
+    (9,
+     'sv_lethih',
+     '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
+     'Lê Thị H',
+     'sv.lethih@student.hcmute.edu.vn',
+     '0987654323',
+     TRUE,
+     4,
+     NOW()),
+
+    (10,
+     'sv_phamvani',
+     '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
+     'Phạm Văn I',
+     'sv.phamvani@student.hcmute.edu.vn',
+     '0987654324',
+     TRUE,
+     4,
+     NOW()),
+
+    (11,
+     'sv_hoangvank',
+     '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
+     'Hoàng Văn K',
+     'sv.hoangvank@student.hcmute.edu.vn',
+     '0987654325',
+     TRUE,
+     4,
+     NOW())
+
+ON DUPLICATE KEY UPDATE
+    password = VALUES(password),
+    full_name = VALUES(full_name),
+    email = VALUES(email),
+    phone = VALUES(phone),
+    enabled = VALUES(enabled),
+    role_id = VALUES(role_id);
+
+
+-- ============================================================
+-- 4. TEACHERS
+-- ============================================================
+
+INSERT INTO teachers
+    (id, teacher_code, academic_rank, degree, department_id)
+VALUES
+    (2, 'GV001', 'TS',     'Tiến sĩ',                 1),
+    (3, 'GV002', 'ThS',    'Thạc sĩ',                 2),
+    (4, 'GV003', 'PGS.TS', 'Phó Giáo sư Tiến sĩ',     3),
+    (5, 'GV004', 'TS',     'Tiến sĩ',                 4),
+    (6, 'GV005', 'ThS',    'Thạc sĩ',                 5)
+
+ON DUPLICATE KEY UPDATE
+    teacher_code = VALUES(teacher_code),
+    academic_rank = VALUES(academic_rank),
+    degree = VALUES(degree),
+    department_id = VALUES(department_id);
+
+
+-- ============================================================
+-- 5. STUDENTS
+-- ============================================================
+
+INSERT INTO students
+    (id, student_code, class_name, academic_year, department_id)
+VALUES
+    (7,  'SV2001', 'ĐH KTPM16A', '2022-2026', 1),
+    (8,  'SV2002', 'ĐH KTPM16A', '2022-2026', 1),
+    (9,  'SV2003', 'ĐH KTPM16A', '2022-2026', 1),
+    (10, 'SV2004', 'ĐH HTTT16A', '2022-2026', 2),
+    (11, 'SV2005', 'ĐH HTTT16A', '2022-2026', 2)
+
+ON DUPLICATE KEY UPDATE
+    student_code = VALUES(student_code),
+    class_name = VALUES(class_name),
+    academic_year = VALUES(academic_year),
+    department_id = VALUES(department_id);
+
+
+-- ============================================================
+-- 6. REGISTRATION PERIOD
+-- ============================================================
+
+INSERT INTO registration_periods
+(
+    id,
+    name,
+    period_type,
+    teacher_start_date,
+    teacher_end_date,
+    student_start_date,
+    student_end_date,
+    review_submission_deadline,
+    council_report_date,
+    status,
+    created_at
+)
+VALUES
+(
+    1,
+    'Đợt Khóa luận Tốt nghiệp Học kỳ 1 (2026-2027)',
+    'KHAN_LUAN',
+    '2026-09-01 00:00:00',
+    '2026-09-15 23:59:59',
+    '2026-09-16 00:00:00',
+    '2026-09-30 23:59:59',
+    '2026-11-30 23:59:59',
+    '2026-12-15 08:00:00',
+    'STUDENT_REGISTRATION',
+    NOW()
+)
+
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    period_type = VALUES(period_type),
+    teacher_start_date = VALUES(teacher_start_date),
+    teacher_end_date = VALUES(teacher_end_date),
+    student_start_date = VALUES(student_start_date),
+    student_end_date = VALUES(student_end_date),
+    review_submission_deadline = VALUES(review_submission_deadline),
+    council_report_date = VALUES(council_report_date),
+    status = VALUES(status);
+
+
+-- ============================================================
+-- 7. TOPICS
+-- ============================================================
+
+INSERT INTO topics
+(
+    id,
+    title,
+    description,
+    requirements,
+    department_id,
+    period_id,
+    status,
+    created_by_teacher_id,
+    created_at
+)
+VALUES
+
+(
+    1,
+    'Xây dựng hệ thống Quản lý Đề tài Niên luận Khóa luận',
+    'Nghiên cứu thiết kế và phát triển hệ thống hỗ trợ đăng ký, duyệt đề tài và phân công hội đồng chấm điểm.',
+    'Hiểu biết về Spring Boot, Thymeleaf, MySQL và JPA',
+    1,
+    1,
+    'APPROVED',
+    2,
+    NOW()
+),
+
+(
+    2,
+    'Ứng dụng AI trong nhận diện khuôn mặt sinh viên điểm danh',
+    'Phát triển mô hình Deep Learning hỗ trợ tự động nhận diện sinh viên trong phòng máy.',
+    'Thành thạo Python, OpenCV, PyTorch hoặc TensorFlow',
+    3,
+    1,
+    'APPROVED',
+    4,
+    NOW()
+)
+
+ON DUPLICATE KEY UPDATE
+    title = VALUES(title),
+    description = VALUES(description),
+    requirements = VALUES(requirements),
+    department_id = VALUES(department_id),
+    period_id = VALUES(period_id),
+    status = VALUES(status),
+    created_by_teacher_id = VALUES(created_by_teacher_id);
+
+
+-- ============================================================
+-- 8. TOPIC ADVISORS
+-- ============================================================
+
+INSERT INTO topic_advisors
+    (id, topic_id, teacher_id, advisor_role)
+VALUES
+    (1, 1, 2, 'PRIMARY'),
+    (2, 2, 4, 'PRIMARY')
+
+ON DUPLICATE KEY UPDATE
+    advisor_role = VALUES(advisor_role);
+
+
+-- ============================================================
+-- 9. STUDENT GROUPS
+-- ============================================================
+
+INSERT INTO student_groups
+    (id, group_code, period_id, leader_student_id, status, created_at)
+VALUES
+    (1, 'N01', 1, 7, 'ACTIVE', NOW()),
+    (2, 'N02', 1, 10, 'ACTIVE', NOW())
+
+ON DUPLICATE KEY UPDATE
+    group_code = VALUES(group_code),
+    period_id = VALUES(period_id),
+    leader_student_id = VALUES(leader_student_id),
+    status = VALUES(status);
+
+
+-- ============================================================
+-- 10. GROUP MEMBERS
+-- ============================================================
+
+INSERT INTO group_members
+    (id, group_id, student_id, joined_at)
+VALUES
+    (1, 1, 7,  NOW()),
+    (2, 1, 8,  NOW()),
+    (3, 1, 9,  NOW()),
+    (4, 2, 10, NOW()),
+    (5, 2, 11, NOW())
+
+ON DUPLICATE KEY UPDATE
+    joined_at = VALUES(joined_at);
+
+
+-- ============================================================
+-- 11. TOPIC REGISTRATIONS
+-- ============================================================
+
+INSERT INTO topic_registrations
+(
+    id,
+    group_id,
+    topic_id,
+    status,
+    rejection_reason,
+    registered_at
+)
+VALUES
+(
+    1,
+    1,
+    1,
+    'APPROVED',
+    NULL,
+    NOW()
+),
+(
+    2,
+    2,
+    2,
+    'APPROVED',
+    NULL,
+    NOW()
+)
+
+ON DUPLICATE KEY UPDATE
+    status = VALUES(status),
+    rejection_reason = VALUES(rejection_reason);
+
+
+-- ============================================================
+-- 12. REVIEW COUNCILS
+-- ============================================================
+
+INSERT INTO review_councils
+(
+    id,
+    council_code,
+    name,
+    period_id,
+    defense_date,
+    location,
+    created_at
+)
+VALUES
+(
+    1,
+    'HD01',
+    'Hội đồng bảo vệ Khóa luận 01',
+    1,
+    '2026-12-15 08:00:00',
+    'Phòng A101',
+    NOW()
+)
+
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    period_id = VALUES(period_id),
+    defense_date = VALUES(defense_date),
+    location = VALUES(location);
+
+
+-- ============================================================
+-- 13. COUNCIL MEMBERS
+-- ============================================================
+
+INSERT INTO council_members
+    (id, council_id, teacher_id, role)
+VALUES
+    (1, 1, 2, 'CHAIRMAN'),
+    (2, 1, 3, 'MEMBER'),
+    (3, 1, 4, 'SECRETARY')
+
+ON DUPLICATE KEY UPDATE
+    role = VALUES(role);
+
+
+-- ============================================================
+-- 14. COUNCIL TOPICS
+-- ============================================================
+
+INSERT INTO council_topics
+    (id, council_id, topic_id)
+VALUES
+    (1, 1, 1),
+    (2, 1, 2)
+
+ON DUPLICATE KEY UPDATE
+    council_id = VALUES(council_id);
+
+
+-- ============================================================
+-- 15. SUBMISSIONS
+-- ============================================================
+
+INSERT INTO submissions
+(
+    id,
+    group_id,
+    file_name,
+    file_path,
+    file_size,
+    version_number,
+    uploaded_by_student_id,
+    notes,
+    uploaded_at
+)
+VALUES
+(
+    1,
+    1,
+    'khoa_luan_nhom_N01_v1.pdf',
+    '/uploads/submissions/khoa_luan_nhom_N01_v1.pdf',
+    5242880,
+    1,
+    7,
+    'Bản nộp thử nghiệm',
+    NOW()
+)
+
+ON DUPLICATE KEY UPDATE
+    file_name = VALUES(file_name),
+    file_path = VALUES(file_path),
+    file_size = VALUES(file_size),
+    version_number = VALUES(version_number),
+    uploaded_by_student_id = VALUES(uploaded_by_student_id),
+    notes = VALUES(notes);
+
+
+-- ============================================================
+-- 16. SCORES
+-- ============================================================
+
+INSERT INTO scores
+(
+    id,
+    topic_id,
+    teacher_id,
+    score_value,
+    comments,
+    scored_at
+)
+VALUES
+(
+    1,
+    1,
+    2,
+    8.50,
+    'Đề tài có tính thực tiễn tốt.',
+    NOW()
+),
+(
+    2,
+    1,
+    3,
+    8.00,
+    'Giải pháp kỹ thuật phù hợp.',
+    NOW()
+),
+(
+    3,
+    2,
+    4,
+    9.00,
+    'Ứng dụng AI có tính thực tiễn cao.',
+    NOW()
+)
+
+ON DUPLICATE KEY UPDATE
+    score_value = VALUES(score_value),
+    comments = VALUES(comments);
+
+
+-- ============================================================
+-- 17. FINAL RESULTS
+-- ============================================================
+
+INSERT INTO final_results
+(
+    id,
+    topic_id,
+    final_score,
+    evaluation_status,
+    chairman_comments,
+    is_published,
+    published_at
+)
+VALUES
+(
+    1,
+    1,
+    8.25,
+    'PASSED',
+    'Kết quả tốt, đáp ứng yêu cầu của đề tài.',
+    TRUE,
+    NOW()
+),
+(
+    2,
+    2,
+    9.00,
+    'PASSED',
+    'Đề tài có chất lượng tốt.',
+    TRUE,
+    NOW()
+)
+
+ON DUPLICATE KEY UPDATE
+    final_score = VALUES(final_score),
+    evaluation_status = VALUES(evaluation_status),
+    chairman_comments = VALUES(chairman_comments),
+    is_published = VALUES(is_published),
+    published_at = VALUES(published_at);
+
+
+-- ============================================================
+-- 18. NOTIFICATIONS
+-- ============================================================
+
+INSERT INTO notifications
+(
+    id,
+    title,
+    content,
+    type,
+    target_role,
+    period_id,
+    created_by_user_id,
+    created_at
+)
+VALUES
+(
+    1,
+    'Thông báo đăng ký đề tài',
+    'Sinh viên vui lòng đăng ký đề tài theo thời gian quy định.',
+    'REGISTRATION',
+    'ROLE_STUDENT',
+    1,
+    1,
+    NOW()
+),
+(
+    2,
+    'Thông báo duyệt đề tài',
+    'Giảng viên vui lòng kiểm tra và duyệt các đề tài đã đăng ký.',
+    'APPROVAL',
+    'ROLE_TEACHER',
+    1,
+    1,
+    NOW()
+)
+
+ON DUPLICATE KEY UPDATE
+    title = VALUES(title),
+    content = VALUES(content),
+    type = VALUES(type),
+    target_role = VALUES(target_role),
+    period_id = VALUES(period_id);
+
+
+-- ============================================================
+-- COMMIT
+-- ============================================================
+
+COMMIT;
+
+
+-- ============================================================
+-- KIỂM TRA DỮ LIỆU
+-- ============================================================
+
+SELECT 'roles' AS table_name, COUNT(*) AS total FROM roles
+UNION ALL
+SELECT 'users', COUNT(*) FROM users
+UNION ALL
+SELECT 'departments', COUNT(*) FROM departments
+UNION ALL
+SELECT 'teachers', COUNT(*) FROM teachers
+UNION ALL
+SELECT 'students', COUNT(*) FROM students
+UNION ALL
+SELECT 'registration_periods', COUNT(*) FROM registration_periods
+UNION ALL
+SELECT 'student_groups', COUNT(*) FROM student_groups
+UNION ALL
+SELECT 'group_members', COUNT(*) FROM group_members
+UNION ALL
+SELECT 'topics', COUNT(*) FROM topics
+UNION ALL
+SELECT 'topic_advisors', COUNT(*) FROM topic_advisors
+UNION ALL
+SELECT 'topic_registrations', COUNT(*) FROM topic_registrations
+UNION ALL
+SELECT 'review_councils', COUNT(*) FROM review_councils
+UNION ALL
+SELECT 'council_members', COUNT(*) FROM council_members
+UNION ALL
+SELECT 'council_topics', COUNT(*) FROM council_topics
+UNION ALL
+SELECT 'submissions', COUNT(*) FROM submissions
+UNION ALL
+SELECT 'scores', COUNT(*) FROM scores
+UNION ALL
+SELECT 'final_results', COUNT(*) FROM final_results
+UNION ALL
+SELECT 'notifications', COUNT(*) FROM notifications;

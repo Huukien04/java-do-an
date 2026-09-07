@@ -22,8 +22,21 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng với username: " + username));
+		 System.out.println("========== LOGIN ==========");
+    System.out.println("Username: " + username);
+
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> {
+            System.out.println("❌ KHÔNG TÌM THẤY USER: " + username);
+            return new UsernameNotFoundException("User not found");
+        });
+
+    System.out.println("✅ Tìm thấy user: " + user.getUsername());
+    System.out.println("Password DB: " + user.getPassword());
+    System.out.println("Role: " + user.getRole());
+
+        // User user = userRepository.findByUsername(username)
+        //         .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng với username: " + username));
 
         Teacher teacher = teacherRepository.findById(user.getId()).orElse(null);
         Student student = studentRepository.findById(user.getId()).orElse(null);

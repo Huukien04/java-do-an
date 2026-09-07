@@ -51,6 +51,10 @@ public class Topic {
     @Builder.Default
     private List<TopicAdvisor> advisors = new ArrayList<>();
 
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @Builder.Default
+    private List<TopicReviewer> reviewers = new ArrayList<>();
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

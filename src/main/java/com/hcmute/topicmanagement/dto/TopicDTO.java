@@ -45,5 +45,8 @@ public class TopicDTO {
     private Long secondaryAdvisorId; // Optional
     private String secondaryAdvisorName;
 
+    private List<Long> criticTeacherIds;
+    private List<String> criticTeacherNames;
+
     private LocalDateTime createdAt;
 }
