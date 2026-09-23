@@ -1,5 +1,6 @@
 com\hcmute\topicmanagement\controller\StudentGroupController.class
 com\hcmute\topicmanagement\entity\ReviewCouncil.class
+com\hcmute\topicmanagement\dto\CalendarEventDTO$CalendarEventDTOBuilder.class
 com\hcmute\topicmanagement\dto\RegistrationPeriodDTO$RegistrationPeriodDTOBuilder.class
 com\hcmute\topicmanagement\entity\TopicAdvisor.class
 com\hcmute\topicmanagement\entity\TopicReviewer$TopicReviewerBuilder.class
@@ -15,6 +16,7 @@ com\hcmute\topicmanagement\entity\StudentGroup.class
 com\hcmute\topicmanagement\exception\GlobalExceptionHandler.class
 com\hcmute\topicmanagement\dto\NotificationDTO.class
 com\hcmute\topicmanagement\controller\TopicController.class
+com\hcmute\topicmanagement\dto\CalendarEventDTO.class
 com\hcmute\topicmanagement\service\NotificationService.class
 com\hcmute\topicmanagement\entity\Submission$SubmissionBuilder.class
 com\hcmute\topicmanagement\controller\ScoreController.class
@@ -75,6 +77,7 @@ com\hcmute\topicmanagement\service\impl\ReviewCouncilServiceImpl.class
 com\hcmute\topicmanagement\dto\ReviewCouncilDTO$CouncilMemberDTO.class
 com\hcmute\topicmanagement\entity\Score$ScoreBuilder.class
 com\hcmute\topicmanagement\entity\ReviewCouncil$ReviewCouncilBuilder.class
+com\hcmute\topicmanagement\service\CalendarService.class
 com\hcmute\topicmanagement\entity\TopicRegistration$TopicRegistrationBuilder.class
 com\hcmute\topicmanagement\service\impl\TopicServiceImpl.class
 com\hcmute\topicmanagement\enums\CouncilRole.class
@@ -107,6 +110,7 @@ com\hcmute\topicmanagement\enums\EvaluationStatus.class
 com\hcmute\topicmanagement\service\SubmissionService.class
 com\hcmute\topicmanagement\service\impl\ScoreServiceImpl.class
 com\hcmute\topicmanagement\exception\ResourceNotFoundException.class
+com\hcmute\topicmanagement\service\impl\CalendarServiceImpl.class
 com\hcmute\topicmanagement\repository\UserRepository.class
 com\hcmute\topicmanagement\security\CustomUserDetailsService.class
 com\hcmute\topicmanagement\dto\StudentGroupDTO$StudentMemberDTO$StudentMemberDTOBuilder.class
