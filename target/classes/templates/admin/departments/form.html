@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title th:text="${isEdit ? 'Chỉnh sửa Bộ môn' : 'Thêm Bộ môn Mới'}">Tạo Bộ môn</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i th:class="${isEdit ? 'bi bi-pencil-square text-primary me-2' : 'bi bi-building-add text-primary me-2'}"></i>
+                <span th:text="${isEdit ? 'CHỈNH SỬA BỘ MÔN' : 'TẠO BỘ MÔN MỚI'}">TẠO BỘ MÔN MỚI</span>
+            </h3>
+            <p class="text-muted mb-0">Nhập mã và tên bộ môn thuộc Khoa Công nghệ Thông tin</p>
+        </div>
+        <a href="/admin/departments" class="btn btn-outline-secondary rounded-pill px-3">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại
+        </a>
+    </div>
+
+    <div class="card card-custom p-4 col-md-8 mx-auto">
+        <form th:action="${isEdit ? '/admin/departments/' + department.id + '/edit' : '/admin/departments/create'}"
+              th:object="${department}" method="post">
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Mã Bộ môn <span class="text-danger">*</span></label>
+                <input type="text" th:field="*{code}" class="form-control" placeholder="VD: CNPM, HTTT, KHMT, MMTH..." required>
+                <small class="form-text text-muted">Mã bộ môn phải là duy nhất (viết hoa không dấu).</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Tên Bộ môn <span class="text-danger">*</span></label>
+                <input type="text" th:field="*{name}" class="form-control" placeholder="VD: Công nghệ Phần mềm, Hệ thống Thông tin..." required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Mô tả / Ghi chú</label>
+                <textarea th:field="*{description}" class="form-control" rows="4" placeholder="Mô tả chức năng hoặc ngành thuộc bộ môn..."></textarea>
+            </div>
+
+            <div class="mt-4 pt-3 border-top text-end">
+                <a href="/admin/departments" class="btn btn-light border px-4 me-2">Hủy bỏ</a>
+                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-circle me-1"></i> Lưu Bộ môn</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

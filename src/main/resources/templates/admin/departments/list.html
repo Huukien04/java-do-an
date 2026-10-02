@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Quản lý Bộ môn</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-building text-primary me-2"></i>QUẢN LÝ BỘ MÔN (KHOA CNTT)</h3>
+            <p class="text-muted mb-0">Danh sách và cấu hình các bộ môn thuộc Khoa Công nghệ Thông tin</p>
+        </div>
+        <a href="/admin/departments/create" class="btn btn-primary shadow-sm rounded-pill px-4">
+            <i class="bi bi-plus-lg me-1"></i> Tạo Bộ môn Mới
+        </a>
+    </div>
+
+    <!-- Departments Table Card -->
+    <div class="card card-custom p-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>STT</th>
+                    <th>Mã Bộ môn</th>
+                    <th>Tên Bộ môn</th>
+                    <th>Mô tả</th>
+                    <th>Ngày tạo</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${departments.empty}">
+                    <td colspan="6" class="text-center py-4 text-muted">Chưa có bộ môn nào trong hệ thống.</td>
+                </tr>
+                <tr th:each="d, iterStat : ${departments}">
+                    <td th:text="${iterStat.count}">1</td>
+                    <td><span class="badge bg-primary-subtle text-primary border font-monospace px-2 py-1 fs-6" th:text="${d.code}">CNTT</span></td>
+                    <td class="fw-bold text-dark" th:text="${d.name}">Công nghệ Phần mềm</td>
+                    <td class="text-muted" th:text="${d.description != null ? d.description : 'Chưa có mô tả'}">Mô tả bộ môn</td>
+                    <td class="small text-muted" th:text="${#temporals.format(d.createdAt, 'dd/MM/yyyy')}">01/01/2026</td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm">
+                            <a th:href="@{/admin/departments/{id}/edit(id=${d.id})}" class="btn btn-outline-primary" title="Chỉnh sửa">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </a>
+                            <form th:action="@{/admin/departments/{id}/delete(id=${d.id})}" method="post" class="d-inline" onsubmit="return confirm('XÁC NHẬN XÓA BỘ MÔN này?')">
+                                <button type="submit" class="btn btn-outline-danger" title="Xóa bộ môn">
+                                    <i class="bi bi-trash-fill"></i> Xóa
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

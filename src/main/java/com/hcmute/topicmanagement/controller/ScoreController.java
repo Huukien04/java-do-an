@@ -36,6 +36,7 @@ public class ScoreController {
     public String viewPublishedResults(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
         boolean isAdminOrTeacher = userDetails != null &&
                 (userDetails.getUser().getRole().getName() == RoleName.ROLE_ADMIN ||
+                 userDetails.getUser().getRole().getName() == RoleName.ROLE_TRUONG_KHOA ||
                  userDetails.getUser().getRole().getName() == RoleName.ROLE_TEACHER);
 
         List<FinalResult> results;
@@ -119,7 +120,7 @@ public class ScoreController {
     }
 
     @PostMapping("/admin/publish")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRUONG_KHOA')")
     public String publishResults(@RequestParam Long periodId, RedirectAttributes redirectAttributes) {
         try {
             scoreService.publishResults(periodId);

@@ -35,6 +35,9 @@ public class DashboardController {
     private final RegistrationPeriodRepository periodRepository;
     private final TopicRegistrationRepository registrationRepository;
 
+    private final UserService userService;
+    private final DepartmentService departmentService;
+
     @GetMapping({"/", "/dashboard"})
     public String dashboard(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
         if (userDetails == null) {
@@ -45,7 +48,7 @@ public class DashboardController {
         model.addAttribute("currentUser", userDetails.getUser());
         model.addAttribute("currentRole", role.name());
 
-        if (role == RoleName.ROLE_ADMIN) {
+        if (role == RoleName.ROLE_ADMIN || role == RoleName.ROLE_TRUONG_KHOA) {
             // Dashboard Statistics for Dean / Admin
             model.addAttribute("totalPeriods", periodService.getAllPeriods().size());
             model.addAttribute("pendingTopicsCount", topicService.getAllTopics().stream()
@@ -53,6 +56,10 @@ public class DashboardController {
             model.addAttribute("pendingRegistrationsCount", registrationRepository.findByStatus(TopicRegistrationStatus.PENDING).size());
             model.addAttribute("totalCouncilsCount", councilService.getAllCouncils().size());
             model.addAttribute("publishedResultsCount", scoreService.getPublishedFinalResults().size());
+            model.addAttribute("totalUsers", userService.countTotalUsers());
+            model.addAttribute("totalTeachers", userService.countTeachers());
+            model.addAttribute("totalStudents", userService.countStudents());
+            model.addAttribute("totalDepartments", departmentService.countDepartments());
             model.addAttribute("notifications", notificationService.getAllNotifications());
 
             return "dashboard/admin_dashboard";

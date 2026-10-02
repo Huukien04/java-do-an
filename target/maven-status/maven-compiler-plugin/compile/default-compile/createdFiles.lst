@@ -6,12 +6,17 @@ com/hcmute/topicmanagement/service/NotificationService.class
 com/hcmute/topicmanagement/entity/GroupMember$GroupMemberBuilder.class
 com/hcmute/topicmanagement/dto/ScoreDTO$ScoreDTOBuilder.class
 com/hcmute/topicmanagement/enums/StudentGroupStatus.class
+com/hcmute/topicmanagement/service/UserService.class
 com/hcmute/topicmanagement/repository/StudentRepository.class
 com/hcmute/topicmanagement/repository/SubmissionRepository.class
 com/hcmute/topicmanagement/entity/ReviewCouncil$ReviewCouncilBuilder.class
+com/hcmute/topicmanagement/controller/AdminUserController.class
+com/hcmute/topicmanagement/dto/UserFormDto.class
 com/hcmute/topicmanagement/service/impl/StudentGroupServiceImpl.class
 com/hcmute/topicmanagement/entity/Teacher.class
+com/hcmute/topicmanagement/service/impl/DepartmentServiceImpl.class
 com/hcmute/topicmanagement/entity/ReviewCouncil.class
+com/hcmute/topicmanagement/service/DepartmentService.class
 com/hcmute/topicmanagement/service/RegistrationPeriodService.class
 com/hcmute/topicmanagement/TopicManagementApplication.class
 com/hcmute/topicmanagement/dto/StudentGroupDTO$StudentMemberDTO.class
@@ -22,6 +27,7 @@ com/hcmute/topicmanagement/entity/Role.class
 com/hcmute/topicmanagement/dto/ReviewCouncilDTO$ReviewCouncilDTOBuilder.class
 com/hcmute/topicmanagement/repository/DepartmentRepository.class
 com/hcmute/topicmanagement/config/SecurityConfig.class
+com/hcmute/topicmanagement/service/impl/UserServiceImpl.class
 com/hcmute/topicmanagement/entity/User.class
 com/hcmute/topicmanagement/entity/Submission.class
 com/hcmute/topicmanagement/entity/Department$DepartmentBuilder.class
@@ -34,6 +40,7 @@ com/hcmute/topicmanagement/enums/RoleName.class
 com/hcmute/topicmanagement/entity/Score.class
 com/hcmute/topicmanagement/entity/FinalResult$FinalResultBuilder.class
 com/hcmute/topicmanagement/dto/ReviewCouncilDTO.class
+com/hcmute/topicmanagement/entity/Role$1.class
 com/hcmute/topicmanagement/controller/TeacherGroupRegistrationController.class
 com/hcmute/topicmanagement/enums/TopicRegistrationStatus.class
 com/hcmute/topicmanagement/entity/GroupMember.class
@@ -49,6 +56,7 @@ com/hcmute/topicmanagement/entity/Submission$SubmissionBuilder.class
 com/hcmute/topicmanagement/entity/Student.class
 com/hcmute/topicmanagement/controller/RegistrationPeriodController.class
 com/hcmute/topicmanagement/entity/Score$ScoreBuilder.class
+com/hcmute/topicmanagement/controller/AdminDepartmentController.class
 com/hcmute/topicmanagement/repository/GroupMemberRepository.class
 com/hcmute/topicmanagement/entity/StudentGroup.class
 com/hcmute/topicmanagement/service/ScoreService.class
@@ -81,6 +89,7 @@ com/hcmute/topicmanagement/dto/TopicDTO.class
 com/hcmute/topicmanagement/enums/AdvisorRole.class
 com/hcmute/topicmanagement/repository/StudentGroupRepository.class
 com/hcmute/topicmanagement/exception/BusinessException.class
+com/hcmute/topicmanagement/dto/UserFormDto$UserFormDtoBuilder.class
 com/hcmute/topicmanagement/entity/TopicRegistration.class
 com/hcmute/topicmanagement/entity/Topic.class
 com/hcmute/topicmanagement/entity/RegistrationPeriod.class

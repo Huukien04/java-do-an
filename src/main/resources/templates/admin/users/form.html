@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title th:text="${isEdit ? 'Chỉnh sửa Tài khoản' : 'Tạo Tài khoản Mới'}">Tạo Tài khoản</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i th:class="${isEdit ? 'bi bi-pencil-square text-primary me-2' : 'bi bi-person-plus-fill text-primary me-2'}"></i>
+                <span th:text="${isEdit ? 'CHỈNH SỬA TÀI KHOẢN' : 'TẠO TÀI KHOẢN MỚI'}">TẠO TÀI KHOẢN MỚI</span>
+            </h3>
+            <p class="text-muted mb-0">Điền đầy đủ thông tin để lưu tài khoản vào hệ thống</p>
+        </div>
+        <a href="/admin/users" class="btn btn-outline-secondary rounded-pill px-3">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại Danh sách
+        </a>
+    </div>
+
+    <div class="card card-custom p-4">
+        <form th:action="${isEdit ? '/admin/users/' + userForm.id + '/edit' : '/admin/users/create'}"
+              th:object="${userForm}" method="post">
+
+            <div class="row g-3">
+                <h5 class="fw-bold text-primary border-bottom pb-2 mb-3"><i class="bi bi-person-badge me-2"></i>Thông tin Tài khoản Cơ bản</h5>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Tên đăng nhập (Username) <span class="text-danger">*</span></label>
+                    <input type="text" th:field="*{username}" class="form-control" placeholder="nhap_username" th:readonly="${isEdit}" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Mật khẩu <span th:if="${!isEdit}" class="text-danger">*</span></label>
+                    <input type="password" th:field="*{password}" class="form-control" th:placeholder="${isEdit ? 'Bỏ trống nếu không muốn đổi' : 'Mặc định: 123456'}" th:required="${!isEdit}">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Vai trò (Role) <span class="text-danger">*</span></label>
+                    <select th:field="*{roleId}" id="roleSelect" class="form-select" required onchange="toggleRoleFields()">
+                        <option value="">-- Chọn vai trò --</option>
+                        <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.displayName}">Role</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Họ và Tên <span class="text-danger">*</span></label>
+                    <input type="text" th:field="*{fullName}" class="form-control" placeholder="Nguyễn Văn A" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                    <input type="email" th:field="*{email}" class="form-control" placeholder="user@hcmute.edu.vn" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Số điện thoại</label>
+                    <input type="text" th:field="*{phone}" class="form-control" placeholder="0901234567">
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" th:field="*{enabled}" id="enabledSwitch">
+                        <label class="form-check-label fw-semibold" for="enabledSwitch">Kích hoạt tài khoản (Cho phép đăng nhập)</label>
+                    </div>
+                </div>
+
+                <!-- Section profile Giảng viên / Sinh viên -->
+                <div id="studentFields" class="row g-3 mt-3" style="display: none;">
+                    <h5 class="fw-bold text-info border-bottom pb-2 mb-2"><i class="bi bi-mortarboard me-2"></i>Thông tin Sinh viên</h5>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Mã số Sinh viên (MSSV)</label>
+                        <input type="text" th:field="*{studentCode}" class="form-control" placeholder="21110001">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Lớp học</label>
+                        <input type="text" th:field="*{className}" class="form-control" placeholder="21110CL1">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Niên khóa</label>
+                        <input type="text" th:field="*{academicYear}" class="form-control" placeholder="2021-2025">
+                    </div>
+                </div>
+
+                <div id="teacherFields" class="row g-3 mt-3" style="display: none;">
+                    <h5 class="fw-bold text-success border-bottom pb-2 mb-2"><i class="bi bi-person-workspace me-2"></i>Thông tin Giảng viên</h5>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Mã Giảng viên (MSGV)</label>
+                        <input type="text" th:field="*{teacherCode}" class="form-control" placeholder="GV001">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Học hàm / Chức danh</label>
+                        <select th:field="*{academicRank}" class="form-select">
+                            <option value="Giảng viên">Giảng viên</option>
+                            <option value="Thạc sĩ">Thạc sĩ</option>
+                            <option value="Phó Giáo sư">Phó Giáo sư</option>
+                            <option value="Giáo sư">Giáo sư</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Học vị</label>
+                        <select th:field="*{degree}" class="form-select">
+                            <option value="Cử nhân / Kỹ sư">Cử nhân / Kỹ sư</option>
+                            <option value="Thạc sĩ">Thạc sĩ</option>
+                            <option value="Tiến sĩ">Tiến sĩ</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="departmentSection" class="col-md-6 mt-3" style="display: none;">
+                    <label class="form-label fw-semibold">Bộ môn trực thuộc</label>
+                    <select th:field="*{departmentId}" class="form-select">
+                        <option value="">-- Chọn bộ môn --</option>
+                        <option th:each="d : ${departments}" th:value="${d.id}" th:text="${d.name}">Bộ môn</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="mt-4 pt-3 border-top text-end">
+                <a href="/admin/users" class="btn btn-light border px-4 me-2">Hủy bỏ</a>
+                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-circle me-1"></i> Lưu Tài khoản</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        function toggleRoleFields() {
+            var roleSelect = document.getElementById('roleSelect');
+            var selectedText = roleSelect.options[roleSelect.selectedIndex] ? roleSelect.options[roleSelect.selectedIndex].text : '';
+
+            var studentFields = document.getElementById('studentFields');
+            var teacherFields = document.getElementById('teacherFields');
+            var departmentSection = document.getElementById('departmentSection');
+
+            studentFields.style.display = 'none';
+            teacherFields.style.display = 'none';
+            departmentSection.style.display = 'none';
+
+            if (selectedText.includes('Sinh viên') || selectedText.includes('STUDENT')) {
+                studentFields.style.display = 'flex';
+                departmentSection.style.display = 'block';
+            } else if (selectedText.includes('Giảng viên') || selectedText.includes('TEACHER')) {
+                teacherFields.style.display = 'flex';
+                departmentSection.style.display = 'block';
+            }
+        }
+        document.addEventListener("DOMContentLoaded", toggleRoleFields);
+    </script>
+</th:block>
+</body>
+</html>

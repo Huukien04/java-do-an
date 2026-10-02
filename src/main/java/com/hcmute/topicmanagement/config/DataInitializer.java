@@ -33,6 +33,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 1. Seed Roles
         Role adminRole = seedRoleIfAbsent(RoleName.ROLE_ADMIN);
+        Role truongKhoaRole = seedRoleIfAbsent(RoleName.ROLE_TRUONG_KHOA);
         Role teacherRole = seedRoleIfAbsent(RoleName.ROLE_TEACHER);
         Role studentRole = seedRoleIfAbsent(RoleName.ROLE_STUDENT);
 
@@ -43,19 +44,44 @@ public class DataInitializer implements CommandLineRunner {
         Department mmt = seedDepartmentIfAbsent("MMT", "Mạng máy tính & Truyền thông", "Bộ môn Mạng máy tính");
         Department cntt = seedDepartmentIfAbsent("CNTT", "Công nghệ Thông tin", "Bộ môn Công nghệ Thông tin");
 
-        // 3. Seed Admin / Trưởng Khoa
-        if (!userRepository.existsByUsername("admin")) {
-            User adminUser = User.builder()
+        // 3. Seed System Admin & Trưởng Khoa
+        User adminUser = userRepository.findByUsername("admin").orElse(null);
+        if (adminUser == null) {
+            adminUser = User.builder()
                     .username("admin")
                     .password(passwordEncoder.encode("admin123"))
-                    .fullName("GS.TS. Trưởng Khoa CNTT")
-                    .email("truongkhoa@hcmute.edu.vn")
-                    .phone("0901234567")
+                    .fullName("Quản trị viên Hệ thống")
+                    .email("admin@hcmute.edu.vn")
+                    .phone("0900000000")
                     .enabled(true)
                     .role(adminRole)
                     .build();
             userRepository.save(adminUser);
-            log.info("Created default Admin / Trưởng khoa: username=admin / pass=admin123");
+            log.info("Created default Admin: username=admin / pass=admin123");
+        } else {
+            // Update admin email and role if it was seeded previously as truongkhoa email
+            if ("truongkhoa@hcmute.edu.vn".equals(adminUser.getEmail())) {
+                adminUser.setEmail("admin@hcmute.edu.vn");
+                adminUser.setRole(adminRole);
+                userRepository.save(adminUser);
+            }
+        }
+
+        if (!userRepository.existsByUsername("truongkhoa")) {
+            String tkEmail = "truongkhoa@hcmute.edu.vn";
+            if (!userRepository.existsByEmail(tkEmail)) {
+                User truongKhoaUser = User.builder()
+                        .username("truongkhoa")
+                        .password(passwordEncoder.encode("truongkhoa123"))
+                        .fullName("GS.TS. Trưởng Khoa CNTT")
+                        .email(tkEmail)
+                        .phone("0901234567")
+                        .enabled(true)
+                        .role(truongKhoaRole)
+                        .build();
+                userRepository.save(truongKhoaUser);
+                log.info("Created default Trưởng khoa: username=truongkhoa / pass=truongkhoa123");
+            }
         }
 
         // 4. Seed Sample Teachers

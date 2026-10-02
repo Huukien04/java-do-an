@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Quản lý Tài khoản Người dùng</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-people-fill text-primary me-2"></i>QUẢN LÝ TÀI KHOẢN NGƯỜI DÙNG</h3>
+            <p class="text-muted mb-0">Quản lý danh sách tài khoản, phân quyền và trạng thái hoạt động</p>
+        </div>
+        <a href="/admin/users/create" class="btn btn-primary shadow-sm rounded-pill px-4">
+            <i class="bi bi-person-plus-fill me-1"></i> Tạo Tài khoản Mới
+        </a>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="card card-custom p-4 mb-4">
+        <form method="get" action="/admin/users" class="row g-3">
+            <div class="col-md-5">
+                <label class="form-label fw-semibold">Tìm kiếm</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="keyword" th:value="${keyword}" class="form-control border-start-0" placeholder="Tên đăng nhập, Họ tên, Email, SĐT...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Vai trò (Role)</label>
+                <select name="roleId" class="form-select">
+                    <option value="">-- Tất cả vai trò --</option>
+                    <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.displayName}" th:selected="${selectedRoleId == r.id}">Role</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Bộ môn</label>
+                <select name="departmentId" class="form-select">
+                    <option value="">-- Tất cả bộ môn --</option>
+                    <option th:each="d : ${departments}" th:value="${d.id}" th:text="${d.name}" th:selected="${selectedDepartmentId == d.id}">Dept</option>
+                </select>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel-fill"></i> Lọc</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Users Table Card -->
+    <div class="card card-custom p-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>STT</th>
+                    <th>Tên đăng nhập</th>
+                    <th>Họ và Tên</th>
+                    <th>Email / SĐT</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${users.empty}">
+                    <td colspan="7" class="text-center py-4 text-muted">Không tìm thấy tài khoản nào.</td>
+                </tr>
+                <tr th:each="u, iterStat : ${users}">
+                    <td th:text="${iterStat.count}">1</td>
+                    <td>
+                        <strong class="text-dark d-block" th:text="${u.username}">username</strong>
+                        <small class="text-muted" th:text="${#temporals.format(u.createdAt, 'dd/MM/yyyy')}">2026-01-01</small>
+                    </td>
+                    <td class="fw-semibold" th:text="${u.fullName}">Nguyễn Văn A</td>
+                    <td>
+                        <div class="small"><i class="bi bi-envelope me-1 text-muted"></i><span th:text="${u.email}">email</span></div>
+                        <div class="small text-muted" th:if="${u.phone}"><i class="bi bi-telephone me-1"></i><span th:text="${u.phone}">phone</span></div>
+                    </td>
+                    <td>
+                        <span th:if="${u.role.name.name() == 'ROLE_ADMIN'}" class="badge bg-purple-subtle text-purple border px-2 py-1" style="background-color: #f3e8ff; color: #7e22ce;">
+                            <i class="bi bi-shield-check me-1"></i> ADMIN / TRƯỞNG KHOA
+                        </span>
+                        <span th:if="${u.role.name.name() == 'ROLE_TEACHER'}" class="badge bg-success-subtle text-success border px-2 py-1">
+                            <i class="bi bi-person-badge me-1"></i> GIẢNG VIÊN
+                        </span>
+                        <span th:if="${u.role.name.name() == 'ROLE_STUDENT'}" class="badge bg-info-subtle text-info border px-2 py-1">
+                            <i class="bi bi-mortarboard me-1"></i> SINH VIÊN
+                        </span>
+                    </td>
+                    <td>
+                        <span th:if="${u.enabled}" class="badge bg-success border">Hoạt động</span>
+                        <span th:unless="${u.enabled}" class="badge bg-danger border">Đã khóa</span>
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm">
+                            <a th:href="@{/admin/users/{id}/edit(id=${u.id})}" class="btn btn-outline-primary" title="Chỉnh sửa">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <form th:action="@{/admin/users/{id}/toggle-status(id=${u.id})}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-outline-warning" th:title="${u.enabled ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}">
+                                    <i th:class="${u.enabled ? 'bi bi-lock-fill' : 'bi bi-unlock-fill'}"></i>
+                                </button>
+                            </form>
+                            <form th:action="@{/admin/users/{id}/reset-password(id=${u.id})}" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn đặt lại mật khẩu tài khoản này về 123456?')">
+                                <button type="submit" class="btn btn-outline-secondary" title="Đặt lại mật khẩu">
+                                    <i class="bi bi-key-fill"></i>
+                                </button>
+                            </form>
+                            <form th:action="@{/admin/users/{id}/delete(id=${u.id})}" method="post" class="d-inline" onsubmit="return confirm('XÁC NHẬN XÓA TÀI KHOẢN? Thao tác này không thể hoàn tác!')">
+                                <button type="submit" class="btn btn-outline-danger" title="Xóa tài khoản">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

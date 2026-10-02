@@ -19,7 +19,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/councils")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAnyRole('ADMIN', 'TRUONG_KHOA')")
 @RequiredArgsConstructor
 public class ReviewCouncilController {
 

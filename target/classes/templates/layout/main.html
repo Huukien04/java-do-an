@@ -175,7 +175,7 @@
         }
     </style>
 </head>
-<body th:classappend="${#authentication != null ? (#strings.contains(#authentication.authorities, 'ROLE_ADMIN') ? 'role-admin' : (#strings.contains(#authentication.authorities, 'ROLE_TEACHER') ? 'role-teacher' : (#strings.contains(#authentication.authorities, 'ROLE_STUDENT') ? 'role-student' : ''))) : ''}">
+<body th:classappend="${#authentication != null ? (#strings.contains(#authentication.authorities, 'ROLE_ADMIN') ? 'role-admin' : (#strings.contains(#authentication.authorities, 'ROLE_TRUONG_KHOA') ? 'role-admin' : (#strings.contains(#authentication.authorities, 'ROLE_TEACHER') ? 'role-teacher' : (#strings.contains(#authentication.authorities, 'ROLE_STUDENT') ? 'role-student' : '')))) : ''}">
 
     <!-- Navbar Fragment -->
     <div th:replace="~{fragments/navbar :: navbar}"></div>

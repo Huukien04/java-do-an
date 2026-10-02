@@ -158,7 +158,7 @@ public class TopicController {
     }
 
     @PostMapping("/{id}/approve")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRUONG_KHOA')")
     public String approveTopic(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         topicService.approveTopic(id);
         redirectAttributes.addFlashAttribute("successMessage", "Đã phê duyệt đề tài thành công.");
@@ -166,7 +166,7 @@ public class TopicController {
     }
 
     @PostMapping("/{id}/reject")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRUONG_KHOA')")
     public String rejectTopic(@PathVariable Long id, @RequestParam(required = false) String reason, RedirectAttributes redirectAttributes) {
         topicService.rejectTopic(id, reason);
         redirectAttributes.addFlashAttribute("successMessage", "Đã từ chối đề tài.");

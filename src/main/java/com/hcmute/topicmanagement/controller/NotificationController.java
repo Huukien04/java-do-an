@@ -30,7 +30,7 @@ public class NotificationController {
     }
 
     @GetMapping("/create")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRUONG_KHOA')")
     public String createForm(Model model) {
         model.addAttribute("notificationDTO", new NotificationDTO());
         model.addAttribute("notificationTypes", NotificationType.values());
@@ -39,7 +39,7 @@ public class NotificationController {
     }
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRUONG_KHOA')")
     public String createNotification(@Valid @ModelAttribute("notificationDTO") NotificationDTO dto,
                                      BindingResult result,
                                      @AuthenticationPrincipal CustomUserDetails userDetails,

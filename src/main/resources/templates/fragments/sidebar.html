@@ -8,10 +8,23 @@
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
 
-        <!-- Admin / Trưởng Khoa -->
+        <!-- Admin Quản trị Kỹ thuật -->
         <div sec:authorize="hasRole('ADMIN')">
             <div class="text-uppercase fw-bold px-3 py-1 rounded mt-3 mb-2" style="font-size: 0.75rem; background-color: #e0e7ff; color: #3730a3;">
-                <i class="bi bi-shield-lock me-1"></i> QUẢN TRỊ KHOA
+                <i class="bi bi-shield-lock me-1"></i> QUẢN TRỊ HỆ THỐNG
+            </div>
+            <a class="nav-link text-dark" href="/admin/users">
+                <i class="bi bi-person-lines-fill"></i> Quản lý Tài khoản
+            </a>
+            <a class="nav-link text-dark" href="/admin/departments">
+                <i class="bi bi-building"></i> Quản lý Bộ môn
+            </a>
+        </div>
+
+        <!-- Trưởng Khoa / Admin -->
+        <div sec:authorize="hasAnyRole('ADMIN', 'TRUONG_KHOA')">
+            <div class="text-uppercase fw-bold px-3 py-1 rounded mt-3 mb-2" style="font-size: 0.75rem; background-color: #fef3c7; color: #92400e;">
+                <i class="bi bi-award me-1"></i> QUẢN LÝ NGHIỆP VỤ KHOA
             </div>
             <a class="nav-link text-dark" href="/admin/periods">
                 <i class="bi bi-calendar-event"></i> Quản lý Đợt đăng ký

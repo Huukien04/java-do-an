@@ -23,11 +23,25 @@
             <div class="card card-custom card-stat p-3">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <span class="text-muted fw-medium d-block mb-1">Số Đợt đăng ký</span>
-                        <h3 class="fw-bold mb-0 text-primary" th:text="${totalPeriods}">0</h3>
+                        <span class="text-muted fw-medium d-block mb-1">Tổng Số Tài khoản</span>
+                        <h3 class="fw-bold mb-0 text-primary" th:text="${totalUsers}">0</h3>
                     </div>
                     <div class="bg-primary-subtle text-primary p-3 rounded-circle">
-                        <i class="bi bi-calendar-range fs-3"></i>
+                        <i class="bi bi-people-fill fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card card-custom card-stat p-3" style="border-left-color: #059669;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium d-block mb-1">Giảng viên / Sinh viên</span>
+                        <h3 class="fw-bold mb-0 text-success"><span th:text="${totalTeachers}">0</span> / <span th:text="${totalStudents}">0</span></h3>
+                    </div>
+                    <div class="bg-success-subtle text-success p-3 rounded-circle">
+                        <i class="bi bi-person-badge fs-3"></i>
                     </div>
                 </div>
             </div>
@@ -37,25 +51,11 @@
             <div class="card card-custom card-stat p-3" style="border-left-color: #f59e0b;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <span class="text-muted fw-medium d-block mb-1">Đề tài Chờ Duyệt</span>
-                        <h3 class="fw-bold mb-0 text-warning" th:text="${pendingTopicsCount}">0</h3>
+                        <span class="text-muted fw-medium d-block mb-1">Bộ môn Khoa CNTT</span>
+                        <h3 class="fw-bold mb-0 text-warning" th:text="${totalDepartments}">0</h3>
                     </div>
                     <div class="bg-warning-subtle text-warning p-3 rounded-circle">
-                        <i class="bi bi-journal-text fs-3"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card card-custom card-stat p-3" style="border-left-color: #10b981;">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <span class="text-muted fw-medium d-block mb-1">Đăng ký Nhóm Chờ Duyệt</span>
-                        <h3 class="fw-bold mb-0 text-success" th:text="${pendingRegistrationsCount}">0</h3>
-                    </div>
-                    <div class="bg-success-subtle text-success p-3 rounded-circle">
-                        <i class="bi bi-people fs-3"></i>
+                        <i class="bi bi-building fs-3"></i>
                     </div>
                 </div>
             </div>
@@ -65,11 +65,11 @@
             <div class="card card-custom card-stat p-3" style="border-left-color: #8b5cf6;">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <span class="text-muted fw-medium d-block mb-1">Hội đồng Phản biện</span>
-                        <h3 class="fw-bold mb-0 text-purple" style="color: #8b5cf6;" th:text="${totalCouncilsCount}">0</h3>
+                        <span class="text-muted fw-medium d-block mb-1">Đợt Đăng ký Đề tài</span>
+                        <h3 class="fw-bold mb-0 text-purple" style="color: #8b5cf6;" th:text="${totalPeriods}">0</h3>
                     </div>
                     <div class="bg-purple-subtle p-3 rounded-circle" style="background-color: #f3e8ff; color: #8b5cf6;">
-                        <i class="bi bi-award fs-3"></i>
+                        <i class="bi bi-calendar-range fs-3"></i>
                     </div>
                 </div>
             </div>
@@ -82,6 +82,24 @@
             <div class="card card-custom p-4 h-100">
                 <h5 class="fw-bold mb-3"><i class="bi bi-lightning-charge text-primary me-2"></i>Thao tác Nhanh</h5>
                 <div class="d-grid gap-2">
+                    <a href="/admin/users" class="btn btn-outline-primary text-start p-3 rounded-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="d-block"><i class="bi bi-person-gear me-1"></i>Quản lý Tài khoản Người dùng</strong>
+                                <small class="text-muted">Tạo mới, chỉnh sửa thông tin, đổi mật khẩu, phân quyền và khóa/mở khóa tài khoản.</small>
+                            </div>
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </a>
+                    <a href="/admin/departments" class="btn btn-outline-primary text-start p-3 rounded-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="d-block"><i class="bi bi-building me-1"></i>Quản lý Bộ môn Khoa CNTT</strong>
+                                <small class="text-muted">Xem danh sách, thêm bộ môn mới (CNPM, HTTT, KHMT, MMTH...), chỉnh sửa hoặc xóa.</small>
+                            </div>
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </a>
                     <a href="/admin/periods" class="btn btn-outline-primary text-start p-3 rounded-3">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -96,15 +114,6 @@
                             <div>
                                 <strong class="d-block">Phê duyệt Đề tài Giảng viên</strong>
                                 <small class="text-muted">Duyệt hoặc từ chối đề tài do giảng viên tạo trong Phase 1.</small>
-                            </div>
-                            <i class="bi bi-chevron-right"></i>
-                        </div>
-                    </a>
-                    <a href="/admin/councils" class="btn btn-outline-primary text-start p-3 rounded-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong class="d-block">Thành lập Hội đồng Phản biện</strong>
-                                <small class="text-muted">Tạo hội đồng 3-5 giảng viên (Chủ tịch, Thư ký, Ủy viên) & gán đề tài.</small>
                             </div>
                             <i class="bi bi-chevron-right"></i>
                         </div>
