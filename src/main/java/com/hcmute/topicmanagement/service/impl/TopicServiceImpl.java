@@ -42,7 +42,9 @@ public class TopicServiceImpl implements TopicService {
 
         // Check timeline rule: GV chỉ được đăng ký đề tài trong thời gian đăng ký GV
         LocalDateTime now = LocalDateTime.now();
-        if (period.getStatus() != PeriodStatus.PHASE1_TEACHER_REG && (now.isBefore(period.getTeacherStartDate()) || now.isAfter(period.getTeacherEndDate()))) {
+        if (period.getStatus() != PeriodStatus.PHASE1_TEACHER_REG
+            || now.isBefore(period.getTeacherStartDate())
+            || now.isAfter(period.getTeacherEndDate())) {
             throw new BusinessException("Thời gian đăng ký đề tài của Giảng viên ngoài khung giờ quy định.");
         }
 
@@ -160,6 +162,7 @@ public class TopicServiceImpl implements TopicService {
     public void approveTopic(Long topicId) {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Đề tài", "id", topicId));
+        validateDepartmentApprovalWindow(topic.getPeriod());
         topic.setStatus(TopicStatus.APPROVED);
         topicRepository.save(topic);
     }
@@ -168,8 +171,20 @@ public class TopicServiceImpl implements TopicService {
     public void rejectTopic(Long topicId, String reason) {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Đề tài", "id", topicId));
+        validateDepartmentApprovalWindow(topic.getPeriod());
         topic.setStatus(TopicStatus.REJECTED);
         topicRepository.save(topic);
+    }
+
+    private void validateDepartmentApprovalWindow(RegistrationPeriod period) {
+        LocalDateTime now = LocalDateTime.now();
+        if (period.getStatus() != PeriodStatus.PHASE1_DEAN_REVIEW
+                || period.getApprovalStartDate() == null
+                || period.getApprovalEndDate() == null
+                || now.isBefore(period.getApprovalStartDate())
+                || now.isAfter(period.getApprovalEndDate())) {
+            throw new BusinessException("Hiện không trong thời gian Khoa duyệt đề tài của đợt đăng ký này.");
+        }
     }
 
     @Override

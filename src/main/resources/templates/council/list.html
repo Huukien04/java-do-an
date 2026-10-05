@@ -9,8 +9,7 @@
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">QUẢN LÝ HỘI ĐỒNG PHẢN BIỆN</h3>
-            <p class="text-muted mb-0">Thành lập Hội đồng (3-5 GV), phân công Chủ tịch, Thư ký & gán Đề tài</p>
+            <div th:replace="~{fragments/components :: pageHeading('QUẢN LÝ HỘI ĐỒNG PHẢN BIỆN', 'Thành lập Hội đồng (3-5 GV), phân công Chủ tịch, Thư ký & gán Đề tài', 'bi-people')}"></div>
         </div>
         <a href="/admin/councils/create" class="btn btn-primary shadow-sm rounded-pill px-3">
             <i class="bi bi-plus-circle me-1"></i> Thành lập Hội đồng Mới
@@ -18,9 +17,9 @@
     </div>
 
     <div class="row g-4">
-        <div th:if="${councils.empty}" class="col-12 text-center py-5 text-muted">
-            Chưa có Hội đồng phản biện nào được tạo.
-        </div>
+        <th:block th:if="${councils.empty}">
+            <div class="col-12" th:replace="~{fragments/components :: emptyState('bi-people', 'Chưa có Hội đồng phản biện nào được tạo.', 'Tạo hội đồng đầu tiên để bắt đầu phân công đề tài.')}"></div>
+        </th:block>
         <div class="col-md-6" th:each="c : ${councils}">
             <div class="card card-custom p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-2">

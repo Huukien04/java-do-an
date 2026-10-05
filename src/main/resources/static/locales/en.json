@@ -1,0 +1,447 @@
+{
+  "common": {
+    "language": "Language",
+    "selectType": "-- Select type --",
+    "cancel": "Cancel"
+  },
+  "period": {
+    "createTitle": "CREATE REGISTRATION PERIOD",
+    "createDescription": "Configure dates and requirements for the topic registration period",
+    "editTitle": "EDIT REGISTRATION PERIOD",
+    "editDescription": "Update the registration period dates and settings",
+    "name": "Period name",
+    "type": "Period type",
+    "totalWindow": "Full registration period:",
+    "chooseWindow": "Select the teacher start and student end dates",
+    "teacherWindow": "Teacher topic proposal window",
+    "teacherStart": "Teacher registration starts",
+    "teacherEnd": "Teacher registration ends",
+    "approvalWindow": "Department topic approval window",
+    "approvalStart": "Department approval starts",
+    "approvalEnd": "Department approval ends",
+    "studentWindow": "Student topic registration window",
+    "studentStart": "Student registration starts",
+    "studentEnd": "Student registration ends",
+    "reviewDeadline": "Reviewer grading deadline (Required for TLCN & KLTN)",
+    "councilDate": "Council presentation date (Required for KLTN)",
+    "save": "Save period",
+    "update": "Update period",
+    "invalidSchedule": "Dates must be in strictly increasing order and must not overlap.",
+    "startMustBeFuture": "Teacher registration must not start in the past.",
+    "missingDate": "Please enter all required dates.",
+    "manageTitle": "REGISTRATION PERIODS",
+    "calendarTitle": "Phase calendar",
+    "kanbanTitle": "Period status board",
+    "emptyColumn": "No periods",
+    "stage": {
+      "teacher": "Teacher proposals",
+      "approval": "Department approval",
+      "student": "Student registration"
+    },
+    "status": {
+      "draft": "Draft",
+      "teacher": "Teacher registration",
+      "approval": "Department approval",
+      "published": "Topics published",
+      "student": "Student registration",
+      "execution": "In progress",
+      "defense": "Review and defense",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "nav": {
+    "scoreDashboard": "Score dashboard"
+  },
+  "auto": {
+    "Ngôn ngữ": "Language",
+    "Quản trị khoa": "Department administration",
+    "Đợt đăng ký": "Registration periods",
+    "Phê duyệt đề tài": "Approve topics",
+    "Hội đồng phản biện": "Review councils",
+    "Đăng thông báo": "Post announcement",
+    "Giảng viên": "Teacher",
+    "Đăng ký đề tài": "Propose a topic",
+    "Danh sách đề tài": "Topic list",
+    "Duyệt nhóm SV": "Approve student groups",
+    "Chấm điểm": "Grade topics",
+    "Sinh viên": "Student",
+    "Nhóm của tôi": "My group",
+    "Tra cứu đề tài": "Browse topics",
+    "Điểm & kết quả": "Scores and results",
+    "Chung": "General",
+    "Bảng điểm": "Score dashboard",
+    "Thông báo": "Announcements",
+    "Dashboard quản trị": "Admin dashboard",
+    "Dashboard giảng viên": "Teacher dashboard",
+    "Dashboard sinh viên": "Student dashboard",
+    "Tổng quan": "Overview",
+    "Đề tài chờ duyệt": "Topics awaiting approval",
+    "Cần xử lý": "Needs attention",
+    "Nhóm chờ duyệt": "Groups awaiting approval",
+    "Hội đồng PB": "Review councils",
+    "Thao tác Nhanh": "Quick actions",
+    "Quản lý Đợt đăng ký": "Manage registration periods",
+    "Phê duyệt Đề tài Giảng viên": "Approve teacher topics",
+    "Thành lập Hội đồng Phản biện": "Create review council",
+    "Thông báo Mới nhất": "Latest announcements",
+    "Tạo Thông báo mới": "Create announcement",
+    "Đợt Đăng ký Đang Mở Cho GV": "Open teacher registration periods",
+    "Hiện tại không có đợt nào ở Phase 1 cho Giảng viên đăng ký.": "No teacher registration period is currently open.",
+    "Duyệt Đăng ký Nhóm SV": "Approve student group requests",
+    "Đăng ký Đề tài mới": "Propose a new topic",
+    "Đề tài Của Tôi": "My topics",
+    "Bạn chưa đăng ký đề tài nào.": "You have not proposed any topics.",
+    "Hội đồng Phản biện Tham gia": "My review councils",
+    "Chưa có phân công hội đồng phản biện.": "No review council assignments yet.",
+    "Vào Chấm điểm": "Open grading",
+    "Đợt Đăng ký Đang Diễn Ra": "Current registration periods",
+    "Chưa có đợt đăng ký nào mở cho Sinh viên.": "No registration period is currently open for students.",
+    "Thời hạn SV đăng ký:": "Student registration window:",
+    "Quản lý Nhóm & Đăng ký Đề tài": "Manage group and register a topic",
+    "Bạn chưa tham gia nhóm nào trong đợt này.": "You are not in a group for this period.",
+    "Tạo Nhóm Mới Ngay": "Create a group",
+    "Nhóm Của Tôi": "My group",
+    "Nhóm trưởng:": "Group leader:",
+    "Thành viên (": "Members (",
+    "Nhóm trưởng": "Group leader",
+    "Kết quả Đánh giá": "Evaluation results",
+    "Kết quả đánh giá chưa được công bố.": "Evaluation results have not been published.",
+    "Điểm Tổng Kết:": "Final score:",
+    "Nhận xét Chủ tịch Hội đồng:": "Council chair comments:",
+    "QUẢN LÝ NHÓM CỦA TÔI": "MANAGE MY GROUP",
+    "ĐỢT ĐĂNG KÝ:": "REGISTRATION PERIOD:",
+    "Bạn Chưa Thuộc Nhóm Nào Trong Đợt Này": "You are not in a group for this period",
+    "Mỗi nhóm gồm từ 1 đến 3 sinh viên. Khi khởi tạo nhóm, bạn sẽ giữ vai trò Nhóm trưởng và có thể": "Each group has 1 to 3 students. When you create a group, you become its leader and can",
+    "mời các thành viên khác gia nhập.": "invite other students to join.",
+    "MÃ NHÓM HỌC TẬP": "GROUP CODE",
+    "Thành viên Nhóm (": "Group members (",
+    "Thêm Thành viên Mới:": "Add a member:",
+    "Nhập Mã Sinh Viên (Vd: SV2002)": "Enter student ID (e.g. SV2002)",
+    "THÊM VÀO": "ADD",
+    "Đề tài Đã Đăng ký": "Registered topic",
+    "Nhóm Chưa Đăng Ký Đề Tài": "No topic registered yet",
+    "Vui lòng truy cập trang Đăng ký Đề tài để lựa chọn đề tài phù hợp.": "Open topic registration to choose a topic.",
+    "Chọn & Đăng ký Đề tài Ngay": "Choose and register a topic",
+    "Trạng thái:": "Status:",
+    "Chờ duyệt": "Pending approval",
+    "Khoa đã duyệt": "Approved by department",
+    "Bị từ chối": "Rejected",
+    "Nộp Báo cáo Đề tài": "Submit topic report",
+    "CHỌN FILE": "CHOOSE FILE",
+    "BÁO CÁO (PDF, DOCX, ZIP)": "REPORT (PDF, DOCX, ZIP)",
+    "GHI CHÚ /": "NOTES /",
+    "BẢN NỘP": "SUBMISSION",
+    "Tải lên Báo cáo Mới": "Upload report",
+    "THÀNH LẬP HỘI ĐỒNG PHẢN BIỆN": "CREATE REVIEW COUNCIL",
+    "Yêu cầu từ 3 đến 5 Giảng viên (Đúng 1 Chủ tịch, 1 Thư ký và các Ủy viên)": "Requires 3 to 5 teachers (one chair, one secretary, and members)",
+    "Đợt Đăng Ký": "Registration period",
+    "Mã Hội đồng": "Council code",
+    "Tên Hội đồng": "Council name",
+    "Thời gian Báo cáo Báo vệ": "Defense date and time",
+    "Địa điểm / Phòng Báo cáo": "Defense location / room",
+    "Phân công Giảng viên Hội đồng": "Assign council teachers",
+    "Chủ tịch Hội đồng": "Council chair",
+    "Thư ký Hội đồng": "Council secretary",
+    "Các Ủy viên Hội đồng (Chọn từ 1 đến 3 Giảng viên khác)": "Council members (select 1 to 3 other teachers)",
+    "Giữ phím Ctrl (hoặc Cmd trên Mac) để chọn nhiều Giảng viên.": "Hold Ctrl (or Cmd on Mac) to select multiple teachers.",
+    "Gán Đề tài cho Hội đồng": "Assign topics to council",
+    "Hủy bỏ": "Cancel",
+    "Tạo Hội đồng": "Create council",
+    "ĐĂNG THÔNG BÁO MỚI": "POST ANNOUNCEMENT",
+    "Cung cấp thông tin kịp thời tới Giảng viên và Sinh viên toàn Khoa": "Share timely information with teachers and students across the department",
+    "Loại Thông báo": "Announcement type",
+    "Đối tượng nhận thông báo": "Recipients",
+    "Tất cả (GV & SV)": "Everyone (teachers and students)",
+    "Tiêu đề Thông báo": "Announcement title",
+    "Nhập tiêu đề thông báo...": "Enter announcement title...",
+    "Nội dung Chi tiết": "Details",
+    "Nội dung thông báo chi tiết...": "Enter announcement details...",
+    "Liên kết Đợt đăng ký (Nếu có)": "Registration period (optional)",
+    "-- Không liên kết đợt --": "-- No linked period --",
+    "Phát hành Thông báo": "Publish announcement",
+    "ĐĂNG KÝ ĐỀ TÀI MỚI": "PROPOSE A NEW TOPIC",
+    "Dành cho Giảng viên tạo đề tài trong khoảng thời gian Phase 1": "For teachers proposing topics during the teacher registration phase",
+    "Chọn Đợt Đăng Ký": "Select registration period",
+    "-- Chọn đợt đang mở --": "-- Select an open period --",
+    "Thuộc Bộ môn": "Department",
+    "Tên Đề tài": "Topic title",
+    "Nhập tên đề tài đầy đủ...": "Enter the full topic title...",
+    "Mô tả Nội dung Đề tài": "Topic description",
+    "Mô tả mục tiêu, bài toán cần giải quyết...": "Describe the goals and problem to solve...",
+    "Yêu cầu Yêu cầu Kỹ thuật / Công nghệ": "Technical requirements",
+    "Yêu cầu về kiến thức: Java, Spring Boot, MySQL...": "Required skills, e.g. Java, Spring Boot, MySQL...",
+    "Giảng viên Hướng dẫn chính (GVHD 1)": "Primary advisor (advisor 1)",
+    "Giảng viên Hướng dẫn phụ (GVHD 2 - Tùy chọn)": "Secondary advisor (optional)",
+    "-- Không có GVHD 2 --": "-- No secondary advisor --",
+    "Gửi Đăng ký Đề tài": "Submit topic proposal",
+    "CHẤM ĐIỂM HỘI ĐỒNG PHẢN BIỆN": "REVIEW COUNCIL GRADING",
+    "Danh sách các Đề tài thuộc Hội đồng phản biện mà bạn tham gia": "Topics assigned to the review councils you belong to",
+    "Bạn chưa được phân công vào Hội đồng phản biện nào.": "You have not been assigned to a review council.",
+    "Đề tài Phân công Chấm điểm:": "Topics assigned for grading:",
+    "GV Hướng dẫn": "Advisor",
+    "Hành động": "Actions",
+    "Nhập Điểm Chấm": "Enter score",
+    "TRA CỨU ĐIỂM & KẾT QUẢ ĐÁNH GIÁ": "SCORE AND EVALUATION RESULTS",
+    "Danh sách kết quả bảo vệ đề tài (Môn học / NCKH / KLTN) đã được công bố": "Published topic defense results",
+    "Tìm kiếm theo Tên đề tài, Mã đề tài...": "Search by topic title or code...",
+    "-- Tất cả Đợt đăng ký --": "-- All periods --",
+    "Điểm Tổng Kết": "Final score",
+    "Trạng Thái": "Status",
+    "Nhận xét Hội đồng": "Council comments",
+    "Hiện chưa có kết quả điểm nào được công bố.": "No scores have been published yet.",
+    "Chấm điểm Đề tài": "Grade topic",
+    "Quay lại Danh sách": "Back to list",
+    "Bạn là": "You are",
+    "Giảng viên Hướng dẫn": "the topic advisor",
+    "của đề tài này! Quy định nghiệp vụ Khoa CNTT tuyệt đối": "for this topic. Department policy strictly",
+    "KHÔNG CHO PHÉP": "PROHIBITS",
+    "GVHD tự chấm điểm phản biện cho đề tài do mình hướng dẫn.": "advisors from grading their own topics.",
+    "Nhập Điểm Chấm Cá Nhân": "Enter your score",
+    "Điểm số (Thang điểm 10.0)": "Score (out of 10)",
+    "Nhận xét / Đánh giá Đề tài": "Topic comments / evaluation",
+    "Nhận xét về nội dung, phương pháp, kết quả đạt được...": "Comment on content, methods, and results...",
+    "Gửi Điểm Đánh Giá": "Submit score",
+    "Bảng Tổng hợp Điểm Thành viên Hội đồng": "Council member scores",
+    "Chưa có thành viên nào nhập điểm.": "No council member has entered a score yet.",
+    "Giảng viên Chấm": "Reviewer",
+    "Điểm số": "Score",
+    "Thời gian": "Time",
+    "Xác nhận Kết quả Cuối cùng (Chủ tịch Hội đồng)": "Confirm final result (council chair)",
+    "Nhận xét Tổng hợp của Chủ tịch Hội đồng": "Council chair summary",
+    "Nhận xét tổng quan về buổi bảo vệ của sinh viên...": "Overall comments on the student defense...",
+    "Tính Điểm Trung Bình & Xác nhận Kết quả": "Calculate average and confirm result",
+    "Không có đợt đăng ký nào được tạo.": "No registration periods have been created.",
+    "Chưa có đợt đăng ký nào được tạo.": "No registration periods have been created.",
+    "Mở giai đoạn Khoa duyệt": "Open department approval",
+    "Công bố Danh sách Đề tài": "Publish topic list",
+    "Mở Phase 1 (GV đăng ký)": "Open teacher registration",
+    "Mở Phase 2 (SV đăng ký)": "Open student registration",
+    "Bắt đầu Chấm Phản biện": "Start review grading",
+    "Hoàn thành Đợt": "Complete period",
+    "Chưa thiết lập": "Not set",
+    "Tạo Đợt đăng ký mới": "Create registration period",
+    "Tạo đợt đăng ký": "Create registration period",
+    "Tên đợt đăng ký": "Period name",
+    "Loại đợt đăng ký": "Period type",
+    "Thời gian Giáo viên đăng ký đề tài": "Teacher topic proposal window",
+    "Thời gian Khoa duyệt đề tài": "Department topic approval window",
+    "Thời gian Sinh viên đăng ký đề tài": "Student topic registration window",
+    "Kết thúc GV đăng ký": "Teacher registration ends",
+    "Kết thúc SV đăng ký": "Student registration ends",
+    "Bắt đầu GV đăng ký": "Teacher registration starts",
+    "Bắt đầu SV đăng ký": "Student registration starts",
+    "Bắt đầu Khoa duyệt": "Department approval starts",
+    "Kết thúc Khoa duyệt": "Department approval ends",
+    "Toàn đợt đăng ký:": "Full registration period:",
+    "Chọn ngày bắt đầu GV và kết thúc SV": "Select teacher start and student end dates",
+    "Tạo nhóm": "Create group",
+    "Lưu": "Save",
+    "Sửa": "Edit",
+    "Duyệt": "Approve",
+    "Từ chối": "Reject",
+    "Thêm": "Add",
+    "Tải lên": "Upload",
+    "Nội dung": "Content",
+    "Mô tả": "Description",
+    "Mã SV:": "Student ID:",
+    "Lớp:": "Class:",
+    "Tên đăng nhập": "Username",
+    "Mật khẩu": "Password",
+    "Đăng nhập": "Sign in",
+    "Đăng xuất": "Sign out",
+    "Bộ môn:": "Department:",
+    "Địa điểm:": "Location:",
+    "Ngày:": "Date:",
+    "GVHD:": "Advisor:",
+    "Điểm:": "Score:",
+    "Start": "Start",
+    "End": "End",
+    "Date": "Date",
+    "STATUS": "STATUS",
+    "DRAFT": "Draft",
+    "GENERAL": "General",
+    "Mon hoc": "Course",
+    "KLTN": "Graduation thesis",
+    "TLCN": "Graduation project"
+  },
+  "autoExtra": {
+    "-- Chọn Bộ môn --": "-- Select department --"
+    ,"-- Chọn Thư ký --": "-- Select secretary --"
+    ,"-- Chọn đợt --": "-- Select period --"
+    ,"-- Chọn loại --": "-- Select type --"
+    ,"Báo cáo:": "Report:"
+    ,"Bạn đã đăng xuất thành công.": "You have signed out successfully."
+    ,"Bảng điểm": "Score dashboard"
+    ,"Chi tiết Hội đồng Phản biện": "Review council details"
+    ,"Chi tiết Đề tài": "Topic details"
+    ,"Chưa có Hội đồng phản biện nào được tạo.": "No review councils have been created."
+    ,"Chưa có yêu cầu đăng ký đề tài nào cho các đề tài của bạn.": "There are no topic registration requests for your topics."
+    ,"Chưa có đề tài nào được phê duyệt cho đợt này.": "No topics have been approved for this period."
+    ,"Chỉnh sửa Đề tài": "Edit topic"
+    ,"Chỉnh Sửa Đề Tài": "EDIT TOPIC"
+    ,"Chọn Đề Tài": "Select topic"
+    ,"Chủ tịch:": "Chair:"
+    ,"Danh sách Đề tài": "Topic list"
+    ,"Danh sách Đề tài Mở Đăng ký": "Topics open for registration"
+    ,"Danh sách Đề tài được Gán": "Assigned topics"
+    ,"Duyệt ĐĂNG KÝ NGUYỆN VỌNG CỦA NHÓM SV": "APPROVE STUDENT GROUP TOPIC REQUESTS"
+    ,"Duyệt Đăng ký Nhóm SV - Giảng viên": "Student group requests - teacher"
+    ,"Đến Trang Quản Lý & Tạo Nhóm": "Go to group management"
+    ,"Gán Đề tài cho Hội đồng": "Assign topics to council"
+    ,"Gửi Đăng ký Đề tài": "Submit topic proposal"
+    ,"Hạn chót GVPB nộp điểm": "Reviewer grading deadline"
+    ,"Hệ thống Quản lý Đề tài Khoa CNTT": "Department Topic Management System"
+    ,"Hệ thống quản lý đề tài": "Topic management system"
+    ,"Họ tên": "Full name"
+    ,"Hội đồng Phản biện - Admin": "Review councils - Admin"
+    ,"Hội đồng phản biện": "Review council"
+    ,"Khoa Phê Duyệt": "Department approval"
+    ,"Không tìm thấy đề tài nào phù hợp.": "No matching topics found."
+    ,"Liên kết Đợt đăng ký (Nếu có)": "Registration period (optional)"
+    ,"Loại Hình": "Type"
+    ,"Loại Thông báo": "Announcement type"
+    ,"Loại Đợt Đăng Ký": "Registration period type"
+    ,"Lưu Cập Nhật Đề Tài": "Save topic changes"
+    ,"Lưu Đợt Đăng Ký": "Save registration period"
+    ,"Lọc Đề tài": "Filter topics"
+    ,"Lựa chọn đề tài đồ án/khóa luận từ danh sách đã được Khoa phê": "Choose a project or thesis topic from the department-approved list"
+    ,"Mã Hội đồng:": "Council code:"
+    ,"Mã Nhóm": "Group code"
+    ,"Mã SV:": "Student ID:"
+    ,"Mô tả chi tiết": "Detailed description"
+    ,"Mô tả ngắn đề tài": "Short topic description"
+    ,"Mô tả Đề tài": "Topic description"
+    ,"Mô tả đề tài...": "Describe the topic..."
+    ,"NHÓM CỦA BẠN:": "YOUR GROUP:"
+    ,"NHÓM ĐÃ ĐĂNG KÝ ĐỀ TÀI": "GROUP TOPIC REGISTRATION"
+    ,"Nhóm trưởng chọn 01 đề tài bên dưới": "The group leader selects one topic below"
+    ,"Nhận xét / Đánh giá Đề tài": "Topic comments / evaluation"
+    ,"Nhận xét Hội đồng": "Council comments"
+    ,"Nhận xét tốt": "Good comments"
+    ,"Nhận xét...": "Comments..."
+    ,"Nhập Điểm Chấm": "Enter score"
+    ,"Nội dung chi tiết thông báo...": "Enter announcement details..."
+    ,"Phân công Giảng viên Hội đồng": "Assign council members"
+    ,"Phê duyệt": "Approve"
+    ,"Phê duyệt Đề tài Giảng viên": "Approve teacher topics"
+    ,"Phê duyệt đề tài": "Approve topic"
+    ,"Phòng H5.1": "Room H5.1"
+    ,"QUẢN LÝ HỘI ĐỒNG PHẢN BIỆN": "REVIEW COUNCIL MANAGEMENT"
+    ,"Quản lý nhóm": "Group management"
+    ,"Quản lý Đợt đăng ký - Admin": "Registration period management - Admin"
+    ,"Quản lý đề tài": "Topic management"
+    ,"Quản lý Nhóm của Tôi": "Manage my group"
+    ,"Quay lại Danh sách": "Back to list"
+    ,"Sẵn sàng": "Ready"
+    ,"SẴN SÀNG": "READY"
+    ,"Sửa": "Edit"
+    ,"THÊM": "ADD"
+    ,"VÀO": "TO GROUP"
+    ,"THÔNG BÁO CHÍNH THỨC KHOA CNTT": "OFFICIAL DEPARTMENT ANNOUNCEMENT"
+    ,"Thành lập Hội đồng (3-5 GV), phân công Chủ tịch, Thư ký & gán Đề tài": "Create a council (3-5 teachers), assign chair and secretary, and add topics"
+    ,"Thành lập Hội đồng Mới": "Create a new council"
+    ,"Thành viên Hội đồng": "Council member"
+    ,"Thành viên Nhóm (": "Group members ("
+    ,"Thông báo Khoa CNTT": "Department announcement"
+    ,"Thư ký Hội đồng": "Council secretary"
+    ,"Thư ký:": "Secretary:"
+    ,"Thời gian Báo cáo Báo vệ": "Defense date and time"
+    ,"Thời gian GV Đăng ký": "Teacher registration window"
+    ,"Thời gian GV đăng ký:": "Teacher registration:"
+    ,"Thời gian SV Đăng ký": "Student registration window"
+    ,"Thời gian Đăng ký": "Registration period"
+    ,"Thời hạn SV đăng ký:": "Student registration:"
+    ,"Tiêu đề": "Title"
+    ,"Tiêu đề Thông báo": "Announcement title"
+    ,"Tiêu đề thông báo": "Announcement title"
+    ,"Toàn đợt": "Entire period"
+    ,"Tra cứu Điểm & Kết quả Đánh giá": "Look up scores and evaluation results"
+    ,"Trạng Thái": "Status"
+    ,"Trạng thái:": "Status:"
+    ,"Tài khoản thử nghiệm": "Demo account"
+    ,"Tên Đề Tài": "Topic title"
+    ,"Tên Đề tài": "Topic title"
+    ,"Tên đăng nhập": "Username"
+    ,"Tên Hội đồng": "Council name"
+    ,"Tính Điểm Trung Bình & Xác nhận Kết quả": "Calculate average and confirm result"
+    ,"Tạo Nhóm Mới Ngay": "Create a group"
+    ,"Tạo Thông báo mới": "Create announcement"
+    ,"Tạo hội đồng 3-5 giảng viên (Chủ tịch, Thư ký, Ủy viên) & gán đề tài.": "Create a council of 3-5 teachers and assign topics."
+    ,"Tạo đợt đăng ký": "Create registration period"
+    ,"Tạo Đợt Đăng Ký Mới": "Create registration period"
+    ,"Tạo Đợt đăng ký mới": "Create registration period"
+    ,"Tạo Hội đồng": "Create council"
+    ,"Xem Điểm / Chấm": "View scores / grade"
+    ,"Xác nhận Kết quả Cuối cùng (Chủ tịch Hội đồng)": "Confirm final result (council chair)"
+    ,"Yêu cầu Kỹ thuật / Kiến thức": "Technical requirements / skills"
+    ,"Yêu cầu kỹ thuật": "Technical requirements"
+    ,"Đăng ký Đề tài Cho Nhóm": "Register a topic for the group"
+    ,"Đăng ký Đề tài Mới": "Propose a new topic"
+    ,"Đăng ký Đề tài mới": "Propose a new topic"
+    ,"Đăng ký đề tài": "Topic registration"
+    ,"Đăng nhập": "Sign in"
+    ,"Đăng xuất": "Sign out"
+    ,"Đăng thông báo": "Post announcement"
+    ,"ĐẠT": "PASSED"
+    ,"Điểm & kết quả": "Scores and results"
+    ,"Điểm Tổng Kết": "Final score"
+    ,"Điểm Tổng Kết:": "Final score:"
+    ,"Điểm số": "Score"
+    ,"Điểm số (Thang điểm 10.0)": "Score (out of 10)"
+    ,"Địa điểm / Phòng Báo cáo": "Defense location / room"
+    ,"Địa điểm:": "Location:"
+    ,"Đối tượng nhận thông báo": "Recipients"
+    ,"Đổi Trạng thái": "Change status"
+    ,"Đợt 1": "Period 1"
+    ,"Đợt Đăng Ký": "Registration period"
+    ,"Đợt Đăng ký": "Registration period"
+    ,"Đợt Đăng ký Đang Diễn Ra": "Current registration periods"
+    ,"Đợt Đăng ký Đang Mở Cho GV": "Open teacher registration periods"
+    ,"Đợt đăng ký": "Registration period"
+    ,"Ủy viên (": "Member ("
+    ,"Ủy viên": "Member"
+    ,"Bước 1": "Step 1"
+    ,"Bước 2": "Step 2"
+    ,"Bước 3": "Step 3"
+    ,"Tất cả": "All"
+    ,"-- Chọn Chủ tịch --": "-- Select chair --"
+    ,"-- Chọn GVHD 1 --": "-- Select primary advisor --"
+    ,"-- Chọn loại hình --": "-- Select type --"
+    ,"Vd: HD_KTPM_01": "e.g. HD_KTPM_01"
+    ,"Vd: Hội đồng KTPM 1": "e.g. KTPM Council 1"
+    ,"Phòng Hội trường H5.1, Tầng 5": "H5.1 Hall, 5th floor"
+    ,"Nhập Mã Sinh Viên (Vd: SV2002)": "Enter student ID (e.g. SV2002)"
+    ,"Ví dụ: Báo cáo giữa kỳ / Báo cáo hoàn thiện...": "e.g. Midterm report / Final report..."
+    ,"Nhập tên đề tài đầy đủ...": "Enter the full topic title..."
+    ,"Mô tả mục tiêu, bài toán cần giải quyết...": "Describe the goals and problem to solve..."
+    ,"Yêu cầu về kiến thức: Java, Spring Boot, MySQL...": "Required skills, e.g. Java, Spring Boot, MySQL..."
+    ,"Nhận xét về nội dung, phương pháp, kết quả đạt được...": "Comment on content, methods, and results..."
+    ,"Nhận xét tổng quan về buổi bảo vệ của sinh viên...": "Overall comments on the student defense..."
+    ,"-- Không có GVHD 2 --": "-- No secondary advisor --"
+    ,"-- Không liên kết đợt --": "-- No linked period --"
+    ,"-- Tất cả Đợt đăng ký --": "-- All periods --"
+    ,"-- Tất cả các Đợt đăng ký --": "-- All periods --"
+    ,"Tìm kiếm theo Tên đề tài, Mã đề tài...": "Search by topic title or code..."
+    ,"Chọn loại hình": "Select type"
+    ,"Mã Hội đồng": "Council code"
+    ,"Tên Đợt": "Period name"
+    ,"Tên đề tài": "Topic title"
+    ,"Thao tác": "Actions"
+    ,"Khoa đã duyệt": "Approved by department"
+    ,"Nhóm Chưa Đăng Ký Đề Tài": "No topic registered yet"
+    ,"Nhận xét Chủ tịch Hội đồng:": "Council chair comments:"
+    ,"Lịch các giai đoạn": "Phase calendar"
+    ,"Kanban trạng thái đợt": "Period status board"
+    ,"Chưa thiết lập": "Not set"
+    ,"Đăng nhập - Hệ thống Quản lý Đề tài Khoa CNTT": "Sign in - Department Topic Management System"
+    ,"Nhập tên đăng nhập": "Enter username"
+    ,"Nhập mật khẩu": "Enter password"
+    ,"Tên đăng nhập hoặc mật khẩu không chính xác!": "Incorrect username or password!"
+    ,"Lỗi Hệ thống": "System error"
+    ,"Đã xảy ra lỗi hệ thống": "A system error occurred"
+    ,"Đã xảy ra sự cố trong quá trình xử lý yêu cầu.": "An error occurred while processing the request."
+    ,"Quay về Trang chủ Dashboard": "Return to dashboard"
+    ,"© 2026 Khoa Công nghệ Thông tin — Hệ thống Quản lý Đề tài": "© 2026 Information Technology Department — Topic Management System"
+  }
+}

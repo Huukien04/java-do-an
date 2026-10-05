@@ -8,14 +8,13 @@
 <body>
 <div layout:fragment="content">
     <div class="mb-4">
-        <h3 class="fw-bold mb-1">CHẤM ĐIỂM HỘI ĐỒNG PHẢN BIỆN</h3>
-        <p class="text-muted mb-0">Danh sách các Đề tài thuộc Hội đồng phản biện mà bạn tham gia</p>
+        <div th:replace="~{fragments/components :: pageHeading('CHẤM ĐIỂM HỘI ĐỒNG PHẢN BIỆN', 'Danh sách các Đề tài thuộc Hội đồng phản biện mà bạn tham gia', 'bi-clipboard-data')}"></div>
     </div>
 
     <div class="row g-4">
-        <div th:if="${councils.empty}" class="col-12 text-center py-5 text-muted">
-            Bạn chưa được phân công vào Hội đồng phản biện nào.
-        </div>
+        <th:block th:if="${councils.empty}">
+            <div class="col-12" th:replace="~{fragments/components :: emptyState('bi-clipboard2', 'Bạn chưa được phân công vào Hội đồng phản biện nào.', 'Các hội đồng được phân công sẽ xuất hiện tại đây.')}"></div>
+        </th:block>
         <div class="col-12" th:each="c : ${councils}">
             <div class="card card-custom p-4 mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-3">

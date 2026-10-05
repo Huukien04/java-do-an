@@ -40,6 +40,7 @@ public class RegistrationPeriodController {
                                Model model,
                                RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
+            model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ và kiểm tra các mốc thời gian của đợt đăng ký.");
             model.addAttribute("periodTypes", PeriodType.values());
             return "period/create";
         }
@@ -68,6 +69,7 @@ public class RegistrationPeriodController {
                                Model model,
                                RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
+            model.addAttribute("errorMessage", "Vui lòng nhập đầy đủ và kiểm tra các mốc thời gian của đợt đăng ký.");
             model.addAttribute("periodTypes", PeriodType.values());
             return "period/edit";
         }

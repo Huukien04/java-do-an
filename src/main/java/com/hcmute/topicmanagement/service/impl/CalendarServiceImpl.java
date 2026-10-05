@@ -95,6 +95,8 @@ public class CalendarServiceImpl implements CalendarService {
             addDate(events, period.getTeacherStartDate(), "GV bắt đầu đăng ký", name, "gv");
             addDate(events, period.getTeacherEndDate(), "Hạn GV đăng ký đề tài", name, "deadline");
         }
+        addDate(events, period.getApprovalStartDate(), "Khoa bắt đầu duyệt đề tài", name, "approval");
+        addDate(events, period.getApprovalEndDate(), "Hạn Khoa duyệt đề tài", name, "deadline");
         if (includeStudent) {
             addDate(events, period.getStudentStartDate(), "SV bắt đầu đăng ký", name, "sv");
             addDate(events, period.getStudentEndDate(), "Hạn SV đăng ký đề tài", name, "deadline");

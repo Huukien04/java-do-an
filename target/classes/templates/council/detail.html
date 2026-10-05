@@ -9,8 +9,7 @@
 <div layout:fragment="content">
     <div class="mb-4">
         <a href="/admin/councils" class="btn btn-sm btn-outline-secondary mb-2"><i class="bi bi-arrow-left"></i> Quay lại Danh sách</a>
-        <h3 class="fw-bold mb-1" th:text="${council.name}">Tên Hội đồng</h3>
-        <p class="text-muted mb-0">Mã Hội đồng: <strong th:text="${council.councilCode}">HD01</strong> | Thuộc đợt: <span th:text="${council.periodName}">Đợt 1</span></p>
+        <div th:replace="~{fragments/components :: pageHeading(${council.name}, ${'Mã Hội đồng: ' + council.councilCode + ' | Thuộc đợt: ' + council.periodName}, 'bi-people')}"></div>
     </div>
 
     <div class="row g-4">
@@ -23,7 +22,7 @@
                             <strong th:text="${m.fullName}">Họ tên</strong>
                             <small class="text-muted d-block" th:text="${m.teacherCode}">GV001</small>
                         </div>
-                        <span class="badge" th:classappend="${m.role == 'CHAIRMAN' ? 'bg-warning text-dark' : (m.role == 'SECRETARY' ? 'bg-info text-dark' : 'bg-secondary')}" th:text="${m.role}">MEMBER</span>
+                        <span th:replace="~{fragments/components :: statusBadge(${m.role}, ${m.role == 'CHAIRMAN' ? 'warning' : (m.role == 'SECRETARY' ? 'info' : 'neutral')})}">MEMBER</span>
                     </li>
                 </ul>
             </div>
@@ -32,7 +31,9 @@
         <div class="col-md-7">
             <div class="card card-custom p-4">
                 <h5 class="fw-bold mb-3"><i class="bi bi-journal-bookmark text-primary me-2"></i>Danh sách Đề tài được Gán</h5>
-                <div th:if="${council.assignedTopics.empty}" class="text-muted py-3">Chưa có đề tài nào được gán cho Hội đồng này.</div>
+                <th:block th:if="${council.assignedTopics.empty}">
+                    <div th:replace="~{fragments/components :: emptyState('bi-journal-x', 'Chưa có đề tài nào được gán cho Hội đồng này.', 'Đề tài được phân công sẽ xuất hiện tại đây.')}"></div>
+                </th:block>
                 <div class="list-group list-group-flush" th:unless="${council.assignedTopics.empty}">
                     <div class="list-group-item py-3 px-0 border-bottom" th:each="top : ${council.assignedTopics}">
                         <div class="d-flex justify-content-between align-items-center mb-1">

@@ -9,10 +9,7 @@
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">
-                <i class="bi bi-award-fill text-warning me-2"></i>TRA CỨU ĐIỂM & KẾT QUẢ ĐÁNH GIÁ
-            </h3>
-            <p class="text-muted mb-0">Danh sách kết quả bảo vệ đề tài (Môn học / NCKH / KLTN) đã được công bố</p>
+            <div th:replace="~{fragments/components :: pageHeading('TRA CỨU ĐIỂM & KẾT QUẢ ĐÁNH GIÁ', 'Danh sách kết quả bảo vệ đề tài (Môn học / NCKH / KLTN) đã được công bố', 'bi-award')}"></div>
         </div>
     </div>
 

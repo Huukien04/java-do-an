@@ -33,6 +33,12 @@ public class RegistrationPeriod {
     @Column(name = "teacher_end_date", nullable = false)
     private LocalDateTime teacherEndDate;
 
+    @Column(name = "approval_start_date")
+    private LocalDateTime approvalStartDate;
+
+    @Column(name = "approval_end_date")
+    private LocalDateTime approvalEndDate;
+
     @Column(name = "student_start_date", nullable = false)
     private LocalDateTime studentStartDate;
 

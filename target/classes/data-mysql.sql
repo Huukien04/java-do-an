@@ -159,6 +159,8 @@ CREATE TABLE registration_periods (
     period_type VARCHAR(20) NOT NULL,
     teacher_start_date DATETIME NOT NULL,
     teacher_end_date DATETIME NOT NULL,
+    approval_start_date DATETIME DEFAULT NULL,
+    approval_end_date DATETIME DEFAULT NULL,
     student_start_date DATETIME NOT NULL,
     student_end_date DATETIME NOT NULL,
     review_submission_deadline DATETIME DEFAULT NULL,

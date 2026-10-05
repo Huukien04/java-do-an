@@ -25,13 +25,15 @@ public class RegistrationPeriodServiceImpl implements RegistrationPeriodService 
 
     @Override
     public RegistrationPeriodDTO createPeriod(RegistrationPeriodDTO dto) {
-        validatePeriodRules(dto);
+        validatePeriodRules(dto, true);
 
         RegistrationPeriod period = RegistrationPeriod.builder()
                 .name(dto.getName())
                 .periodType(dto.getPeriodType())
                 .teacherStartDate(dto.getTeacherStartDate())
                 .teacherEndDate(dto.getTeacherEndDate())
+                .approvalStartDate(dto.getApprovalStartDate())
+                .approvalEndDate(dto.getApprovalEndDate())
                 .studentStartDate(dto.getStudentStartDate())
                 .studentEndDate(dto.getStudentEndDate())
                 .reviewSubmissionDeadline(dto.getReviewSubmissionDeadline())
@@ -48,12 +50,14 @@ public class RegistrationPeriodServiceImpl implements RegistrationPeriodService 
         RegistrationPeriod period = periodRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Đợt đăng ký", "id", id));
 
-        validatePeriodRules(dto);
+        validatePeriodRules(dto, !dto.getTeacherStartDate().equals(period.getTeacherStartDate()));
 
         period.setName(dto.getName());
         period.setPeriodType(dto.getPeriodType());
         period.setTeacherStartDate(dto.getTeacherStartDate());
         period.setTeacherEndDate(dto.getTeacherEndDate());
+        period.setApprovalStartDate(dto.getApprovalStartDate());
+        period.setApprovalEndDate(dto.getApprovalEndDate());
         period.setStudentStartDate(dto.getStudentStartDate());
         period.setStudentEndDate(dto.getStudentEndDate());
         period.setReviewSubmissionDeadline(dto.getReviewSubmissionDeadline());
@@ -90,8 +94,11 @@ public class RegistrationPeriodServiceImpl implements RegistrationPeriodService 
     @Override
     @Transactional(readOnly = true)
     public List<RegistrationPeriodDTO> getActivePeriodsForStudent() {
+        LocalDateTime now = LocalDateTime.now();
         return periodRepository.findAll().stream()
-                .filter(p -> p.getStatus() != PeriodStatus.COMPLETED)
+            .filter(p -> p.getStatus() == PeriodStatus.PHASE2_STUDENT_REG
+                && !now.isBefore(p.getStudentStartDate())
+                && !now.isAfter(p.getStudentEndDate()))
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -99,18 +106,25 @@ public class RegistrationPeriodServiceImpl implements RegistrationPeriodService 
     @Override
     @Transactional(readOnly = true)
     public List<RegistrationPeriodDTO> getActivePeriodsForTeacher() {
+        LocalDateTime now = LocalDateTime.now();
         return periodRepository.findAll().stream()
-                .filter(p -> p.getStatus() != PeriodStatus.COMPLETED)
+                .filter(p -> p.getStatus() == PeriodStatus.PHASE1_TEACHER_REG
+                        && !now.isBefore(p.getTeacherStartDate())
+                        && !now.isAfter(p.getTeacherEndDate()))
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
-    private void validatePeriodRules(RegistrationPeriodDTO dto) {
-        if (dto.getTeacherStartDate().isAfter(dto.getTeacherEndDate())) {
-            throw new BusinessException("Thời gian bắt đầu đăng ký của GV phải trước thời gian kết thúc.");
+    private void validatePeriodRules(RegistrationPeriodDTO dto, boolean validateFutureStart) {
+        if (validateFutureStart && dto.getTeacherStartDate().isBefore(LocalDateTime.now())) {
+            throw new BusinessException("Thời gian bắt đầu GV đăng ký không được ở quá khứ.");
         }
-        if (dto.getStudentStartDate().isAfter(dto.getStudentEndDate())) {
-            throw new BusinessException("Thời gian bắt đầu đăng ký của SV phải trước thời gian kết thúc.");
+        if (!dto.getTeacherStartDate().isBefore(dto.getTeacherEndDate())
+                || !dto.getTeacherEndDate().isBefore(dto.getApprovalStartDate())
+                || !dto.getApprovalStartDate().isBefore(dto.getApprovalEndDate())
+                || !dto.getApprovalEndDate().isBefore(dto.getStudentStartDate())
+                || !dto.getStudentStartDate().isBefore(dto.getStudentEndDate())) {
+            throw new BusinessException("Các mốc phải tăng dần, không trùng nhau: GV đăng ký → Khoa duyệt → Sinh viên đăng ký.");
         }
         if (dto.getPeriodType() == PeriodType.TLCN || dto.getPeriodType() == PeriodType.KLTN) {
             if (dto.getReviewSubmissionDeadline() == null) {
@@ -131,6 +145,8 @@ public class RegistrationPeriodServiceImpl implements RegistrationPeriodService 
                 .periodType(period.getPeriodType())
                 .teacherStartDate(period.getTeacherStartDate())
                 .teacherEndDate(period.getTeacherEndDate())
+                .approvalStartDate(period.getApprovalStartDate())
+                .approvalEndDate(period.getApprovalEndDate())
                 .studentStartDate(period.getStudentStartDate())
                 .studentEndDate(period.getStudentEndDate())
                 .reviewSubmissionDeadline(period.getReviewSubmissionDeadline())

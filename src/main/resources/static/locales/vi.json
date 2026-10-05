@@ -1,0 +1,56 @@
+{
+  "common": {
+    "language": "Ngôn ngữ",
+    "selectType": "-- Chọn loại hình --",
+    "cancel": "Hủy bỏ"
+  },
+  "nav": {
+    "scoreDashboard": "Dashboard điểm"
+  },
+  "period": {
+    "emptyColumn": "Không có đợt nào",
+    "createTitle": "TẠO ĐỢT ĐĂNG KÝ MỚI",
+    "createDescription": "Thiết lập cấu hình thời gian và điều kiện cho đợt đăng ký đề tài",
+    "editTitle": "CẬP NHẬT ĐỢT ĐĂNG KÝ",
+    "editDescription": "Chỉnh sửa thông tin và cấu hình đợt đăng ký đề tài",
+    "name": "Tên đợt đăng ký",
+    "type": "Loại đợt đăng ký",
+    "totalWindow": "Toàn đợt đăng ký:",
+    "chooseWindow": "Chọn ngày bắt đầu GV và kết thúc SV",
+    "teacherWindow": "Thời gian Giáo viên đăng ký đề tài",
+    "teacherStart": "Bắt đầu GV đăng ký",
+    "teacherEnd": "Kết thúc GV đăng ký",
+    "approvalWindow": "Thời gian Khoa duyệt đề tài",
+    "approvalStart": "Bắt đầu Khoa duyệt",
+    "approvalEnd": "Kết thúc Khoa duyệt",
+    "studentWindow": "Thời gian Sinh viên đăng ký đề tài",
+    "studentStart": "Bắt đầu SV đăng ký",
+    "studentEnd": "Kết thúc SV đăng ký",
+    "reviewDeadline": "Hạn chót GVPB nộp điểm (Bắt buộc với TLCN & KLTN)",
+    "councilDate": "Ngày Báo cáo Hội đồng (Bắt buộc với KLTN)",
+    "save": "Lưu đợt đăng ký",
+    "update": "Cập nhật đợt",
+    "invalidSchedule": "Các mốc thời gian phải tăng dần, không được trùng hoặc chồng lấn.",
+    "startMustBeFuture": "Thời gian bắt đầu GV đăng ký không được ở quá khứ.",
+    "missingDate": "Vui lòng nhập đầy đủ các mốc thời gian bắt buộc.",
+    "manageTitle": "QUẢN LÝ ĐỢT ĐĂNG KÝ",
+    "calendarTitle": "Lịch các giai đoạn",
+    "kanbanTitle": "Kanban trạng thái đợt",
+    "stage": {
+      "teacher": "GV đăng ký",
+      "approval": "Khoa duyệt",
+      "student": "SV đăng ký"
+    },
+    "status": {
+      "draft": "Nháp",
+      "teacher": "GV đăng ký",
+      "approval": "Khoa duyệt",
+      "published": "Đã công bố đề tài",
+      "student": "SV đăng ký",
+      "execution": "Đang thực hiện",
+      "defense": "Phản biện và chấm điểm",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy"
+    }
+  }
+}

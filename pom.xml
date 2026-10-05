@@ -106,6 +106,60 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-npm-browser-assets</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/static/vendor</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/node_modules/fullcalendar</directory>
+                                    <targetPath>fullcalendar</targetPath>
+                                    <includes>
+                                        <include>all/global.js</include>
+                                        <include>locales-all/global.js</include>
+                                        <include>skeleton.css</include>
+                                        <include>themes/classic/global.js</include>
+                                        <include>themes/classic/theme.css</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/node_modules/sortablejs</directory>
+                                    <targetPath>sortablejs</targetPath>
+                                    <includes>
+                                        <include>Sortable.min.js</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/node_modules/apexcharts/dist</directory>
+                                    <targetPath>apexcharts</targetPath>
+                                    <includes>
+                                        <include>apexcharts.min.js</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/node_modules/flatpickr/dist</directory>
+                                    <targetPath>flatpickr</targetPath>
+                                    <includes>
+                                        <include>flatpickr.min.js</include>
+                                        <include>flatpickr.min.css</include>
+                                        <include>l10n/vn.js</include>
+                                        <include>themes/dark.css</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>

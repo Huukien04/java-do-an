@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="pageHeading(title, subtitle, icon)" class="ui-page-heading">
+    <span class="ui-page-heading__icon" aria-hidden="true">
+        <i th:class="'bi ' + ${icon}"></i>
+    </span>
+    <span class="ui-page-heading__copy">
+        <h1 class="ui-page-heading__title" th:text="${title}">Page title</h1>
+        <span class="ui-page-heading__subtitle" th:text="${subtitle}">Page description</span>
+    </span>
+</header>
+
+<article th:fragment="metricCard(label, value, icon, tone)"
+         class="ui-metric-card"
+         th:classappend="${'ui-metric-card--' + tone}">
+    <span class="ui-metric-card__icon" aria-hidden="true">
+        <i th:class="'bi ' + ${icon}"></i>
+    </span>
+    <span class="ui-metric-card__label" th:text="${label}">Metric label</span>
+    <strong class="ui-metric-card__value" th:text="${value}">0</strong>
+</article>
+
+<span th:fragment="statusBadge(label, tone)"
+      class="ui-status-badge"
+      th:classappend="${'ui-status-badge--' + tone}"
+      th:text="${label}">Status</span>
+
+<a th:fragment="actionLink(href, label, icon, tone)"
+   th:href="${href}"
+   class="ui-action-link"
+   th:classappend="${'ui-action-link--' + tone}">
+    <i th:if="${icon != null}" th:class="'bi ' + ${icon}" aria-hidden="true"></i>
+    <span th:text="${label}">Action</span>
+</a>
+
+<button th:fragment="actionButton(label, icon, tone, type, disabled)"
+        th:type="${type}"
+        th:disabled="${disabled}"
+        class="ui-action-link ui-action-button"
+        th:classappend="${'ui-action-link--' + tone}">
+    <i th:if="${icon != null}" th:class="'bi ' + ${icon}" aria-hidden="true"></i>
+    <span th:text="${label}">Action</span>
+</button>
+
+<section th:fragment="card(title, subtitle, icon, content)" class="ui-card">
+    <header class="ui-card__header" th:if="${title != null || subtitle != null || icon != null}">
+        <i th:if="${icon != null}" th:class="'bi ' + ${icon}" aria-hidden="true"></i>
+        <div class="ui-card__heading">
+            <h2 class="ui-card__title" th:if="${title != null}" th:text="${title}">Card title</h2>
+            <p class="ui-card__subtitle" th:if="${subtitle != null}" th:text="${subtitle}">Card description</p>
+        </div>
+    </header>
+    <div class="ui-card__body" th:insert="${content}"></div>
+</section>
+
+<section th:fragment="widget(title, subtitle, icon, content)" class="ui-widget">
+    <header class="ui-widget__header">
+        <span class="ui-widget__icon" th:if="${icon != null}" aria-hidden="true">
+            <i th:class="'bi ' + ${icon}"></i>
+        </span>
+        <div class="ui-card__heading">
+            <h2 class="ui-card__title" th:text="${title}">Widget title</h2>
+            <p class="ui-card__subtitle" th:if="${subtitle != null}" th:text="${subtitle}">Widget description</p>
+        </div>
+    </header>
+    <div class="ui-widget__body" th:insert="${content}"></div>
+</section>
+
+<form th:fragment="form(action, method, content)"
+      th:action="${action}"
+      th:method="${method}"
+      class="ui-form"
+      th:insert="${content}"></form>
+
+<div th:fragment="field(label, inputId, required, description, error, content)" class="ui-field">
+    <label class="ui-field__label" th:for="${inputId}">
+        <span th:text="${label}">Field label</span>
+        <span th:if="${required}" class="ui-field__required" aria-hidden="true">*</span>
+    </label>
+    <div th:insert="${content}"></div>
+    <small class="ui-field__description" th:if="${description != null}" th:text="${description}">Help text</small>
+    <small class="ui-field__error" th:if="${error != null}" th:text="${error}">Validation error</small>
+</div>
+
+<div th:fragment="inputField(id, name, label, type, value, placeholder, required, description, error)" class="ui-field">
+    <label class="ui-field__label" th:for="${id}">
+        <span th:text="${label}">Field label</span>
+        <span th:if="${required}" class="ui-field__required" aria-hidden="true">*</span>
+    </label>
+    <input class="ui-input" th:id="${id}" th:name="${name}" th:type="${type}"
+           th:value="${value}" th:placeholder="${placeholder}" th:required="${required}">
+    <small class="ui-field__description" th:if="${description != null}" th:text="${description}">Help text</small>
+    <small class="ui-field__error" th:if="${error != null}" th:text="${error}">Validation error</small>
+</div>
+
+<div th:fragment="dropdownField(id, name, label, options, selected, placeholder, required)" class="ui-field">
+    <label class="ui-field__label" th:for="${id}">
+        <span th:text="${label}">Field label</span>
+        <span th:if="${required}" class="ui-field__required" aria-hidden="true">*</span>
+    </label>
+    <select class="ui-select" th:id="${id}" th:name="${name}" th:required="${required}">
+        <option th:if="${placeholder != null}" value="" th:text="${placeholder}">Select an option</option>
+        <option th:each="option : ${options}"
+                th:value="${option.value}"
+                th:text="${option.label}"
+                th:selected="${option.value == selected}"></option>
+    </select>
+</div>
+
+<div th:fragment="popup(id, title, content, footer)" class="modal fade" tabindex="-1" aria-hidden="true" th:id="${id}">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content ui-popup">
+            <div class="modal-header ui-popup__header">
+                <h2 class="modal-title ui-card__title" th:text="${title}">Dialog title</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body ui-popup__body" th:insert="${content}"></div>
+            <div class="modal-footer ui-popup__footer" th:if="${footer != null}" th:insert="${footer}"></div>
+        </div>
+    </div>
+</div>
+
+<section th:fragment="chartWidget(id, title, subtitle, type, labels, values, colors)" class="ui-card ui-chart-widget">
+    <header class="ui-card__header">
+        <span class="ui-widget__icon" aria-hidden="true"><i class="bi bi-bar-chart-line"></i></span>
+        <div class="ui-card__heading">
+            <h2 class="ui-card__title" th:text="${title}">Chart title</h2>
+            <p class="ui-card__subtitle" th:if="${subtitle != null}" th:text="${subtitle}">Chart description</p>
+        </div>
+    </header>
+    <div class="ui-card__body ui-chart-widget__body">
+        <div class="ui-chart-canvas" th:id="${id}"
+            th:attr="data-ui-chart-type=${type},data-ui-chart-labels=${labels},data-ui-chart-values=${values},data-ui-chart-colors=${colors}"
+            role="img" th:aria-label="${title}"></div>
+        <p class="ui-chart-widget__fallback" hidden>Chart library is unavailable.</p>
+    </div>
+</section>
+
+<div th:fragment="toast(id, title, message, tone, autoShow)"
+     class="toast ui-toast"
+     role="status"
+     aria-live="polite"
+     aria-atomic="true"
+     th:id="${id}"
+     th:classappend="${'ui-toast--' + tone}"
+    th:attr="data-ui-toast=${autoShow},data-bs-autohide='true',data-bs-delay=5000">
+    <div class="toast-header ui-toast__header">
+        <strong class="me-auto" th:text="${title}">Notification</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" th:text="${message}">Message</div>
+</div>
+
+<div th:fragment="emptyState(icon, title, description)" class="ui-empty-state">
+    <span class="ui-empty-state__icon" aria-hidden="true">
+        <i th:class="'bi ' + ${icon}"></i>
+    </span>
+    <strong class="ui-empty-state__title" th:text="${title}">Nothing here yet</strong>
+    <span class="ui-empty-state__description" th:text="${description}">No data is available.</span>
+</div>
+</body>
+</html>

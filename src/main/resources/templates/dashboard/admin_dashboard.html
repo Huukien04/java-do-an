@@ -8,55 +8,17 @@
 <body>
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <div>
-            <h3 class="page-title mb-1">Dashboard quản trị</h3>
-            <p class="page-sub mb-0">Khoa Công nghệ Thông tin · Tổng quan hệ thống</p>
-        </div>
-        <a href="/admin/periods/create" class="btn btn-primary px-3">
-            <i class="bi bi-plus-circle me-1"></i> Tạo đợt đăng ký
-        </a>
+        <div th:replace="~{fragments/components :: pageHeading('Dashboard quản trị', 'Khoa Công nghệ Thông tin · Tổng quan hệ thống', 'bi-speedometer2')}"></div>
+        <a th:replace="~{fragments/components :: actionLink('/admin/periods/create', 'Tạo đợt đăng ký', 'bi-plus-circle', 'primary')}">Create period</a>
     </div>
 
     <div class="card card-custom p-4 mb-4">
         <h5 class="fw-bold mb-3">Tổng quan</h5>
         <div class="row g-3">
-            <div class="col-md-3">
-                <div class="stat-mini">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted small">Đợt đăng ký</span>
-                        <i class="bi bi-calendar-range" style="color:#a9dfd8;"></i>
-                    </div>
-                    <h3 class="fw-bold mb-0" th:text="${totalPeriods}">0</h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-mini">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted small">Đề tài chờ duyệt</span>
-                        <i class="bi bi-journal-text" style="color:#f2c46e;"></i>
-                    </div>
-                    <h3 class="fw-bold mb-0" th:text="${pendingTopicsCount}">0</h3>
-                    <small style="color:#f2c46e;">Cần xử lý</small>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-mini">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted small">Nhóm chờ duyệt</span>
-                        <i class="bi bi-people" style="color:#7ee2a8;"></i>
-                    </div>
-                    <h3 class="fw-bold mb-0" th:text="${pendingRegistrationsCount}">0</h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-mini">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted small">Hội đồng PB</span>
-                        <i class="bi bi-award" style="color:#8cbcff;"></i>
-                    </div>
-                    <h3 class="fw-bold mb-0" th:text="${totalCouncilsCount}">0</h3>
-                </div>
-            </div>
+            <div class="col-md-3"><div th:replace="~{fragments/components :: metricCard('Đợt đăng ký', ${totalPeriods}, 'bi-calendar-range', 'teal')}"></div></div>
+            <div class="col-md-3"><div th:replace="~{fragments/components :: metricCard('Đề tài chờ duyệt', ${pendingTopicsCount}, 'bi-journal-text', 'amber')}"></div></div>
+            <div class="col-md-3"><div th:replace="~{fragments/components :: metricCard('Nhóm chờ duyệt', ${pendingRegistrationsCount}, 'bi-people', 'green')}"></div></div>
+            <div class="col-md-3"><div th:replace="~{fragments/components :: metricCard('Hội đồng PB', ${totalCouncilsCount}, 'bi-award', 'blue')}"></div></div>
         </div>
     </div>
 
@@ -100,7 +62,9 @@
         <div class="col-md-6">
             <div class="card card-custom p-4 h-100">
                 <h5 class="fw-bold mb-3"><i class="bi bi-bell text-warning me-2"></i>Thông báo Mới nhất</h5>
-                <div th:if="${notifications.empty}" class="text-muted text-center py-4">Chưa có thông báo nào.</div>
+                <th:block th:if="${notifications.empty}">
+                    <div th:replace="~{fragments/components :: emptyState('bi-bell', 'Chưa có thông báo nào.', 'Thông báo mới sẽ xuất hiện tại đây.')}"></div>
+                </th:block>
                 <ul class="list-group list-group-flush mb-3" th:unless="${notifications.empty}">
                     <li class="list-group-item px-0 py-3" th:each="n : ${notifications}">
                         <div class="d-flex justify-content-between align-items-start">
@@ -119,6 +83,13 @@
             </div>
         </div>
     </div>
+	
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div th:replace="~{fragments/components :: chartWidget('adminOverviewChart', 'Tổng quan chỉ số', 'Số liệu hiện tại của hệ thống', 'bar', 'Đợt đăng ký|Đề tài chờ duyệt|Nhóm chờ duyệt|Hội đồng PB', ${totalPeriods + '|' + pendingTopicsCount + '|' + pendingRegistrationsCount + '|' + totalCouncilsCount}, '#55b9aa|#e2aa4f|#67bd81|#6da7df')}"></div>
+        </div>
+    </div>
+
 </div>
 </body>
 </html>

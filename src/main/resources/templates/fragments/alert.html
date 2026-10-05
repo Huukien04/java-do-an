@@ -1,20 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<div th:fragment="alert">
-    <!-- Success Alert -->
-    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
-        <span th:text="${successMessage}">Thao tác thành công!</span>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-
-    <!-- Error Alert -->
-    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-        <span th:text="${errorMessage}">Đã xảy ra lỗi!</span>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+<div th:fragment="alert" class="ui-toast-stack" aria-live="polite">
+     <th:block th:if="${successMessage}">
+          <div th:replace="~{fragments/components :: toast('appSuccessToast', 'Thành công', ${successMessage}, 'success', true)}"></div>
+     </th:block>
+     <th:block th:if="${errorMessage}">
+          <div th:replace="~{fragments/components :: toast('appErrorToast', 'Có lỗi xảy ra', ${errorMessage}, 'danger', true)}"></div>
+     </th:block>
 </div>
 </body>
 </html>

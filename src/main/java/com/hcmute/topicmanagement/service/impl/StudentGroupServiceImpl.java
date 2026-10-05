@@ -40,7 +40,9 @@ public class StudentGroupServiceImpl implements StudentGroupService {
 
         // Check timeline rule for student registration
         LocalDateTime now = LocalDateTime.now();
-        if (period.getStatus() != PeriodStatus.PHASE2_STUDENT_REG && (now.isBefore(period.getStudentStartDate()) || now.isAfter(period.getStudentEndDate()))) {
+        if (period.getStatus() != PeriodStatus.PHASE2_STUDENT_REG
+            || now.isBefore(period.getStudentStartDate())
+            || now.isAfter(period.getStudentEndDate())) {
             throw new BusinessException("Hiện tại ngoài thời gian cho phép Sinh viên tạo nhóm / đăng ký đợt.");
         }
 
@@ -141,7 +143,9 @@ public class StudentGroupServiceImpl implements StudentGroupService {
 
         RegistrationPeriod period = group.getPeriod();
         LocalDateTime now = LocalDateTime.now();
-        if (period.getStatus() != PeriodStatus.PHASE2_STUDENT_REG && (now.isBefore(period.getStudentStartDate()) || now.isAfter(period.getStudentEndDate()))) {
+        if (period.getStatus() != PeriodStatus.PHASE2_STUDENT_REG
+            || now.isBefore(period.getStudentStartDate())
+            || now.isAfter(period.getStudentEndDate())) {
             throw new BusinessException("Thời gian đăng ký đề tài của Sinh viên đã kết thúc hoặc chưa bắt đầu.");
         }
 

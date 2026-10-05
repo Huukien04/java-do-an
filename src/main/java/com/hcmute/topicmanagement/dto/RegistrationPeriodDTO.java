@@ -33,6 +33,14 @@ public class RegistrationPeriodDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime teacherEndDate;
 
+    @NotNull(message = "Thời gian bắt đầu Khoa duyệt không được để trống")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime approvalStartDate;
+
+    @NotNull(message = "Thời gian kết thúc Khoa duyệt không được để trống")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime approvalEndDate;
+
     @NotNull(message = "Thời gian bắt đầu SV đăng ký không được để trống")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime studentStartDate;
