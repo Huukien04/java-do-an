@@ -6,16 +6,6 @@
     <a class="nav-link" href="/dashboard">
         <i class="bi bi-house-door"></i> Dashboard
     </a>
-    <div sec:authorize="hasRole('TEACHER')">
-        <a class="nav-link" href="/scoring/teacher" data-i18n="nav.scoreDashboard">
-            <i class="bi bi-speedometer2"></i> Dashboard điểm
-        </a>
-    </div>
-    <div sec:authorize="hasAnyRole('STUDENT')">
-        <a class="nav-link" href="/scoring/results" data-i18n="nav.scoreDashboard">
-            <i class="bi bi-speedometer2"></i> Dashboard điểm
-        </a>
-    </div>
 
     <div sec:authorize="hasRole('ADMIN')">
         <div class="nav-section">Quản trị khoa</div>
@@ -53,6 +43,9 @@
         </a>
         <a class="nav-link" href="/student/group/register">
             <i class="bi bi-journal-check"></i> Đăng ký đề tài
+        </a>
+        <a class="nav-link" href="/student/registrations">
+            <i class="bi bi-clipboard-check"></i> Kết quả đăng ký đề tài
         </a>
         <a class="nav-link" href="/topics">
             <i class="bi bi-search"></i> Tra cứu đề tài

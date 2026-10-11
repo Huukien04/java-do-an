@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +32,22 @@ public class NotificationServiceImpl implements NotificationService {
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Người dùng", "id", currentUserId));
 
+        Set<User> recipients = new LinkedHashSet<>();
+        String targetRole = dto.getTargetRole() != null ? dto.getTargetRole() : "ALL";
+        if ("INDIVIDUAL".equals(targetRole)) {
+            List<Long> recipientIds = dto.getTargetUserIds() == null
+                    ? List.of()
+                    : dto.getTargetUserIds().stream().distinct().toList();
+            if (recipientIds.isEmpty()) {
+                throw new IllegalArgumentException("Chọn ít nhất một người nhận thông báo.");
+            }
+            recipients.addAll(userRepository.findAllById(recipientIds));
+            if (recipients.size() != recipientIds.size()
+                    || recipients.stream().anyMatch(recipient -> !recipient.isEnabled())) {
+                throw new IllegalArgumentException("Một hoặc nhiều người nhận không tồn tại hoặc đã bị vô hiệu hóa.");
+            }
+        }
+
         RegistrationPeriod period = null;
         if (dto.getPeriodId() != null) {
             period = periodRepository.findById(dto.getPeriodId()).orElse(null);
@@ -39,9 +57,10 @@ public class NotificationServiceImpl implements NotificationService {
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .type(dto.getType())
-                .targetRole(dto.getTargetRole() != null ? dto.getTargetRole() : "ALL")
+                .targetRole(targetRole)
                 .period(period)
                 .createdBy(user)
+                .recipients(recipients)
                 .build();
 
         notification = notificationRepository.save(notification);
@@ -59,6 +78,44 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationRepository.findNotificationsByRole(roleName).stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<NotificationDTO> getGeneralNotifications(String roleName) {
+        List<Notification> notifications = "ROLE_ADMIN".equals(roleName)
+                ? notificationRepository.findGeneralNotifications()
+                : notificationRepository.findNotificationsByRole(roleName);
+        return notifications.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<NotificationDTO> getPersonalNotifications(Long userId) {
+        return notificationRepository.findByRecipients_IdOrderByCreatedAtDesc(userId).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public NotificationDTO getNotificationForUser(Long id, Long userId, String roleName) {
+        Notification notification = notificationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Thông báo", "id", id));
+
+        boolean isIndividual = "INDIVIDUAL".equals(notification.getTargetRole());
+        boolean isRecipient = notification.getRecipients().stream()
+                .anyMatch(recipient -> recipient.getId().equals(userId));
+        boolean isAdmin = "ROLE_ADMIN".equals(roleName);
+        boolean isGeneral = notification.getTargetRole() == null
+                || "ALL".equals(notification.getTargetRole())
+                || notification.getTargetRole().equals(roleName)
+                || (isAdmin && !isIndividual);
+
+        if ((isIndividual && !isRecipient) || (!isIndividual && !isGeneral)) {
+            throw new ResourceNotFoundException("Thông báo", "id", id);
+        }
+        return mapToDTO(notification);
     }
 
     @Override

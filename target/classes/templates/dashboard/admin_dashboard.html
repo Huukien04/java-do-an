@@ -8,11 +8,11 @@
 <body>
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <div th:replace="~{fragments/components :: pageHeading('Dashboard quản trị', 'Khoa Công nghệ Thông tin · Tổng quan hệ thống', 'bi-speedometer2')}"></div>
+        <div th:replace="~{fragments/components :: pageHeading('Dashboard quản trị', 'Khoa Công nghệ Thông tin · Tổng quan hệ thống')}"></div>
         <a th:replace="~{fragments/components :: actionLink('/admin/periods/create', 'Tạo đợt đăng ký', 'bi-plus-circle', 'primary')}">Create period</a>
     </div>
 
-    <div class="card card-custom p-4 mb-4">
+    <div class="card card-custom p-3 mb-4">
         <h5 class="fw-bold mb-3">Tổng quan</h5>
         <div class="row g-3">
             <div class="col-md-3"><div th:replace="~{fragments/components :: metricCard('Đợt đăng ký', ${totalPeriods}, 'bi-calendar-range', 'teal')}"></div></div>
@@ -25,7 +25,7 @@
     <!-- Quick Action Links -->
     <div class="row g-4 mb-4">
         <div class="col-md-6">
-            <div class="card card-custom p-4 h-100">
+            <div class="card card-custom p-3 h-100">
                 <h5 class="fw-bold mb-3"><i class="bi bi-lightning-charge text-primary me-2"></i>Thao tác Nhanh</h5>
                 <div class="d-grid gap-2">
                     <a href="/admin/periods" class="btn btn-outline-primary text-start p-3 rounded-3">
@@ -60,7 +60,7 @@
         </div>
 
         <div class="col-md-6">
-            <div class="card card-custom p-4 h-100">
+            <div class="card card-custom p-3 h-100">
                 <h5 class="fw-bold mb-3"><i class="bi bi-bell text-warning me-2"></i>Thông báo Mới nhất</h5>
                 <th:block th:if="${notifications.empty}">
                     <div th:replace="~{fragments/components :: emptyState('bi-bell', 'Chưa có thông báo nào.', 'Thông báo mới sẽ xuất hiện tại đây.')}"></div>
@@ -85,9 +85,12 @@
     </div>
 	
     <div class="row mb-4">
-        <div class="col-lg-8">
-            <div th:replace="~{fragments/components :: chartWidget('adminOverviewChart', 'Tổng quan chỉ số', 'Số liệu hiện tại của hệ thống', 'bar', 'Đợt đăng ký|Đề tài chờ duyệt|Nhóm chờ duyệt|Hội đồng PB', ${totalPeriods + '|' + pendingTopicsCount + '|' + pendingRegistrationsCount + '|' + totalCouncilsCount}, '#55b9aa|#e2aa4f|#67bd81|#6da7df')}"></div>
-        </div>
+		
+			<div class="col-lg-8">
+				<div class="card card-custom p-3 h-100">
+				<div th:replace="~{fragments/components :: chartWidget('adminOverviewChart', 'Tổng quan chỉ số', 'Số liệu hiện tại của hệ thống', 'bar', 'Đợt đăng ký|Đề tài chờ duyệt|Nhóm chờ duyệt|Hội đồng PB', ${totalPeriods + '|' + pendingTopicsCount + '|' + pendingRegistrationsCount + '|' + totalCouncilsCount}, '#55b9aa|#e2aa4f|#67bd81|#6da7df')}"></div>
+			</div>
+		</div>
     </div>
 
 </div>

@@ -8,10 +8,10 @@
 <body>
 <div layout:fragment="content">
     <div class="mb-4">
-        <div th:replace="~{fragments/components :: pageHeading('ĐĂNG THÔNG BÁO MỚI', 'Cung cấp thông tin kịp thời tới Giảng viên và Sinh viên toàn Khoa', 'bi-megaphone')}"></div>
+        <div th:replace="~{fragments/components :: pageHeading('ĐĂNG THÔNG BÁO MỚI', 'Cung cấp thông tin kịp thời tới Giảng viên và Sinh viên toàn Khoa')}"></div>
     </div>
 
-    <div class="card card-custom p-4">
+    <div class="card card-custom p-3">
         <form th:action="@{/notifications/create}" th:object="${notificationDTO}" method="post">
             <div class="row g-3">
                 <div class="col-md-6">
@@ -23,12 +23,25 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label for="targetRole" class="form-label fw-medium">Đối tượng nhận thông báo</label>
-                    <select class="form-select" id="targetRole" th:field="*{targetRole}">
-                        <option value="ALL">Tất cả (GV & SV)</option>
-                        <option value="ROLE_TEACHER">Giảng viên</option>
-                        <option value="ROLE_STUDENT">Sinh viên</option>
+                    <label for="targetRole" class="form-label fw-medium">Đối tượng nhận thông báo <span class="text-danger">*</span></label>
+                    <select class="form-select" id="targetRole" th:field="*{targetRole}" required>
+                        <option value="ALL">Thông báo chung (tất cả)</option>
+                        <option value="ROLE_TEACHER">Thông báo chung (giảng viên)</option>
+                        <option value="ROLE_STUDENT">Thông báo chung (sinh viên)</option>
+                        <option value="INDIVIDUAL">Thông báo cá nhân</option>
                     </select>
+                </div>
+
+                <div class="col-12" id="individualRecipients" hidden>
+                    <label for="targetUserIds" class="form-label fw-medium">Người nhận <span class="text-danger">*</span></label>
+                    <select class="form-select notification-recipient-select" id="targetUserIds"
+                            th:field="*{targetUserIds}" multiple>
+                        <option th:each="user : ${users}" th:value="${user.id}"
+                                th:text="${user.fullName + ' (' + user.username + ') - ' + user.role.name.displayName}"></option>
+                    </select>
+                    <small class="form-text text-muted">Có thể chọn nhiều tài khoản.</small>
+                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('targetUserIds')}"
+                         th:errors="*{targetUserIds}"></div>
                 </div>
 
                 <div class="col-12">
@@ -57,5 +70,19 @@
         </form>
     </div>
 </div>
+<th:block layout:fragment="scripts">
+    <script>
+        (function () {
+            const audience = document.getElementById('targetRole');
+            const recipientField = document.getElementById('individualRecipients');
+            if (!audience || !recipientField) return;
+            function updateRecipientVisibility() {
+                recipientField.hidden = audience.value !== 'INDIVIDUAL';
+            }
+            audience.addEventListener('change', updateRecipientVisibility);
+            updateRecipientVisibility();
+        })();
+    </script>
+</th:block>
 </body>
 </html>

@@ -174,14 +174,14 @@ function Dashboard({ role }: { role: Role }) {
       <h1 className="text-2xl font-bold font-[family-name:var(--font-display)] text-[#1b2f6e] mb-1">Tổng quan hệ thống</h1>
       <p className="text-sm text-[#64718a] mb-6">Khoa Công nghệ Thông tin · HK1 2025-2026</p>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         <StatCard label="Đề tài đã duyệt" value={mockDeTais.filter(d => d.trangThai === "Đã duyệt").length} sub="trong tổng số 6 đề tài" accent />
         <StatCard label="Nhóm đang thực hiện" value={mockNhoms.filter(n => n.trangThai === "Đã duyệt").length} sub="đã được phê duyệt" />
         <StatCard label="Chờ phê duyệt" value={mockNhoms.filter(n => n.trangThai === "Chờ duyệt").length + mockDeTais.filter(d => d.trangThai === "Chờ duyệt").length} sub="đề tài + nhóm" />
         <StatCard label="Hội đồng phản biện" value={mockHoiDongs.length} sub="đã thành lập" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Recent dots */}
         <div className="lg:col-span-2 bg-white border border-[#dde1ed] rounded p-5">
           <h2 className="text-sm font-semibold text-[#64718a] uppercase tracking-wider mb-4">Đợt đăng ký gần đây</h2>
@@ -298,7 +298,7 @@ function DotDangKySection() {
       {showForm && (
         <div className="bg-white border border-[#dde1ed] rounded p-6 mb-6">
           <h2 className="font-semibold text-[#0f1523] mb-4">Tạo đợt đăng ký mới</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="md:col-span-2">
               <label className="block text-xs font-semibold text-[#64718a] uppercase tracking-wider mb-1">Tên đợt đăng ký *</label>
               <input className="w-full border border-[#dde1ed] rounded px-3 py-2 text-sm focus:outline-none focus:border-[#1b2f6e]"
@@ -354,7 +354,7 @@ function DotDangKySection() {
         </div>
       )}
 
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         {dots.map(dot => (
           <div key={dot.id} className="bg-white border border-[#dde1ed] rounded p-5 hover:border-[#1b2f6e] transition-colors">
             <div className="flex items-start justify-between mb-3">
@@ -484,7 +484,7 @@ function DeTaiSection({ role }: { role: Role }) {
 
       {/* Detail modal */}
       {selected && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setSelected(null)}>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-3" onClick={() => setSelected(null)}>
           <div className="bg-white rounded-lg w-full max-w-lg p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
@@ -535,7 +535,7 @@ function NhomSection({ role }: { role: Role }) {
         )}
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         {nhoms.map(nhom => {
           const dt = mockDeTais.find(d => d.id === nhom.deTaiId);
           return (
@@ -702,7 +702,7 @@ function KetQuaSection({ role }: { role: Role }) {
         <div className="mt-6 bg-white border border-[#dde1ed] rounded p-5">
           <h2 className="font-semibold text-[#0f1523] mb-4 font-[family-name:var(--font-display)]">Nhập điểm phản biện</h2>
           <p className="text-sm text-[#64718a] mb-4">Bạn được phân công chấm điểm cho đề tài: <strong className="text-[#0f1523]">KLTN002 — Ứng dụng nhận diện khuôn mặt trong điểm danh</strong></p>
-          <div className="grid grid-cols-2 gap-4 max-w-sm">
+          <div className="grid grid-cols-2 gap-3 max-w-sm">
             <div>
               <label className="block text-xs font-semibold text-[#64718a] uppercase tracking-wider mb-1">Điểm nội dung</label>
               <input type="number" min="0" max="10" step="0.5" className="w-full border border-[#dde1ed] rounded px-3 py-2 text-sm focus:outline-none focus:border-[#1b2f6e]" placeholder="0.0 – 10.0" />
@@ -732,7 +732,7 @@ function ThongBaoSection() {
       <div className="grid gap-3">
         {mockThongBaos.map(tb => (
           <div key={tb.id} onClick={() => setSelected(tb)}
-            className="bg-white border border-[#dde1ed] rounded p-4 hover:border-[#1b2f6e] transition-colors cursor-pointer">
+            className="bg-white border border-[#dde1ed] rounded p-3 hover:border-[#1b2f6e] transition-colors cursor-pointer">
             <div className="flex items-center gap-2 mb-2">
               <Pill text={tb.loai} color={tb.loai === "Khoa" ? "blue" : "violet"} />
               <span className="font-mono text-xs text-[#64718a]">{tb.ngay}</span>
@@ -744,7 +744,7 @@ function ThongBaoSection() {
       </div>
 
       {selected && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setSelected(null)}>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-3" onClick={() => setSelected(null)}>
           <div className="bg-white rounded-lg w-full max-w-lg p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-2">

@@ -3,6 +3,7 @@ package com.hcmute.topicmanagement.controller;
 import com.hcmute.topicmanagement.dto.NotificationDTO;
 import com.hcmute.topicmanagement.enums.NotificationType;
 import com.hcmute.topicmanagement.security.CustomUserDetails;
+import com.hcmute.topicmanagement.repository.UserRepository;
 import com.hcmute.topicmanagement.service.NotificationService;
 import com.hcmute.topicmanagement.service.RegistrationPeriodService;
 import jakarta.validation.Valid;
@@ -22,19 +23,38 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final RegistrationPeriodService periodService;
+    private final UserRepository userRepository;
 
     @GetMapping
-    public String listNotifications(Model model) {
-        model.addAttribute("notifications", notificationService.getAllNotifications());
+    public String listNotifications(@RequestParam(defaultValue = "general") String view,
+                                    @AuthenticationPrincipal CustomUserDetails userDetails,
+                                    Model model) {
+        String selectedView = "personal".equals(view) ? "personal" : "general";
+        String roleName = userDetails.getUser().getRole().getName().name();
+        model.addAttribute("view", selectedView);
+        model.addAttribute("notifications", "personal".equals(selectedView)
+                ? notificationService.getPersonalNotifications(userDetails.getUserId())
+                : notificationService.getGeneralNotifications(roleName));
         return "notification/list";
+    }
+
+    @GetMapping("/{id}")
+    public String notificationDetail(@PathVariable Long id,
+                                     @RequestParam(defaultValue = "general") String view,
+                                     @AuthenticationPrincipal CustomUserDetails userDetails,
+                                     Model model) {
+        String selectedView = "personal".equals(view) ? "personal" : "general";
+        String roleName = userDetails.getUser().getRole().getName().name();
+        model.addAttribute("view", selectedView);
+        model.addAttribute("notification",
+                notificationService.getNotificationForUser(id, userDetails.getUserId(), roleName));
+        return "notification/detail";
     }
 
     @GetMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public String createForm(Model model) {
-        model.addAttribute("notificationDTO", new NotificationDTO());
-        model.addAttribute("notificationTypes", NotificationType.values());
-        model.addAttribute("periods", periodService.getAllPeriods());
+        populateCreateForm(model, new NotificationDTO());
         return "notification/create";
     }
 
@@ -45,9 +65,13 @@ public class NotificationController {
                                      @AuthenticationPrincipal CustomUserDetails userDetails,
                                      Model model,
                                      RedirectAttributes redirectAttributes) {
+        if ("INDIVIDUAL".equals(dto.getTargetRole())
+                && (dto.getTargetUserIds() == null || dto.getTargetUserIds().isEmpty())) {
+            result.rejectValue("targetUserIds", "notification.recipients.required",
+                    "Chọn ít nhất một người nhận.");
+        }
         if (result.hasErrors()) {
-            model.addAttribute("notificationTypes", NotificationType.values());
-            model.addAttribute("periods", periodService.getAllPeriods());
+            populateCreateForm(model, dto);
             return "notification/create";
         }
         try {
@@ -56,9 +80,15 @@ public class NotificationController {
             return "redirect:/notifications";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("notificationTypes", NotificationType.values());
-            model.addAttribute("periods", periodService.getAllPeriods());
+            populateCreateForm(model, dto);
             return "notification/create";
         }
+    }
+
+    private void populateCreateForm(Model model, NotificationDTO dto) {
+        model.addAttribute("notificationDTO", dto);
+        model.addAttribute("notificationTypes", NotificationType.values());
+        model.addAttribute("periods", periodService.getAllPeriods());
+        model.addAttribute("users", userRepository.findByEnabledTrueOrderByFullNameAsc());
     }
 }

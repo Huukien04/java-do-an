@@ -6,6 +6,11 @@ server:
 spring:
   application:
     name: topic-management
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
 
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/hcmute_topic_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8}

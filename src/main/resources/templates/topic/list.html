@@ -10,7 +10,7 @@
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <div th:replace="~{fragments/components :: pageHeading('DANH SÁCH ĐỀ TÀI', 'Tra cứu & Quản lý các Đề tài Môn học / NCKH / TLCN / KLTN', 'bi-journal-text')}"></div>
+            <div th:replace="~{fragments/components :: pageHeading('DANH SÁCH ĐỀ TÀI', 'Tra cứu & Quản lý các Đề tài Môn học / NCKH / TLCN / KLTN')}"></div>
         </div>
         <a sec:authorize="hasRole('TEACHER')" href="/topics/create" class="btn btn-primary shadow-sm rounded-pill px-3">
             <i class="bi bi-plus-circle me-1"></i> Đăng ký Đề tài Mới
@@ -38,11 +38,11 @@
             <div class="col-12" th:replace="~{fragments/components :: emptyState('bi-inbox', 'Không tìm thấy đề tài nào phù hợp.', 'Thử thay đổi điều kiện lọc hoặc tìm kiếm.')}"></div>
         </th:block>
         <div class="col-md-6 col-lg-4" th:each="t : ${topics}">
-            <div class="card card-custom h-100 p-4 d-flex flex-column justify-content-between">
+            <div class="card card-custom h-100 p-3 d-flex flex-column justify-content-between">
                 <div>
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <span class="badge bg-primary-subtle text-primary fw-bold" th:text="${t.departmentName}">CNTT</span>
-                        <span th:replace="~{fragments/components :: statusBadge(${t.status.displayName}, ${t.status.name() == 'APPROVED' ? 'success' : (t.status.name() == 'PENDING_APPROVAL' ? 'warning' : 'neutral')})}">APPROVED</span>
+                        <span th:replace="~{fragments/components :: statusBadge(${t.status.displayName})}">APPROVED</span>
                     </div>
                     <h5 class="fw-bold text-dark mb-2" th:text="${t.title}">Tên đề tài</h5>
                     <p class="text-muted small mb-3" th:text="${#strings.abbreviate(t.description, 120)}">Mô tả ngắn đề tài</p>

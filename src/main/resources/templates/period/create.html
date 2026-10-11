@@ -8,21 +8,20 @@
 <body>
 <div layout:fragment="content">
     <div class="mb-4">
-        <div th:replace="~{fragments/components :: pageHeading('TẠO ĐỢT ĐĂNG KÝ MỚI', 'Thiết lập cấu hình thời gian và điều kiện cho đợt đăng ký đề tài', 'bi-calendar-plus')}"></div>
+        <div th:replace="~{fragments/components :: pageHeading('TẠO ĐỢT ĐĂNG KÝ MỚI', 'Thiết lập cấu hình thời gian và điều kiện cho đợt đăng ký đề tài')}"></div>
     </div>
 
-    <div class="card card-custom p-4">
+    <div class="card card-custom p-3">
         <form th:action="@{/admin/periods/create}" th:object="${periodDTO}" method="post" data-period-schedule data-period-create novalidate>
             <div class="row g-3">
                 <div class="col-md-8">
-                    <label for="name" class="form-label fw-medium" data-i18n="period.name">Tên Đợt Đăng Ký <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Ví dụ: Đợt Đăng ký Khóa luận Tốt nghiệp Học kỳ 1 (2026-2027)" required>
-                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                    <label for="name" class="form-label fw-medium" data-i18n="period.name">Tên Đợt Đăng Ký <span class="text-danger" data-required-marker>*</span></label>
+                    <input type="text" class="form-control" id="name" th:field="*{name}" th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''" placeholder="Ví dụ: Đợt Đăng ký Khóa luận Tốt nghiệp Học kỳ 1 (2026-2027)" required>
                 </div>
 
                 <div class="col-md-4">
-                    <label for="periodType" class="form-label fw-medium" data-i18n="period.type">Loại Đợt Đăng Ký <span class="text-danger">*</span></label>
-                    <select class="form-select" id="periodType" th:field="*{periodType}" required>
+                    <label for="periodType" class="form-label fw-medium" data-i18n="period.type">Loại Đợt Đăng Ký <span class="text-danger" data-required-marker>*</span></label>
+                    <select class="form-select" id="periodType" th:field="*{periodType}" th:classappend="${#fields.hasErrors('periodType')} ? 'is-invalid' : ''" required>
                         <option value="" data-i18n="common.selectType">-- Chọn loại hình --</option>
                         <option th:each="type : ${periodTypes}" th:value="${type}" th:text="${type.displayName}"></option>
                     </select>
@@ -34,46 +33,46 @@
 
                 <div class="col-12"><h5 class="mb-0" data-i18n="period.teacherWindow">Thời gian Giáo viên đăng ký đề tài</h5></div>
                 <div class="col-md-6">
-                    <label for="teacherStartDate" class="form-label fw-medium" data-i18n="period.teacherStart">Bắt đầu GV đăng ký</label>
-                    <wa-input type="datetime-local" class="period-date-input" id="teacherStartDate" name="teacherStartDate" aria-label="Bắt đầu GV đăng ký" th:value="${periodDTO.teacherStartDate != null ? #temporals.format(periodDTO.teacherStartDate, 'yyyy-MM-dd''T''HH:mm') : ''}" step="300" required></wa-input>
+                    <label for="teacherStartDate" class="form-label fw-medium" data-i18n="period.teacherStart">Bắt đầu GV đăng ký <span class="text-danger" data-required-marker>*</span></label>
+                    <input type="text" class="form-control period-date-input" th:classappend="${#fields.hasErrors('teacherStartDate')} ? 'is-invalid' : ''" id="teacherStartDate" name="teacherStartDate" aria-label="Bắt đầu GV đăng ký" th:value="${periodDTO.teacherStartDate != null ? #temporals.format(periodDTO.teacherStartDate, 'dd/MM/yyyy HH:mm') : ''}" data-period-date-picker autocomplete="off" required>
                 </div>
 
                 <div class="col-md-6">
-                    <label for="teacherEndDate" class="form-label fw-medium" data-i18n="period.teacherEnd">Kết thúc GV đăng ký</label>
-                    <wa-input type="datetime-local" class="period-date-input" id="teacherEndDate" name="teacherEndDate" aria-label="Kết thúc GV đăng ký" th:value="${periodDTO.teacherEndDate != null ? #temporals.format(periodDTO.teacherEndDate, 'yyyy-MM-dd''T''HH:mm') : ''}" step="300" required></wa-input>
+                    <label for="teacherEndDate" class="form-label fw-medium" data-i18n="period.teacherEnd">Kết thúc GV đăng ký <span class="text-danger" data-required-marker>*</span></label>
+                    <input type="text" class="form-control period-date-input" th:classappend="${#fields.hasErrors('teacherEndDate')} ? 'is-invalid' : ''" id="teacherEndDate" name="teacherEndDate" aria-label="Kết thúc GV đăng ký" th:value="${periodDTO.teacherEndDate != null ? #temporals.format(periodDTO.teacherEndDate, 'dd/MM/yyyy HH:mm') : ''}" data-period-date-picker autocomplete="off" required>
                 </div>
 
                 <div class="col-12"><h5 class="mb-0" data-i18n="period.approvalWindow">Thời gian Khoa duyệt đề tài</h5></div>
                 <div class="col-md-6">
-                    <label for="approvalStartDate" class="form-label fw-medium" data-i18n="period.approvalStart">Bắt đầu Khoa duyệt</label>
-                    <wa-input type="datetime-local" class="period-date-input" id="approvalStartDate" name="approvalStartDate" aria-label="Bắt đầu Khoa duyệt" th:value="${periodDTO.approvalStartDate != null ? #temporals.format(periodDTO.approvalStartDate, 'yyyy-MM-dd''T''HH:mm') : ''}" step="300" required></wa-input>
+                    <label for="approvalStartDate" class="form-label fw-medium" data-i18n="period.approvalStart">Bắt đầu Khoa duyệt <span class="text-danger" data-required-marker>*</span></label>
+                    <input type="text" class="form-control period-date-input" th:classappend="${#fields.hasErrors('approvalStartDate')} ? 'is-invalid' : ''" id="approvalStartDate" name="approvalStartDate" aria-label="Bắt đầu Khoa duyệt" th:value="${periodDTO.approvalStartDate != null ? #temporals.format(periodDTO.approvalStartDate, 'dd/MM/yyyy HH:mm') : ''}" data-period-date-picker autocomplete="off" required>
                 </div>
                 <div class="col-md-6">
-                    <label for="approvalEndDate" class="form-label fw-medium" data-i18n="period.approvalEnd">Kết thúc Khoa duyệt</label>
-                    <wa-input type="datetime-local" class="period-date-input" id="approvalEndDate" name="approvalEndDate" aria-label="Kết thúc Khoa duyệt" th:value="${periodDTO.approvalEndDate != null ? #temporals.format(periodDTO.approvalEndDate, 'yyyy-MM-dd''T''HH:mm') : ''}" step="300" required></wa-input>
+                    <label for="approvalEndDate" class="form-label fw-medium" data-i18n="period.approvalEnd">Kết thúc Khoa duyệt <span class="text-danger" data-required-marker>*</span></label>
+                    <input type="text" class="form-control period-date-input" th:classappend="${#fields.hasErrors('approvalEndDate')} ? 'is-invalid' : ''" id="approvalEndDate" name="approvalEndDate" aria-label="Kết thúc Khoa duyệt" th:value="${periodDTO.approvalEndDate != null ? #temporals.format(periodDTO.approvalEndDate, 'dd/MM/yyyy HH:mm') : ''}" data-period-date-picker autocomplete="off" required>
                 </div>
 
                 <div class="col-12"><h5 class="mb-0" data-i18n="period.studentWindow">Thời gian Sinh viên đăng ký đề tài</h5></div>
                 <div class="col-md-6">
-                    <label for="studentStartDate" class="form-label fw-medium" data-i18n="period.studentStart">Bắt đầu SV đăng ký</label>
-                    <wa-input type="datetime-local" class="period-date-input" id="studentStartDate" name="studentStartDate" aria-label="Bắt đầu SV đăng ký" th:value="${periodDTO.studentStartDate != null ? #temporals.format(periodDTO.studentStartDate, 'yyyy-MM-dd''T''HH:mm') : ''}" step="300" required></wa-input>
+                    <label for="studentStartDate" class="form-label fw-medium" data-i18n="period.studentStart">Bắt đầu SV đăng ký <span class="text-danger" data-required-marker>*</span></label>
+                    <input type="text" class="form-control period-date-input" th:classappend="${#fields.hasErrors('studentStartDate')} ? 'is-invalid' : ''" id="studentStartDate" name="studentStartDate" aria-label="Bắt đầu SV đăng ký" th:value="${periodDTO.studentStartDate != null ? #temporals.format(periodDTO.studentStartDate, 'dd/MM/yyyy HH:mm') : ''}" data-period-date-picker autocomplete="off" required>
                 </div>
 
                 <div class="col-md-6">
-                    <label for="studentEndDate" class="form-label fw-medium" data-i18n="period.studentEnd">Kết thúc SV đăng ký</label>
-                    <wa-input type="datetime-local" class="period-date-input" id="studentEndDate" name="studentEndDate" aria-label="Kết thúc SV đăng ký" th:value="${periodDTO.studentEndDate != null ? #temporals.format(periodDTO.studentEndDate, 'yyyy-MM-dd''T''HH:mm') : ''}" step="300" required></wa-input>
+                    <label for="studentEndDate" class="form-label fw-medium" data-i18n="period.studentEnd">Kết thúc SV đăng ký <span class="text-danger" data-required-marker>*</span></label>
+                    <input type="text" class="form-control period-date-input" th:classappend="${#fields.hasErrors('studentEndDate')} ? 'is-invalid' : ''" id="studentEndDate" name="studentEndDate" aria-label="Kết thúc SV đăng ký" th:value="${periodDTO.studentEndDate != null ? #temporals.format(periodDTO.studentEndDate, 'dd/MM/yyyy HH:mm') : ''}" data-period-date-picker autocomplete="off" required>
                 </div>
 
                 <div class="col-12"><div class="small text-danger" data-schedule-error role="alert" aria-live="polite"></div></div>
 
                 <div class="col-md-6">
-                    <label for="reviewSubmissionDeadline" class="form-label fw-medium" data-i18n="period.reviewDeadline">Hạn chót GVPB nộp điểm (Bắt buộc với TLCN &amp; KLTN)</label>
-                    <wa-input type="datetime-local" class="period-date-input" id="reviewSubmissionDeadline" name="reviewSubmissionDeadline" aria-label="Hạn chót GVPB nộp điểm" th:value="${periodDTO.reviewSubmissionDeadline != null ? #temporals.format(periodDTO.reviewSubmissionDeadline, 'yyyy-MM-dd''T''HH:mm') : ''}" step="300"></wa-input>
+                    <label for="reviewSubmissionDeadline" class="form-label fw-medium" data-i18n="period.reviewDeadline">Hạn chót GVPB nộp điểm (Bắt buộc với TLCN &amp; KLTN) <span class="text-danger" data-required-marker hidden>*</span></label>
+                    <input type="text" class="form-control period-date-input" th:classappend="${#fields.hasErrors('reviewSubmissionDeadline')} ? 'is-invalid' : ''" id="reviewSubmissionDeadline" name="reviewSubmissionDeadline" aria-label="Hạn chót GVPB nộp điểm" th:value="${periodDTO.reviewSubmissionDeadline != null ? #temporals.format(periodDTO.reviewSubmissionDeadline, 'dd/MM/yyyy HH:mm') : ''}" data-period-date-picker autocomplete="off">
                 </div>
 
                 <div class="col-md-6">
-                    <label for="councilReportDate" class="form-label fw-medium" data-i18n="period.councilDate">Ngày báo cáo Hội đồng (Bắt buộc với KLTN)</label>
-                    <wa-input type="datetime-local" class="period-date-input" id="councilReportDate" name="councilReportDate" aria-label="Ngày báo cáo Hội đồng" th:value="${periodDTO.councilReportDate != null ? #temporals.format(periodDTO.councilReportDate, 'yyyy-MM-dd''T''HH:mm') : ''}" step="300"></wa-input>
+                    <label for="councilReportDate" class="form-label fw-medium" data-i18n="period.councilDate">Ngày báo cáo Hội đồng (Bắt buộc với KLTN) <span class="text-danger" data-required-marker hidden>*</span></label>
+                    <input type="text" class="form-control period-date-input" th:classappend="${#fields.hasErrors('councilReportDate')} ? 'is-invalid' : ''" id="councilReportDate" name="councilReportDate" aria-label="Ngày báo cáo Hội đồng" th:value="${periodDTO.councilReportDate != null ? #temporals.format(periodDTO.councilReportDate, 'dd/MM/yyyy HH:mm') : ''}" data-period-date-picker autocomplete="off">
                 </div>
             </div>
 
@@ -87,6 +86,7 @@
     </div>
 </div>
 <th:block layout:fragment="scripts">
+    <script th:src="@{/js/period-date-picker.js(v=6)}"></script>
     <script th:src="@{/js/period-schedule.js}"></script>
 </th:block>
 </body>

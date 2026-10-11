@@ -8,10 +8,10 @@
 <body>
 <div layout:fragment="content">
     <div class="mb-4">
-        <div th:replace="~{fragments/components :: pageHeading('CHỈNH SỬA ĐỀ TÀI', 'Cập nhật thông tin đề tài khi chưa được Khoa phê duyệt', 'bi-pencil-square')}"></div>
+        <div th:replace="~{fragments/components :: pageHeading('CHỈNH SỬA ĐỀ TÀI', 'Cập nhật thông tin đề tài khi chưa được Khoa phê duyệt')}"></div>
     </div>
 
-    <div class="card card-custom p-4">
+    <div class="card card-custom p-3">
         <form th:action="@{/topics/{id}/edit(id=${topicDTO.id})}" th:object="${topicDTO}" method="post">
             <input type="hidden" th:field="*{id}">
             <div class="row g-3">

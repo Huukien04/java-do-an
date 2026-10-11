@@ -6,6 +6,7 @@
 
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS notification_recipients;
 DROP TABLE IF EXISTS notifications;
 DROP TABLE IF EXISTS final_results;
 DROP TABLE IF EXISTS scores;
@@ -532,6 +533,27 @@ CREATE TABLE notifications (
         FOREIGN KEY (created_by_user_id)
         REFERENCES users(id)
         ON DELETE RESTRICT
+        ON UPDATE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE notification_recipients (
+    notification_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+
+    PRIMARY KEY (notification_id, user_id),
+
+    CONSTRAINT fk_notification_recipients_notification
+        FOREIGN KEY (notification_id)
+        REFERENCES notifications(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_notification_recipients_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4

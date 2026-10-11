@@ -15,7 +15,7 @@
     <link href="https://ka-f.webawesome.com/webawesome@3.14.0/styles/themes/default.css" rel="stylesheet">
     <script type="module" src="https://ka-f.webawesome.com/webawesome@3.14.0/webawesome.loader.js"></script>
     <link rel="stylesheet" th:href="@{/css/theme.css}">
-    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css(v=4)}">
     <script th:src="@{/js/theme-boot.js}"></script>
 </head>
 <body>
@@ -29,13 +29,6 @@
             </span>
         </a>
         <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-        <div class="sidebar-footer">
-            <form th:action="@{/logout}" method="post">
-                <button type="submit">
-                    <i class="bi bi-box-arrow-left"></i> Đăng xuất
-                </button>
-            </form>
-        </div>
     </aside>
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
@@ -58,15 +51,18 @@
 <script>
     (function () {
         const path = window.location.pathname;
+        let activeLink = null;
         document.querySelectorAll('.sidebar-nav a.nav-link').forEach(function (link) {
             const href = link.getAttribute('href');
             if (!href) return;
-            if (href === '/dashboard') {
-                if (path === '/' || path === '/dashboard') link.classList.add('active');
-                return;
+            const matches = href === '/dashboard'
+                ? path === '/' || path === '/dashboard'
+                : path === href || path.startsWith(href + '/');
+            if (matches && (!activeLink || href.length > activeLink.getAttribute('href').length)) {
+                activeLink = link;
             }
-            if (path === href || path.startsWith(href + '/')) link.classList.add('active');
         });
+        if (activeLink) activeLink.classList.add('active');
         const sidebar = document.getElementById('appSidebar');
         const backdrop = document.getElementById('sidebarBackdrop');
         const toggle = document.getElementById('sidebarToggle');

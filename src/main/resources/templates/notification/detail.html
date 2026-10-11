@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Chi tiết thông báo</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <nav class="notification-tabs mb-4" aria-label="Loại thông báo">
+        <a th:href="@{/notifications(view='general')}"
+           th:classappend="${view == 'general'} ? ' active' : ''">Thông báo chung</a>
+        <a th:href="@{/notifications(view='personal')}"
+           th:classappend="${view == 'personal'} ? ' active' : ''">Thông báo cá nhân</a>
+    </nav>
+
+    <article class="card card-custom notification-detail-card">
+        <h1 class="notification-detail-title" th:text="${notification.title}">Tiêu đề thông báo</h1>
+        <p class="notification-detail-meta">
+            <span th:text="${#temporals.format(notification.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</span>
+            <span aria-hidden="true"> · </span>
+            <span th:text="${notification.createdByFullName}">Người gửi</span>
+        </p>
+        <div class="notification-detail-content" th:text="${notification.content}">Nội dung thông báo</div>
+        <div class="notification-detail-actions">
+            <a class="btn btn-primary" th:href="@{/notifications(view=${view})}">
+                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Quay lại
+            </a>
+        </div>
+    </article>
+</div>
+</body>
+</html>

@@ -8,7 +8,7 @@
 <body>
 <div layout:fragment="content">
     <div class="mb-4">
-        <div th:replace="~{fragments/components :: pageHeading('Duyệt ĐĂNG KÝ NGUYỆN VỌNG CỦA NHÓM SV', 'Duyệt hoặc từ chối nguyện vọng đăng ký đề tài của các nhóm Sinh viên', 'bi-person-check')}"></div>
+        <div th:replace="~{fragments/components :: pageHeading('Duyệt ĐĂNG KÝ NGUYỆN VỌNG CỦA NHÓM SV', 'Duyệt hoặc từ chối nguyện vọng đăng ký đề tài của các nhóm Sinh viên')}"></div>
     </div>
 
     <!-- Filter -->
@@ -27,7 +27,7 @@
         </form>
     </div>
 
-    <div class="card card-custom p-4">
+    <div class="card card-custom p-3">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
@@ -62,7 +62,7 @@
                             <small class="text-muted" th:text="${#temporals.format(r.registeredAt, 'dd/MM/yyyy HH:mm')}">Date</small>
                         </td>
                         <td>
-                            <span th:replace="~{fragments/components :: statusBadge(${r.status.displayName}, ${r.status.name() == 'APPROVED' ? 'success' : (r.status.name() == 'PENDING' ? 'warning' : 'danger')})}">PENDING</span>
+                            <span th:replace="~{fragments/components :: statusBadge(${r.status.displayName})}">PENDING</span>
                         </td>
                         <td class="text-end">
                             <div th:if="${r.status.name() == 'PENDING'}" class="btn-group btn-group-sm">

@@ -10,11 +10,11 @@
 <div layout:fragment="content">
     <div class="mb-4">
         <a href="/scoring/teacher" class="btn btn-sm btn-outline-secondary mb-2"><i class="bi bi-arrow-left"></i> Quay lại Danh sách</a>
-        <div th:replace="~{fragments/components :: pageHeading(${topic.title}, ${'Bộ môn: ' + topic.departmentName + ' | GVHD: ' + topic.primaryAdvisorName}, 'bi-journal-check')}"></div>
+        <div th:replace="~{fragments/components :: pageHeading(${topic.title}, ${'Bộ môn: ' + topic.departmentName + ' | GVHD: ' + topic.primaryAdvisorName})}"></div>
     </div>
 
     <!-- Rule R-SCORE-01 Constraint Alert -->
-    <div th:if="${isAdvisor}" class="alert alert-danger shadow-sm border-0 p-4 mb-4">
+    <div th:if="${isAdvisor}" class="alert alert-danger shadow-sm border-0 p-3 mb-4">
         <div class="d-flex align-items-center">
             <i class="bi bi-shield-slash-fill display-5 me-3 text-danger"></i>
             <div>
@@ -27,7 +27,7 @@
     <div class="row g-4">
         <!-- Score Input Form (If not advisor) -->
         <div class="col-md-6" th:unless="${isAdvisor}">
-            <div class="card card-custom p-4">
+            <div class="card card-custom p-3">
                 <h5 class="fw-bold mb-3"><i class="bi bi-pencil-fill text-primary me-2"></i>Nhập Điểm Chấm Cá Nhân</h5>
                 <form th:action="@{/scoring/submit}" method="post">
                     <input type="hidden" name="topicId" th:value="${topic.id}">
@@ -51,7 +51,7 @@
 
         <!-- Submitted Scores List & Chairman Summary -->
         <div class="col-md-6" th:classappend="${isAdvisor ? 'col-md-12' : ''}">
-            <div class="card card-custom p-4 mb-4">
+            <div class="card card-custom p-3 mb-4">
                 <h5 class="fw-bold mb-3"><i class="bi bi-list-stars text-warning me-2"></i>Bảng Tổng hợp Điểm Thành viên Hội đồng</h5>
                 <th:block th:if="${existingScores.empty}">
                     <div th:replace="~{fragments/components :: emptyState('bi-clipboard2-data', 'Chưa có thành viên nào nhập điểm.', 'Điểm từ các thành viên hội đồng sẽ xuất hiện tại đây.')}"></div>
@@ -78,7 +78,7 @@
             </div>
 
             <!-- Chairman Confirmation Section -->
-            <div sec:authorize="hasAnyRole('TEACHER', 'ADMIN')" class="card card-custom p-4 bg-light border">
+            <div sec:authorize="hasAnyRole('TEACHER', 'ADMIN')" class="card card-custom p-3 bg-light border">
                 <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-award me-2"></i>Xác nhận Kết quả Cuối cùng (Chủ tịch Hội đồng)</h5>
                 <form th:action="@{/scoring/chairman/confirm}" method="post">
                     <input type="hidden" name="topicId" th:value="${topic.id}">

@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,6 +28,9 @@ public class NotificationDTO {
     private NotificationType type;
 
     private String targetRole; // ALL, ROLE_TEACHER, ROLE_STUDENT
+
+    @Builder.Default
+    private List<Long> targetUserIds = new ArrayList<>();
 
     private Long periodId;
     private String periodName;

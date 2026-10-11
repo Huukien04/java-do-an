@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<header th:fragment="pageHeading(title, subtitle, icon)" class="ui-page-heading">
-    <span class="ui-page-heading__icon" aria-hidden="true">
+<header th:fragment="pageHeading(title, subtitle)" class="ui-page-heading">
+    <!-- <span class="ui-page-heading__icon" aria-hidden="true">
         <i th:class="'bi ' + ${icon}"></i>
-    </span>
+    </span> -->
     <span class="ui-page-heading__copy">
         <h1 class="ui-page-heading__title" th:text="${title}">Page title</h1>
         <span class="ui-page-heading__subtitle" th:text="${subtitle}">Page description</span>
@@ -21,9 +21,8 @@
     <strong class="ui-metric-card__value" th:text="${value}">0</strong>
 </article>
 
-<span th:fragment="statusBadge(label, tone)"
+<span th:fragment="statusBadge(label)"
       class="ui-status-badge"
-      th:classappend="${'ui-status-badge--' + tone}"
       th:text="${label}">Status</span>
 
 <a th:fragment="actionLink(href, label, icon, tone)"

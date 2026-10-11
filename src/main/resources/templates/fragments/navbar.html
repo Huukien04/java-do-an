@@ -25,21 +25,32 @@
         <a class="icon-btn" href="/notifications" title="Thông báo">
             <i class="bi bi-bell"></i>
         </a>
-        <div class="user-chip" sec:authorize="isAuthenticated()">
-            <span class="avatar">
-                <span sec:authorize="hasRole('ADMIN')">TK</span>
-                <span sec:authorize="hasRole('TEACHER')">GV</span>
-                <span sec:authorize="hasRole('STUDENT')">SV</span>
-            </span>
-            <span>
-                <span class="d-block" sec:authentication="name">User</span>
-                <span class="d-block" style="font-size:0.68rem;color:#9a9aa8;font-weight:500;">
-                    <span sec:authorize="hasRole('ADMIN')">Trưởng khoa</span>
-                    <span sec:authorize="hasRole('TEACHER')">Giảng viên</span>
-                    <span sec:authorize="hasRole('STUDENT')">Sinh viên</span>
+        <div class="dropdown" sec:authorize="isAuthenticated()">
+            <button type="button" class="user-chip" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="avatar">
+                    <span sec:authorize="hasRole('ADMIN')">AD</span>
+                    <span sec:authorize="hasRole('TEACHER')">GV</span>
+                    <span sec:authorize="hasRole('STUDENT')">SV</span>
                 </span>
-            </span>
-            <i class="bi bi-chevron-down" style="font-size:0.7rem;color:#9a9aa8;"></i>
+                <span>
+                    <span class="d-block" sec:authentication="name">User</span>
+                    <span class="d-block" style="font-size:0.68rem;color:#9a9aa8;font-weight:500;">
+                        <span sec:authorize="hasRole('ADMIN')">Trưởng khoa</span>
+                        <span sec:authorize="hasRole('TEACHER')">Giảng viên</span>
+                        <span sec:authorize="hasRole('STUDENT')">Sinh viên</span>
+                    </span>
+                </span>
+                <i class="bi bi-chevron-down" style="font-size:0.7rem;color:#9a9aa8;"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="dropdown-item">
+                            <i class="bi bi-box-arrow-left me-2"></i>Đăng xuất
+                        </button>
+                    </form>
+                </li>
+            </ul>
         </div>
     </div>
 </header>

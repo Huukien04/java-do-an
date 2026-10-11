@@ -8,36 +8,78 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <div th:replace="~{fragments/components :: pageHeading('THÔNG BÁO CHÍNH THỨC KHOA CNTT', 'Cập nhật tin tức, lịch phản biện và thông báo kết quả mới nhất', 'bi-megaphone')}"></div>
-        </div>
-        <a sec:authorize="hasRole('ADMIN')" href="/notifications/create" class="btn btn-primary shadow-sm rounded-pill px-3">
-            <i class="bi bi-plus-circle me-1"></i> Đăng Thông báo Mới
+    <div class="notification-page-header">
+        <nav class="notification-tabs" aria-label="Loại thông báo">
+            <a th:href="@{/notifications(view='general')}"
+               th:classappend="${view == 'general'} ? ' active' : ''"
+               th:attr="aria-current=${view == 'general'} ? 'page' : null">Thông báo chung</a>
+            <a th:href="@{/notifications(view='personal')}"
+               th:classappend="${view == 'personal'} ? ' active' : ''"
+               th:attr="aria-current=${view == 'personal'} ? 'page' : null">Thông báo cá nhân</a>
+        </nav>
+        <a sec:authorize="hasRole('ADMIN')" href="/notifications/create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Đăng thông báo
         </a>
     </div>
 
-    <div class="row g-4">
-        <th:block th:if="${notifications.empty}">
-            <div class="col-12" th:replace="~{fragments/components :: emptyState('bi-bell', 'Chưa có thông báo nào.', 'Thông báo mới sẽ xuất hiện tại đây.')}"></div>
-        </th:block>
-        <div class="col-12" th:each="n : ${notifications}">
-            <div class="card card-custom p-4">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <div>
-                        <span class="badge bg-primary me-2" th:text="${n.type.displayName}">GENERAL</span>
-                        <span class="badge bg-secondary" th:if="${n.targetRole}" th:text="${'Dành cho: ' + n.targetRole}">ALL</span>
-                    </div>
-                    <small class="text-muted" th:text="${#temporals.format(n.createdAt, 'dd/MM/yyyy HH:mm')}">Date</small>
-                </div>
-                <h4 class="fw-bold text-dark mb-2" th:text="${n.title}">Tiêu đề thông báo</h4>
-                <p class="text-secondary lh-lg mb-0" th:text="${n.content}">Nội dung chi tiết thông báo...</p>
-                <div class="mt-3 pt-2 border-top text-end">
-                    <small class="text-muted">Đăng bởi: <strong th:text="${n.createdByFullName}">Trưởng Khoa</strong></small>
-                </div>
-            </div>
+    <section class="card card-custom notification-list-card">
+        <label class="notification-search">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input type="search" placeholder="Tìm kiếm thông báo" aria-label="Tìm kiếm thông báo"
+                   data-notification-search>
+        </label>
+
+        <div class="table-responsive">
+            <table class="table notification-table align-middle mb-0">
+                <thead>
+                <tr>
+                    <th scope="col">Tiêu đề</th>
+                    <th scope="col">Người gửi</th>
+                    <th scope="col">Thời gian gửi</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="n : ${notifications}" data-notification-row>
+                    <td>
+                        <a class="notification-title-link"
+                           th:href="@{/notifications/{id}(id=${n.id}, view=${view})}"
+                           th:text="${n.title}">Tiêu đề thông báo</a>
+                    </td>
+                    <td th:text="${n.createdByFullName}">Người gửi</td>
+                    <td th:text="${#temporals.format(n.createdAt, 'dd/MM/yyyy')}">01/01/2026</td>
+                </tr>
+                <tr th:if="${notifications.empty}" class="notification-empty-row">
+                    <td colspan="3">
+                        <div th:replace="~{fragments/components :: emptyState('bi-bell', 'Chưa có thông báo nào.', 'Thông báo mới sẽ xuất hiện tại đây.')}"></div>
+                    </td>
+                </tr>
+                <tr hidden data-notification-no-results>
+                    <td colspan="3" class="text-center text-muted py-4">Không tìm thấy thông báo phù hợp.</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
+    </section>
 </div>
+<th:block layout:fragment="scripts">
+    <script>
+        (function () {
+            const search = document.querySelector('[data-notification-search]');
+            if (!search) return;
+            const rows = Array.from(document.querySelectorAll('[data-notification-row]'));
+            const noResults = document.querySelector('[data-notification-no-results]');
+            search.addEventListener('input', function () {
+                const query = search.value.trim().toLocaleLowerCase();
+                let visibleCount = 0;
+                rows.forEach(function (row) {
+                    const matches = row.textContent.toLocaleLowerCase().includes(query);
+                    row.hidden = !matches;
+                    if (matches) visibleCount++;
+                });
+                if (noResults) noResults.hidden = visibleCount > 0 || rows.length === 0;
+            });
+        })();
+    </script>
+</th:block>
 </body>
 </html>
