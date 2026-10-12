@@ -31,6 +31,19 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         log.info("Checking initial seed data...");
 
+        // Tự động phân loại và reset mật khẩu riêng cho từng nhóm tài khoản
+        userRepository.findAll().forEach(u -> {
+            if ("admin".equals(u.getUsername())) {
+                u.setPassword(passwordEncoder.encode("admin123"));
+            } else if ("truongkhoa".equals(u.getUsername())) {
+                u.setPassword(passwordEncoder.encode("truongkhoa123"));
+            } else {
+                u.setPassword(passwordEncoder.encode("123456"));
+            }
+            u.setEnabled(true);
+            userRepository.save(u);
+        });
+
         // 1. Seed Roles
         Role adminRole = seedRoleIfAbsent(RoleName.ROLE_ADMIN);
         Role truongKhoaRole = seedRoleIfAbsent(RoleName.ROLE_TRUONG_KHOA);
@@ -85,18 +98,28 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // 4. Seed Sample Teachers
-        seedTeacherIfAbsent("gv_nguyenvana", "TS. Nguyễn Văn A", "gv.nguyenvana@hcmute.edu.vn", "GV001", "TS", "Tiến sĩ", ktpm, teacherRole);
-        seedTeacherIfAbsent("gv_tranvanb", "ThS. Trần Văn B", "gv.tranvanb@hcmute.edu.vn", "GV002", "ThS", "Thạc sĩ", httt, teacherRole);
-        seedTeacherIfAbsent("gv_lethic", "PGS.TS. Lê Thị C", "gv.lethic@hcmute.edu.vn", "GV003", "PGS.TS", "Phó Giáo sư Tiến sĩ", khmt, teacherRole);
-        seedTeacherIfAbsent("gv_phamvand", "TS. Phạm Văn D", "gv.phamvand@hcmute.edu.vn", "GV004", "TS", "Tiến sĩ", mmt, teacherRole);
-        seedTeacherIfAbsent("gv_hoangvane", "ThS. Hoàng Văn E", "gv.hoangvane@hcmute.edu.vn", "GV005", "ThS", "Thạc sĩ", cntt, teacherRole);
+        seedTeacherIfAbsent("gv_nguyenvana", "TS. Nguyễn Văn A", "gv.nguyenvana@hcmute.edu.vn", "GV001", "TS",
+                "Tiến sĩ", ktpm, teacherRole);
+        seedTeacherIfAbsent("gv_tranvanb", "ThS. Trần Văn B", "gv.tranvanb@hcmute.edu.vn", "GV002", "ThS", "Thạc sĩ",
+                httt, teacherRole);
+        seedTeacherIfAbsent("gv_lethic", "PGS.TS. Lê Thị C", "gv.lethic@hcmute.edu.vn", "GV003", "PGS.TS",
+                "Phó Giáo sư Tiến sĩ", khmt, teacherRole);
+        seedTeacherIfAbsent("gv_phamvand", "TS. Phạm Văn D", "gv.phamvand@hcmute.edu.vn", "GV004", "TS", "Tiến sĩ", mmt,
+                teacherRole);
+        seedTeacherIfAbsent("gv_hoangvane", "ThS. Hoàng Văn E", "gv.hoangvane@hcmute.edu.vn", "GV005", "ThS", "Thạc sĩ",
+                cntt, teacherRole);
 
         // 5. Seed Sample Students
-        seedStudentIfAbsent("sv_nguyenvanf", "Nguyễn Văn F", "sv.nguyenvanf@student.hcmute.edu.vn", "SV2001", "ĐH KTPM16A", "2022-2026", ktpm, studentRole);
-        seedStudentIfAbsent("sv_tranvang", "Trần Văn G", "sv.tranvang@student.hcmute.edu.vn", "SV2002", "ĐH KTPM16A", "2022-2026", ktpm, studentRole);
-        seedStudentIfAbsent("sv_lethih", "Lê Thị H", "sv.lethih@student.hcmute.edu.vn", "SV2003", "ĐH KTPM16A", "2022-2026", ktpm, studentRole);
-        seedStudentIfAbsent("sv_phamvani", "Phạm Văn I", "sv.phamvani@student.hcmute.edu.vn", "SV2004", "ĐH HTTT16A", "2022-2026", httt, studentRole);
-        seedStudentIfAbsent("sv_hoangvank", "Hoàng Văn K", "sv.hoangvank@student.hcmute.edu.vn", "SV2005", "ĐH HTTT16A", "2022-2026", httt, studentRole);
+        seedStudentIfAbsent("sv_nguyenvanf", "Nguyễn Văn F", "sv.nguyenvanf@student.hcmute.edu.vn", "SV2001",
+                "ĐH KTPM16A", "2022-2026", ktpm, studentRole);
+        seedStudentIfAbsent("sv_tranvang", "Trần Văn G", "sv.tranvang@student.hcmute.edu.vn", "SV2002", "ĐH KTPM16A",
+                "2022-2026", ktpm, studentRole);
+        seedStudentIfAbsent("sv_lethih", "Lê Thị H", "sv.lethih@student.hcmute.edu.vn", "SV2003", "ĐH KTPM16A",
+                "2022-2026", ktpm, studentRole);
+        seedStudentIfAbsent("sv_phamvani", "Phạm Văn I", "sv.phamvani@student.hcmute.edu.vn", "SV2004", "ĐH HTTT16A",
+                "2022-2026", httt, studentRole);
+        seedStudentIfAbsent("sv_hoangvank", "Hoàng Văn K", "sv.hoangvank@student.hcmute.edu.vn", "SV2005", "ĐH HTTT16A",
+                "2022-2026", httt, studentRole);
 
         // 6. Seed Default Registration Period if none exists
         if (periodRepository.count() == 0) {
@@ -132,7 +155,8 @@ public class DataInitializer implements CommandLineRunner {
         });
     }
 
-    private void seedTeacherIfAbsent(String username, String fullName, String email, String code, String rank, String degree, Department dept, Role role) {
+    private void seedTeacherIfAbsent(String username, String fullName, String email, String code, String rank,
+            String degree, Department dept, Role role) {
         if (!userRepository.existsByUsername(username)) {
             User u = User.builder()
                     .username(username)
@@ -157,7 +181,8 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    private void seedStudentIfAbsent(String username, String fullName, String email, String code, String className, String year, Department dept, Role role) {
+    private void seedStudentIfAbsent(String username, String fullName, String email, String code, String className,
+            String year, Department dept, Role role) {
         if (!userRepository.existsByUsername(username)) {
             User u = User.builder()
                     .username(username)
