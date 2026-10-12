@@ -30,6 +30,17 @@
     "startMustBeFuture": "Teacher registration must not start in the past.",
     "missingDate": "Please enter all required dates.",
     "manageTitle": "REGISTRATION PERIODS",
+    "table": {
+      "index": "#",
+      "name": "Period name",
+      "type": "Type",
+      "fullPeriod": "Full period",
+      "teacherRegistration": "Teacher registration",
+      "departmentApproval": "Department approval",
+      "studentRegistration": "Student registration",
+      "status": "Status",
+      "actions": "Actions"
+    },
     "calendarTitle": "Phase calendar",
     "kanbanTitle": "Period status board",
     "emptyColumn": "No periods",

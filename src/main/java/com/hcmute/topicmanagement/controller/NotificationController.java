@@ -15,6 +15,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/notifications")
@@ -48,7 +50,17 @@ public class NotificationController {
         model.addAttribute("view", selectedView);
         model.addAttribute("notification",
                 notificationService.getNotificationForUser(id, userDetails.getUserId(), roleName));
+        notificationService.markAsRead(id, userDetails.getUserId());
         return "notification/detail";
+    }
+
+    @GetMapping("/unread-count")
+    @ResponseBody
+    public ResponseEntity<Map<String, Long>> unreadCount(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        String roleName = userDetails.getUser().getRole().getName().name();
+        return ResponseEntity.ok(Map.of(
+                "count", notificationService.getUnreadCount(userDetails.getUserId(), roleName)));
     }
 
     @GetMapping("/create")

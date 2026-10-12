@@ -1,11 +1,13 @@
 package com.hcmute.topicmanagement.service.impl;
 
+import com.hcmute.topicmanagement.dto.NotificationDTO;
 import com.hcmute.topicmanagement.dto.StudentGroupDTO;
 import com.hcmute.topicmanagement.entity.*;
 import com.hcmute.topicmanagement.enums.*;
 import com.hcmute.topicmanagement.exception.BusinessException;
 import com.hcmute.topicmanagement.exception.ResourceNotFoundException;
 import com.hcmute.topicmanagement.repository.*;
+import com.hcmute.topicmanagement.service.NotificationService;
 import com.hcmute.topicmanagement.service.StudentGroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,9 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +32,7 @@ public class StudentGroupServiceImpl implements StudentGroupService {
     private final StudentRepository studentRepository;
     private final RegistrationPeriodRepository periodRepository;
     private final TopicRepository topicRepository;
+    private final NotificationService notificationService;
 
     @Override
     public StudentGroupDTO createGroup(Long leaderStudentId, Long periodId) {
@@ -193,6 +197,9 @@ public class StudentGroupServiceImpl implements StudentGroupService {
         StudentGroup group = reg.getGroup();
         group.setStatus(StudentGroupStatus.APPROVED);
         groupRepository.save(group);
+
+        notifyGroupMembers(reg, "Đăng ký đề tài \"" + topic.getTitle()
+                + "\" của nhóm " + group.getGroupCode() + " đã được giảng viên duyệt.");
     }
 
     @Override
@@ -207,6 +214,27 @@ public class StudentGroupServiceImpl implements StudentGroupService {
         StudentGroup group = reg.getGroup();
         group.setStatus(StudentGroupStatus.READY);
         groupRepository.save(group);
+
+        String content = "Đăng ký đề tài \"" + reg.getTopic().getTitle()
+                + "\" của nhóm " + group.getGroupCode() + " đã bị giảng viên từ chối."
+                + (reason == null || reason.isBlank() ? "" : " Lý do: " + reason.trim());
+        notifyGroupMembers(reg, content);
+    }
+
+    private void notifyGroupMembers(TopicRegistration registration, String content) {
+        StudentGroup group = registration.getGroup();
+        Set<Long> recipientIds = new LinkedHashSet<>();
+        recipientIds.add(group.getLeader().getUser().getId());
+        group.getMembers().forEach(member -> recipientIds.add(member.getStudent().getUser().getId()));
+
+        notificationService.createNotification(NotificationDTO.builder()
+                .title("Cập nhật đăng ký đề tài")
+                .content(content)
+                .type(NotificationType.RESULT)
+                .targetRole("INDIVIDUAL")
+                .targetUserIds(List.copyOf(recipientIds))
+                .periodId(group.getPeriod().getId())
+                .build(), registration.getTopic().getCreatedByTeacher().getUser().getId());
     }
 
     @Override

@@ -22,8 +22,9 @@
         <button type="button" class="icon-btn" id="themeToggle" aria-label="Chuyển giao diện" title="Chuyển giao diện sáng">
             <i class="bi bi-sun" id="themeToggleIcon"></i>
         </button>
-        <a class="icon-btn" href="/notifications" title="Thông báo">
+        <a class="icon-btn notification-bell" href="/notifications" title="Thông báo" aria-label="Thông báo">
             <i class="bi bi-bell"></i>
+            <span class="notification-unread-badge" data-notification-unread hidden></span>
         </a>
         <div class="dropdown" sec:authorize="isAuthenticated()">
             <button type="button" class="user-chip" data-bs-toggle="dropdown" aria-expanded="false">

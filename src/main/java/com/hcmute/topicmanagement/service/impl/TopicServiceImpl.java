@@ -1,14 +1,17 @@
 package com.hcmute.topicmanagement.service.impl;
 
 import com.hcmute.topicmanagement.dto.TopicDTO;
+import com.hcmute.topicmanagement.dto.NotificationDTO;
 import com.hcmute.topicmanagement.entity.*;
 import com.hcmute.topicmanagement.enums.AdvisorRole;
+import com.hcmute.topicmanagement.enums.NotificationType;
 import com.hcmute.topicmanagement.enums.PeriodStatus;
 import com.hcmute.topicmanagement.enums.TopicStatus;
 import com.hcmute.topicmanagement.exception.BusinessException;
 import com.hcmute.topicmanagement.exception.ResourceNotFoundException;
 import com.hcmute.topicmanagement.repository.*;
 import com.hcmute.topicmanagement.service.TopicService;
+import com.hcmute.topicmanagement.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,11 @@ public class TopicServiceImpl implements TopicService {
     private final TeacherRepository teacherRepository;
     private final DepartmentRepository departmentRepository;
     private final RegistrationPeriodRepository periodRepository;
+    private final NotificationService notificationService;
+    private final TopicRegistrationRepository topicRegistrationRepository;
+    private final CouncilTopicRepository councilTopicRepository;
+    private final ScoreRepository scoreRepository;
+    private final FinalResultRepository finalResultRepository;
 
     @Override
     public TopicDTO createTopic(TopicDTO dto, Long currentTeacherId) {
@@ -159,32 +167,72 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public void approveTopic(Long topicId) {
-        Topic topic = topicRepository.findById(topicId)
-                .orElseThrow(() -> new ResourceNotFoundException("Đề tài", "id", topicId));
-        validateDepartmentApprovalWindow(topic.getPeriod());
-        topic.setStatus(TopicStatus.APPROVED);
-        topicRepository.save(topic);
+    public void deleteTopicByAdmin(Long id, Long adminUserId) {
+        Topic topic = topicRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Đề tài", "id", id));
+
+        List<Long> recipientUserIds = new ArrayList<>();
+        recipientUserIds.add(topic.getCreatedByTeacher().getUser().getId());
+        topic.getAdvisors().stream()
+                .map(advisor -> advisor.getTeacher().getUser().getId())
+                .forEach(recipientUserIds::add);
+
+        topicRegistrationRepository.findByTopicId(id).ifPresent(registration -> {
+            StudentGroup group = registration.getGroup();
+            recipientUserIds.add(group.getLeader().getUser().getId());
+            group.getMembers().stream()
+                    .map(member -> member.getStudent().getUser().getId())
+                    .forEach(recipientUserIds::add);
+            topicRegistrationRepository.delete(registration);
+        });
+
+        notificationService.createNotification(NotificationDTO.builder()
+                .title("Đề tài đã bị xóa")
+                .content("Đề tài \"" + topic.getTitle() + "\" đã bị quản trị viên xóa. Đăng ký liên quan (nếu có) cũng đã bị hủy.")
+                .type(NotificationType.RESULT)
+                .targetRole("INDIVIDUAL")
+                .targetUserIds(recipientUserIds.stream().distinct().toList())
+                .periodId(topic.getPeriod().getId())
+                .build(), adminUserId);
+
+        councilTopicRepository.findByTopicId(id).ifPresent(councilTopicRepository::delete);
+        scoreRepository.deleteAll(scoreRepository.findByTopicId(id));
+        finalResultRepository.findByTopicId(id).ifPresent(finalResultRepository::delete);
+        topicRepository.delete(topic);
     }
 
     @Override
-    public void rejectTopic(Long topicId, String reason) {
+    public void approveTopicByAdmin(Long topicId, Long approverUserId) {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Đề tài", "id", topicId));
-        validateDepartmentApprovalWindow(topic.getPeriod());
-        topic.setStatus(TopicStatus.REJECTED);
+        topic.setStatus(TopicStatus.APPROVED);
         topicRepository.save(topic);
+
+        notificationService.createNotification(NotificationDTO.builder()
+                .title("Đề tài mới được Khoa phê duyệt")
+                .content("Đề tài \"" + topic.getTitle() + "\" đã được phê duyệt và hiện có thể đăng ký.")
+                .type(NotificationType.GENERAL)
+                .targetRole("ROLE_STUDENT")
+                .periodId(topic.getPeriod().getId())
+                .build(), approverUserId);
     }
 
-    private void validateDepartmentApprovalWindow(RegistrationPeriod period) {
-        LocalDateTime now = LocalDateTime.now();
-        if (period.getStatus() != PeriodStatus.PHASE1_DEAN_REVIEW
-                || period.getApprovalStartDate() == null
-                || period.getApprovalEndDate() == null
-                || now.isBefore(period.getApprovalStartDate())
-                || now.isAfter(period.getApprovalEndDate())) {
-            throw new BusinessException("Hiện không trong thời gian Khoa duyệt đề tài của đợt đăng ký này.");
-        }
+    @Override
+    public void rejectTopicByAdmin(Long topicId, String reason, Long approverUserId) {
+        Topic topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new ResourceNotFoundException("Đề tài", "id", topicId));
+        topic.setStatus(TopicStatus.REJECTED);
+        topicRepository.save(topic);
+
+        String content = "Đề tài \"" + topic.getTitle() + "\" đã bị Khoa từ chối."
+                + (reason == null || reason.isBlank() ? "" : " Lý do: " + reason.trim());
+        notificationService.createNotification(NotificationDTO.builder()
+                .title("Kết quả duyệt đề tài")
+                .content(content)
+                .type(NotificationType.RESULT)
+                .targetRole("INDIVIDUAL")
+                .targetUserIds(List.of(topic.getCreatedByTeacher().getUser().getId()))
+                .build(), approverUserId);
     }
 
     @Override

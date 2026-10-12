@@ -12,7 +12,7 @@
     </div>
 
     <div class="card card-custom p-3">
-        <form th:action="@{/admin/councils/create}" th:object="${councilDTO}" method="post">
+        <form th:action="@{/admin/councils/create}" th:object="${councilDTO}" method="post" data-council-create>
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="periodId" class="form-label fw-medium">Đợt Đăng Ký <span class="text-danger">*</span></label>
@@ -23,18 +23,22 @@
                 </div>
 
                 <div class="col-md-3">
-                    <label for="councilCode" class="form-label fw-medium">Mã Hội đồng <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="councilCode" th:field="*{councilCode}" placeholder="Vd: HD_KTPM_01" required>
-                </div>
-
-                <div class="col-md-3">
                     <label for="name" class="form-label fw-medium">Tên Hội đồng <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Vd: Hội đồng KTPM 1" required>
                 </div>
 
+                <div class="col-md-3">
+                    <label for="councilCode" class="form-label fw-medium">Mã Hội đồng</label>
+                    <input type="text" class="form-control" id="councilCode" th:value="${councilDTO.councilCode}"
+                           placeholder="Tự sinh từ tên hội đồng" readonly>
+                    <small class="form-text text-muted">Mã được tự tạo từ tên; nếu trùng sẽ tự thêm số.</small>
+                </div>
+
                 <div class="col-md-6">
                     <label for="defenseDate" class="form-label fw-medium">Thời gian Báo cáo Báo vệ</label>
-                    <input type="datetime-local" class="form-control" id="defenseDate" th:field="*{defenseDate}">
+                    <input type="text" class="form-control period-date-input" id="defenseDate" name="defenseDate"
+                           th:value="${councilDTO.defenseDate != null ? #temporals.format(councilDTO.defenseDate, 'dd/MM/yyyy HH:mm') : ''}"
+                           data-period-date-picker autocomplete="off">
                 </div>
 
                 <div class="col-md-6">
@@ -71,11 +75,18 @@
 
                 <hr class="my-4">
                 <h5 class="fw-bold text-primary mb-2"><i class="bi bi-journal-plus me-2"></i>Gán Đề tài cho Hội đồng</h5>
+                <p class="text-muted small mb-2">
+                    Chọn đề tài đã được nhóm đăng ký và giảng viên duyệt để đưa vào lịch phản biện của hội đồng.
+                    Đề tài phải thuộc cùng đợt đăng ký và chỉ có thể được gán cho một hội đồng.
+                </p>
 
                 <div class="col-12">
                     <select class="form-select" id="assignedTopicIds" th:field="*{assignedTopicIds}" multiple style="height: 120px;">
-                        <option th:each="top : ${assignedTopics}" th:value="${top.id}" th:text="${top.title + ' (GVHD: ' + top.createdByTeacher.user.fullName + ')'}"></option>
+                        <option th:each="top : ${assignedTopics}" th:value="${top.id}"
+                                th:attr="data-period-id=${top.period.id}"
+                                th:text="${top.title + ' (GVHD: ' + top.createdByTeacher.user.fullName + ')'}"></option>
                     </select>
+                    <small class="form-text text-muted">Có thể chọn nhiều đề tài; giữ Ctrl (hoặc Cmd trên Mac) để chọn nhiều mục.</small>
                 </div>
             </div>
 
@@ -86,5 +97,9 @@
         </form>
     </div>
 </div>
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/period-date-picker.js(v=6)}"></script>
+    <script th:src="@{/js/council-form.js}"></script>
+</th:block>
 </body>
 </html>

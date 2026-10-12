@@ -2,16 +2,22 @@ package com.hcmute.topicmanagement.service.impl;
 
 import com.hcmute.topicmanagement.dto.NotificationDTO;
 import com.hcmute.topicmanagement.entity.Notification;
+import com.hcmute.topicmanagement.entity.NotificationRead;
 import com.hcmute.topicmanagement.entity.RegistrationPeriod;
 import com.hcmute.topicmanagement.entity.User;
+import com.hcmute.topicmanagement.config.NotificationWebSocketHandler;
 import com.hcmute.topicmanagement.exception.ResourceNotFoundException;
 import com.hcmute.topicmanagement.repository.NotificationRepository;
+import com.hcmute.topicmanagement.repository.NotificationReadRepository;
 import com.hcmute.topicmanagement.repository.RegistrationPeriodRepository;
 import com.hcmute.topicmanagement.repository.UserRepository;
 import com.hcmute.topicmanagement.service.NotificationService;
+import com.hcmute.topicmanagement.enums.RoleName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.LinkedHashSet;
@@ -24,8 +30,10 @@ import java.util.stream.Collectors;
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final NotificationReadRepository notificationReadRepository;
     private final UserRepository userRepository;
     private final RegistrationPeriodRepository periodRepository;
+    private final NotificationWebSocketHandler webSocketHandler;
 
     @Override
     public NotificationDTO createNotification(NotificationDTO dto, Long currentUserId) {
@@ -64,11 +72,35 @@ public class NotificationServiceImpl implements NotificationService {
                 .build();
 
         notification = notificationRepository.save(notification);
-        return mapToDTO(notification);
+        NotificationDTO savedNotification = mapToDTO(notification);
+        List<User> pushRecipients = switch (targetRole) {
+            case "INDIVIDUAL" -> List.copyOf(recipients);
+            case "ALL" -> userRepository.findByEnabledTrueOrderByFullNameAsc();
+            default -> userRepository.findByEnabledTrueAndRole_Name(RoleName.valueOf(targetRole));
+        };
+        List<String> recipientUsernames = pushRecipients.stream().map(User::getUsername).toList();
+        java.util.Map<String, Object> pushMessage = java.util.Map.of(
+                "id", savedNotification.getId(),
+                "title", savedNotification.getTitle(),
+                "content", savedNotification.getContent(),
+                "url", "/notifications/" + savedNotification.getId()
+        );
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    webSocketHandler.sendToUsers(recipientUsernames, pushMessage);
+                }
+            });
+        } else {
+            webSocketHandler.sendToUsers(recipientUsernames, pushMessage);
+        }
+        return savedNotification;
     }
 
     @Override
     public void deleteNotification(Long id) {
+        notificationReadRepository.deleteByNotificationId(id);
         notificationRepository.deleteById(id);
     }
 
@@ -124,6 +156,26 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationRepository.findAll().stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long getUnreadCount(Long userId, String roleName) {
+        return notificationReadRepository.countUnreadForUser(userId, roleName);
+    }
+
+    @Override
+    public void markAsRead(Long notificationId, Long userId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Thông báo", "id", notificationId));
+        if (!notificationReadRepository.existsByNotificationIdAndUserId(notificationId, userId)) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Người dùng", "id", userId));
+            notificationReadRepository.save(NotificationRead.builder()
+                    .notification(notification)
+                    .user(user)
+                    .build());
+        }
     }
 
     private NotificationDTO mapToDTO(Notification notification) {

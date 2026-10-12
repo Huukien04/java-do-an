@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface ReviewCouncilRepository extends JpaRepository<ReviewCouncil, Long> {
     List<ReviewCouncil> findByPeriodId(Long periodId);
     Optional<ReviewCouncil> findByCouncilCode(String councilCode);
+    boolean existsByCouncilCode(String councilCode);
 
     @Query("SELECT DISTINCT c FROM ReviewCouncil c JOIN c.members m WHERE m.teacher.id = :teacherId")
     List<ReviewCouncil> findCouncilsByTeacherId(@Param("teacherId") Long teacherId);

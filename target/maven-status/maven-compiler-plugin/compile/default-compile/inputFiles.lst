@@ -1,4 +1,6 @@
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\config\DataInitializer.java
+D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\config\NotificationWebSocketConfig.java
+D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\config\NotificationWebSocketHandler.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\config\SecurityConfig.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\controller\AuthController.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\controller\DashboardController.java
@@ -7,6 +9,7 @@ D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\controller\Re
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\controller\ReviewCouncilController.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\controller\ScoreController.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\controller\StudentGroupController.java
+D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\controller\StudentRegistrationController.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\controller\SubmissionController.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\controller\TeacherGroupRegistrationController.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\controller\TopicController.java
@@ -23,6 +26,7 @@ D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\entity\Depart
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\entity\FinalResult.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\entity\GroupMember.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\entity\Notification.java
+D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\entity\NotificationRead.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\entity\RegistrationPeriod.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\entity\ReviewCouncil.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\entity\Role.java
@@ -54,6 +58,7 @@ D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\repository\Co
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\repository\DepartmentRepository.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\repository\FinalResultRepository.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\repository\GroupMemberRepository.java
+D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\repository\NotificationReadRepository.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\repository\NotificationRepository.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\repository\RegistrationPeriodRepository.java
 D:\LapTrinhWeb\java-do-an\src\main\java\com\hcmute\topicmanagement\repository\ReviewCouncilRepository.java

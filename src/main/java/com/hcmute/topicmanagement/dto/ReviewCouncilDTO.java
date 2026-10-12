@@ -17,7 +17,6 @@ public class ReviewCouncilDTO {
 
     private Long id;
 
-    @NotBlank(message = "Mã hội đồng không được để trống")
     private String councilCode;
 
     @NotBlank(message = "Tên hội đồng không được để trống")

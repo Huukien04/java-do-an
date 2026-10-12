@@ -60,25 +60,33 @@ public class ScoreController {
     }
 
     @GetMapping("/topic/{topicId}")
-    @PreAuthorize("hasRole('TEACHER')")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     public String topicScoringForm(@PathVariable Long topicId,
                                    @AuthenticationPrincipal CustomUserDetails userDetails,
                                    Model model) {
         TopicDTO topic = topicService.getTopicById(topicId);
-        Long teacherId = userDetails.getTeacher().getId();
+        boolean isTeacher = userDetails.getUser().getRole().getName() == RoleName.ROLE_TEACHER;
+        Long teacherId = isTeacher && userDetails.getTeacher() != null
+                ? userDetails.getTeacher().getId()
+                : null;
+        List<ScoreDTO> existingScores = scoreService.getScoresByTopic(topicId);
 
         model.addAttribute("topic", topic);
-        model.addAttribute("existingScores", scoreService.getScoresByTopic(topicId));
+        model.addAttribute("existingScores", existingScores);
 
-        ScoreDTO myScore = scoreService.getScoresByTopic(topicId).stream()
-                .filter(s -> s.getTeacherId().equals(teacherId))
-                .findFirst()
-                .orElse(ScoreDTO.builder().topicId(topicId).teacherId(teacherId).build());
+        ScoreDTO myScore = teacherId == null
+                ? ScoreDTO.builder().topicId(topicId).build()
+                : existingScores.stream()
+                        .filter(s -> teacherId.equals(s.getTeacherId()))
+                        .findFirst()
+                        .orElse(ScoreDTO.builder().topicId(topicId).teacherId(teacherId).build());
 
         model.addAttribute("scoreDTO", myScore);
 
-        boolean isAdvisor = teacherId.equals(topic.getPrimaryAdvisorId()) || teacherId.equals(topic.getSecondaryAdvisorId());
+        boolean isAdvisor = teacherId != null
+                && (teacherId.equals(topic.getPrimaryAdvisorId()) || teacherId.equals(topic.getSecondaryAdvisorId()));
         model.addAttribute("isAdvisor", isAdvisor);
+        model.addAttribute("canSubmitScore", isTeacher && !isAdvisor);
 
         return "scoring/topic_form";
     }
@@ -130,4 +138,3 @@ public class ScoreController {
         return "redirect:/admin/periods";
     }
 }
-

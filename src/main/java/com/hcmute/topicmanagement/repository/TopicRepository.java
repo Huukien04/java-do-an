@@ -16,6 +16,18 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     List<Topic> findByCreatedByTeacherId(Long teacherId);
     List<Topic> findByDepartmentIdAndPeriodId(Long departmentId, Long periodId);
 
+    @Query("""
+            SELECT topic
+            FROM Topic topic
+            WHERE topic.status = :status
+              AND NOT EXISTS (
+                  SELECT councilTopic.id
+                  FROM CouncilTopic councilTopic
+                  WHERE councilTopic.topic.id = topic.id
+              )
+            """)
+    List<Topic> findUnassignedByStatus(@Param("status") TopicStatus status);
+
     @Query("SELECT DISTINCT t FROM Topic t JOIN t.advisors ta WHERE ta.teacher.id = :teacherId")
     List<Topic> findTopicsByAdvisorTeacherId(@Param("teacherId") Long teacherId);
 }

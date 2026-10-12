@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.hcmute.topicmanagement.enums.TopicStatus;
+import com.hcmute.topicmanagement.enums.RoleName;
 import com.hcmute.topicmanagement.exception.BusinessException;
 
 @Controller
@@ -144,12 +145,16 @@ public class TopicController {
     }
 
     @PostMapping("/{id}/delete")
-    @PreAuthorize("hasRole('TEACHER')")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     public String deleteTopic(@PathVariable Long id,
                               @AuthenticationPrincipal CustomUserDetails userDetails,
                               RedirectAttributes redirectAttributes) {
         try {
-            topicService.deleteTopic(id, userDetails.getTeacher().getId());
+            if (userDetails.getUser().getRole().getName() == RoleName.ROLE_ADMIN) {
+                topicService.deleteTopicByAdmin(id, userDetails.getUserId());
+            } else {
+                topicService.deleteTopic(id, userDetails.getTeacher().getId());
+            }
             redirectAttributes.addFlashAttribute("successMessage", "Xóa đề tài thành công.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -159,17 +164,30 @@ public class TopicController {
 
     @PostMapping("/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
-    public String approveTopic(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        topicService.approveTopic(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Đã phê duyệt đề tài thành công.");
+    public String approveTopic(@PathVariable Long id,
+                               @AuthenticationPrincipal CustomUserDetails userDetails,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            topicService.approveTopicByAdmin(id, userDetails.getUserId());
+            redirectAttributes.addFlashAttribute("successMessage", "Đã phê duyệt đề tài thành công.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
         return "redirect:/topics";
     }
 
     @PostMapping("/{id}/reject")
     @PreAuthorize("hasRole('ADMIN')")
-    public String rejectTopic(@PathVariable Long id, @RequestParam(required = false) String reason, RedirectAttributes redirectAttributes) {
-        topicService.rejectTopic(id, reason);
-        redirectAttributes.addFlashAttribute("successMessage", "Đã từ chối đề tài.");
+    public String rejectTopic(@PathVariable Long id,
+                              @RequestParam(required = false) String reason,
+                              @AuthenticationPrincipal CustomUserDetails userDetails,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            topicService.rejectTopicByAdmin(id, reason, userDetails.getUserId());
+            redirectAttributes.addFlashAttribute("successMessage", "Đã từ chối đề tài.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
         return "redirect:/topics";
     }
 }

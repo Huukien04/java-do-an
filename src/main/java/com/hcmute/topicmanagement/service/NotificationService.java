@@ -12,4 +12,6 @@ public interface NotificationService {
     List<NotificationDTO> getPersonalNotifications(Long userId);
     NotificationDTO getNotificationForUser(Long id, Long userId, String roleName);
     List<NotificationDTO> getAllNotifications();
+    long getUnreadCount(Long userId, String roleName);
+    void markAsRead(Long notificationId, Long userId);
 }

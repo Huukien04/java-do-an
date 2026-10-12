@@ -15,8 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-
 @Controller
 @RequestMapping("/admin/councils")
 @PreAuthorize("hasRole('ADMIN')")
@@ -44,7 +42,7 @@ public class ReviewCouncilController {
         model.addAttribute("councilDTO", new ReviewCouncilDTO());
         model.addAttribute("periods", periodService.getAllPeriods());
         model.addAttribute("teachers", teacherRepository.findAll());
-        model.addAttribute("assignedTopics", topicRepository.findAll().stream().filter(t -> t.getStatus() == TopicStatus.ASSIGNED).toList());
+        model.addAttribute("assignedTopics", topicRepository.findUnassignedByStatus(TopicStatus.ASSIGNED));
         return "council/create";
     }
 
@@ -56,7 +54,7 @@ public class ReviewCouncilController {
         if (result.hasErrors()) {
             model.addAttribute("periods", periodService.getAllPeriods());
             model.addAttribute("teachers", teacherRepository.findAll());
-            model.addAttribute("assignedTopics", topicRepository.findAll().stream().filter(t -> t.getStatus() == TopicStatus.ASSIGNED).toList());
+            model.addAttribute("assignedTopics", topicRepository.findUnassignedByStatus(TopicStatus.ASSIGNED));
             return "council/create";
         }
         try {
@@ -67,7 +65,7 @@ public class ReviewCouncilController {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("periods", periodService.getAllPeriods());
             model.addAttribute("teachers", teacherRepository.findAll());
-            model.addAttribute("assignedTopics", topicRepository.findAll().stream().filter(t -> t.getStatus() == TopicStatus.ASSIGNED).toList());
+            model.addAttribute("assignedTopics", topicRepository.findUnassignedByStatus(TopicStatus.ASSIGNED));
             return "council/create";
         }
     }

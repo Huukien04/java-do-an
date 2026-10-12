@@ -8,6 +8,29 @@
         .table-responsive {
             min-height: 250px;
         }
+        .period-list-table {
+            font-size: .82rem;
+        }
+        .period-list-table thead th {
+            padding: .7rem .65rem;
+            color: var(--bs-secondary-color);
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .period-list-table tbody td {
+            padding: .75rem .65rem;
+        }
+        .period-list-table tbody td small {
+            font-size: .78rem;
+        }
+        .period-list-table .btn {
+            font-size: .75rem;
+        }
+        .period-list-table .period-name {
+            font-size: .86rem;
+        }
         #periodKanban {
             overflow-x: auto;
         }
@@ -72,20 +95,20 @@
         </a>
     </div>
 
-    <div class="card card-custom p-3">
+    <div class="card card-custom overflow-hidden">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+            <table class="table table-hover align-middle mb-0 period-list-table">
+                <thead class="table-primary">
                     <tr>
-                        <th>#</th>
-                        <th>Tên Đợt</th>
-                        <th>Loại Hình</th>
-                        <th>Toàn đợt</th>
-                        <th>Thời gian GV Đăng ký</th>
-                        <th>Thời gian Khoa Duyệt</th>
-                        <th>Thời gian SV Đăng ký</th>
-                        <th>Trạng thái</th>
-                        <th class="text-end">Thao tác</th>
+                        <th data-i18n="period.table.index">#</th>
+                        <th data-i18n="period.table.name">Tên Đợt</th>
+                        <th data-i18n="period.table.type">Loại Hình</th>
+                        <th data-i18n="period.table.fullPeriod">Toàn đợt</th>
+                        <th data-i18n="period.table.teacherRegistration">Thời gian GV Đăng ký</th>
+                        <th data-i18n="period.table.departmentApproval">Thời gian Khoa Duyệt</th>
+                        <th data-i18n="period.table.studentRegistration">Thời gian SV Đăng ký</th>
+                        <th data-i18n="period.table.status">Trạng thái</th>
+                        <th class="text-end" data-i18n="period.table.actions">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -95,7 +118,7 @@
                     <tr th:each="p, stat : ${periods}">
                         <td th:text="${stat.count}">1</td>
                         <td>
-                            <strong th:text="${p.name}">Đợt 1</strong>
+                            <strong class="period-name" th:text="${p.name}">Đợt 1</strong>
                         </td>
                         <td>
                             <span class="badge bg-secondary" th:text="${p.periodType.displayName}">KLTN</span>

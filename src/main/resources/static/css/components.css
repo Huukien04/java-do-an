@@ -923,6 +923,50 @@ html[data-theme="light"] .ui-toast .btn-close { filter: none; }
     line-height: 1.5;
 }
 
+.notification-bell {
+    position: relative;
+}
+
+.notification-unread-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 17px;
+    padding: 1px 4px;
+    border-radius: 999px;
+    background: #dc3545;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 15px;
+    text-align: center;
+}
+
+.notification-live-toast {
+    position: fixed;
+    z-index: 1090;
+    right: 20px;
+    bottom: 20px;
+    display: grid;
+    gap: 4px;
+    width: min(360px, calc(100vw - 40px));
+    padding: 14px 16px;
+    border: 1px solid #d9e2ef;
+    border-left: 4px solid #2185d0;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 8px 28px rgba(20, 35, 60, .18);
+    color: #263244;
+    text-decoration: none;
+}
+
+.notification-live-toast span {
+    overflow: hidden;
+    color: #687386;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 @media (max-width: 575.98px) {
     .ui-page-heading__title { font-size: 1.05rem; }
     .ui-metric-card { min-height: 100px; padding: .85rem; }

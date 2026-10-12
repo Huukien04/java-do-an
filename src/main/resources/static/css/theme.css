@@ -376,7 +376,6 @@ a:hover { color: var(--accent-hover); }
 .topbar-search {
     flex: 1;
     max-width: 640px;
-    margin: 0 auto;
     position: relative;
 }
 
@@ -717,6 +716,7 @@ a:hover { color: var(--accent-hover); }
     background: var(--color-primary-disabled) !important;
     border-color: var(--color-primary-disabled) !important;
     color: var(--color-text-tertiary) !important;
+	
 }
 
 .btn-outline-primary,
@@ -725,6 +725,8 @@ a:hover { color: var(--accent-hover); }
     color: var(--accent) !important;
     border-color: var(--accent) !important;
     background: transparent !important;
+	display: flex;
+	align-items: center;
 }
 
 .btn-outline-primary:not(:disabled):not(.disabled):hover,

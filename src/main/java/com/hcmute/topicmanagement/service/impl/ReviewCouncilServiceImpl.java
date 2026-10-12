@@ -4,6 +4,7 @@ import com.hcmute.topicmanagement.dto.ReviewCouncilDTO;
 import com.hcmute.topicmanagement.dto.TopicDTO;
 import com.hcmute.topicmanagement.entity.*;
 import com.hcmute.topicmanagement.enums.CouncilRole;
+import com.hcmute.topicmanagement.enums.TopicStatus;
 import com.hcmute.topicmanagement.exception.BusinessException;
 import com.hcmute.topicmanagement.exception.ResourceNotFoundException;
 import com.hcmute.topicmanagement.repository.*;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +40,7 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
         validateCouncilMembers(dto);
 
         ReviewCouncil council = ReviewCouncil.builder()
-                .councilCode(dto.getCouncilCode())
+                .councilCode(generateCouncilCode(dto.getName()))
                 .name(dto.getName())
                 .period(period)
                 .defenseDate(dto.getDefenseDate())
@@ -113,17 +115,33 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
         ReviewCouncil council = councilRepository.findById(councilId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hội đồng", "id", councilId));
 
-        for (Long topicId : topicIds) {
-            if (!councilTopicRepository.existsByTopicId(topicId)) {
-                Topic topic = topicRepository.findById(topicId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Đề tài", "id", topicId));
+        Set<Long> uniqueTopicIds = new HashSet<>(topicIds);
+        if (uniqueTopicIds.size() != topicIds.size()) {
+            throw new BusinessException("Danh sách đề tài được gán có mục trùng lặp.");
+        }
 
-                CouncilTopic ct = CouncilTopic.builder()
-                        .council(council)
-                        .topic(topic)
-                        .build();
-                councilTopicRepository.save(ct);
+        List<Topic> topics = uniqueTopicIds.stream()
+                .map(topicId -> topicRepository.findById(topicId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Đề tài", "id", topicId)))
+                .toList();
+        for (Topic topic : topics) {
+            if (topic.getStatus() != TopicStatus.ASSIGNED) {
+                throw new BusinessException("Chỉ được gán các đề tài đã được phân công cho nhóm.");
             }
+            if (!topic.getPeriod().getId().equals(council.getPeriod().getId())) {
+                throw new BusinessException("Đề tài được gán phải thuộc cùng đợt đăng ký với Hội đồng.");
+            }
+            if (councilTopicRepository.existsByTopicId(topic.getId())) {
+                throw new BusinessException("Đề tài \"" + topic.getTitle() + "\" đã được gán cho Hội đồng khác.");
+            }
+        }
+
+        for (Topic topic : topics) {
+            CouncilTopic councilTopic = CouncilTopic.builder()
+                    .council(council)
+                    .topic(topic)
+                    .build();
+            councilTopicRepository.save(councilTopic);
         }
     }
 
@@ -223,10 +241,10 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
             }
         }
 
-        List<TopicDTO> assignedTopics = council.getCouncilTopics().stream()
-                .map(ct -> TopicDTO.builder()
-                        .id(ct.getTopic().getId())
-                        .title(ct.getTopic().getTitle())
+        List<TopicDTO> assignedTopics = councilTopicRepository.findTopicSummariesByCouncilId(council.getId()).stream()
+                .map(topic -> TopicDTO.builder()
+                        .id(topic.getId())
+                        .title(topic.getTitle())
                         .build())
                 .collect(Collectors.toList());
 
@@ -249,5 +267,22 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
                 .assignedTopicIds(assignedTopicIds)
                 .assignedTopics(assignedTopics)
                 .build();
+    }
+
+    private String generateCouncilCode(String councilName) {
+        String normalized = Normalizer.normalize(councilName.replace('đ', 'd').replace('Đ', 'D'),
+                        Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toUpperCase()
+                .replaceAll("[^A-Z0-9]+", "_")
+                .replaceAll("^_+|_+$", "");
+        String base = normalized.isBlank() ? "HOI_DONG" : normalized;
+        String candidate = base.substring(0, Math.min(base.length(), 30));
+        int suffix = 2;
+        while (councilRepository.existsByCouncilCode(candidate)) {
+            String suffixText = "_" + suffix++;
+            candidate = base.substring(0, Math.min(base.length(), 30 - suffixText.length())) + suffixText;
+        }
+        return candidate;
     }
 }

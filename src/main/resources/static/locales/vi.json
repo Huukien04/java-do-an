@@ -34,6 +34,17 @@
     "startMustBeFuture": "Thời gian bắt đầu GV đăng ký không được ở quá khứ.",
     "missingDate": "Vui lòng nhập đầy đủ các mốc thời gian bắt buộc.",
     "manageTitle": "QUẢN LÝ ĐỢT ĐĂNG KÝ",
+    "table": {
+      "index": "#",
+      "name": "Tên đợt",
+      "type": "Loại hình",
+      "fullPeriod": "Toàn đợt",
+      "teacherRegistration": "Thời gian GV đăng ký",
+      "departmentApproval": "Thời gian Khoa duyệt",
+      "studentRegistration": "Thời gian SV đăng ký",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
     "calendarTitle": "Lịch các giai đoạn",
     "kanbanTitle": "Kanban trạng thái đợt",
     "stage": {
