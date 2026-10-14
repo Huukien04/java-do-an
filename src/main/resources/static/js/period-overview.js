@@ -1,9 +1,139 @@
 (function () {
-    const calendarRoot = document.getElementById('periodCalendar');
-    const kanbanRoot = document.getElementById('periodKanban');
-    if (!calendarRoot || !kanbanRoot) return;
+    const periodRows = Array.from(document.querySelectorAll('[data-period-row]'));
+    const searchInput = document.getElementById('periodSearch');
+    const statusFilter = document.getElementById('periodStatusFilter');
+    const typeFilter = document.getElementById('periodTypeFilter');
+    const resultsCount = document.getElementById('periodResultsCount');
+    const pageInfo = document.getElementById('periodPageInfo');
+    const previousPage = document.getElementById('periodPreviousPage');
+    const nextPage = document.getElementById('periodNextPage');
+    const noResults = document.getElementById('periodNoResults');
+    const pageSize = 10;
+    let currentPage = 1;
 
-    const periods = Array.from(document.querySelectorAll('[data-kanban-period]')).map(function (element) {
+    function normalizeSearchText(value) {
+        return value.toLowerCase().replace(/đ/g, 'd').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function renderPeriodList() {
+        if (!searchInput || !statusFilter || !typeFilter) return;
+
+        const query = normalizeSearchText(searchInput.value.trim());
+        const selectedStatus = statusFilter.value;
+        const selectedType = typeFilter.value;
+        const filteredRows = periodRows.filter(function (row) {
+            const matchesStatus = selectedStatus === 'all'
+                || (selectedStatus === 'active'
+                    ? row.dataset.status !== 'COMPLETED' && row.dataset.status !== 'CANCELLED'
+                    : row.dataset.status === selectedStatus);
+            const matchesType = selectedType === 'all' || row.dataset.type === selectedType;
+            const matchesQuery = !query || normalizeSearchText(row.textContent).includes(query);
+            return matchesStatus && matchesType && matchesQuery;
+        });
+        const pageCount = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+        currentPage = Math.min(currentPage, pageCount);
+
+        periodRows.forEach(function (row) {
+            row.hidden = true;
+        });
+        filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+            .forEach(function (row, index) {
+                row.hidden = false;
+                row.querySelector('.period-index').textContent = String((currentPage - 1) * pageSize + index + 1);
+            });
+
+        if (noResults) noResults.hidden = periodRows.length === 0 || filteredRows.length > 0;
+        const translate = window.appTranslate || function (key) { return key; };
+        if (resultsCount) resultsCount.textContent = filteredRows.length + ' ' + translate('period.count');
+        if (pageInfo) {
+            const first = filteredRows.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+            const last = Math.min(currentPage * pageSize, filteredRows.length);
+            pageInfo.textContent = translate('period.showing')
+                .replace('{from}', first).replace('{to}', last).replace('{total}', filteredRows.length);
+        }
+        if (previousPage) previousPage.disabled = currentPage <= 1;
+        if (nextPage) nextPage.disabled = currentPage >= pageCount;
+    }
+
+    if (searchInput && statusFilter && typeFilter) {
+        [searchInput, statusFilter, typeFilter].forEach(function (control) {
+            control.addEventListener('input', function () {
+                currentPage = 1;
+                renderPeriodList();
+            });
+            control.addEventListener('change', function () {
+                currentPage = 1;
+                renderPeriodList();
+            });
+        });
+        if (previousPage) previousPage.addEventListener('click', function () {
+            currentPage = Math.max(1, currentPage - 1);
+            renderPeriodList();
+        });
+        if (nextPage) nextPage.addEventListener('click', function () {
+            currentPage += 1;
+            renderPeriodList();
+        });
+        renderPeriodList();
+    }
+
+    let activeStatusDropdown = null;
+
+    function positionStatusDropdown() {
+        if (!activeStatusDropdown) return;
+
+        const toggleRect = activeStatusDropdown.toggle.getBoundingClientRect();
+        const menu = activeStatusDropdown.menu;
+        const menuWidth = menu.offsetWidth;
+        const menuHeight = menu.offsetHeight;
+        const left = Math.max(8, Math.min(toggleRect.right - menuWidth, window.innerWidth - menuWidth - 8));
+        let top = toggleRect.bottom + 4;
+        if (top + menuHeight > window.innerHeight - 8 && toggleRect.top - menuHeight - 4 >= 8) {
+            top = toggleRect.top - menuHeight - 4;
+        }
+
+        menu.style.setProperty('--period-menu-top', top + 'px');
+        menu.style.setProperty('--period-menu-left', left + 'px');
+    }
+
+    function getStatusToggle(event) {
+        const dropdown = event.target.closest('.period-status-control');
+        return dropdown ? dropdown.querySelector('.period-status-toggle') : null;
+    }
+
+    document.addEventListener('shown.bs.dropdown', function (event) {
+        const toggle = getStatusToggle(event);
+        if (!toggle) return;
+
+        const menu = toggle.parentElement.querySelector('.period-status-menu');
+        if (!menu) return;
+        menu.classList.add('period-status-menu-floating');
+        activeStatusDropdown = { toggle: toggle, menu: menu };
+        positionStatusDropdown();
+    });
+
+    document.addEventListener('hidden.bs.dropdown', function (event) {
+        const toggle = getStatusToggle(event);
+        if (!toggle) return;
+
+        const menu = toggle.parentElement.querySelector('.period-status-menu');
+        if (menu) {
+            menu.classList.remove('period-status-menu-floating');
+            menu.style.removeProperty('--period-menu-top');
+            menu.style.removeProperty('--period-menu-left');
+        }
+        if (activeStatusDropdown && activeStatusDropdown.toggle === toggle) {
+            activeStatusDropdown = null;
+        }
+    });
+
+    window.addEventListener('scroll', positionStatusDropdown, true);
+    window.addEventListener('resize', positionStatusDropdown);
+
+    const calendarRoot = document.getElementById('periodCalendar');
+    if (!calendarRoot) return;
+
+    const periods = Array.from(document.querySelectorAll('[data-period-calendar]')).map(function (element) {
         return element.dataset;
     });
     const stageDefinitions = [
@@ -11,28 +141,6 @@
         { key: 'approval', start: 'approvalStart', end: 'approvalEnd', color: '#c07a28' },
         { key: 'student', start: 'studentStart', end: 'studentEnd', color: '#4776a8' }
     ];
-    const statusKeys = [
-        ['DRAFT', 'period.status.draft'],
-        ['PHASE1_TEACHER_REG', 'period.status.teacher'],
-        ['PHASE1_DEAN_REVIEW', 'period.status.approval'],
-        ['PUBLISHED_TOPICS', 'period.status.published'],
-        ['PHASE2_STUDENT_REG', 'period.status.student'],
-        ['EXECUTION', 'period.status.execution'],
-        ['DEFENSE_EVALUATION', 'period.status.defense'],
-        ['COMPLETED', 'period.status.completed'],
-        ['CANCELLED', 'period.status.cancelled']
-    ];
-    const colors = {
-        DRAFT: '#667085',
-        PHASE1_TEACHER_REG: '#16867a',
-        PHASE1_DEAN_REVIEW: '#c77d18',
-        PUBLISHED_TOPICS: '#628b22',
-        PHASE2_STUDENT_REG: '#3478c5',
-        EXECUTION: '#7655b5',
-        DEFENSE_EVALUATION: '#c14f78',
-        COMPLETED: '#258558',
-        CANCELLED: '#c44336'
-    };
     let calendar;
 
     function followingDay(date) {
@@ -60,82 +168,6 @@
         });
     }
 
-    function renderKanban() {
-        kanbanRoot.replaceChildren();
-        kanbanRoot.classList.add('period-kanban-board');
-        statusKeys.forEach(function (status) {
-            const title = window.appTranslate(status[1]);
-            const column = document.createElement('section');
-            column.className = 'period-kanban-column';
-            column.style.setProperty('--period-column-color', colors[status[0]]);
-
-            const heading = document.createElement('h6');
-            heading.className = 'period-kanban-heading';
-            heading.textContent = title;
-            column.appendChild(heading);
-
-            const list = document.createElement('div');
-            list.className = 'period-kanban-items';
-            list.dataset.status = status[0];
-            list.setAttribute('aria-label', title);
-
-            const boardPeriods = periods.filter(function (period) {
-                return period.status === status[0];
-            });
-            if (boardPeriods.length === 0) {
-                const empty = document.createElement('p');
-                empty.className = 'period-kanban-empty';
-                empty.textContent = window.appTranslate('period.emptyColumn');
-                list.appendChild(empty);
-            }
-
-            boardPeriods.forEach(function (period) {
-                const card = document.createElement('article');
-                card.className = 'period-kanban-card';
-                card.dataset.status = status[0];
-                card.dataset.statusUrl = period.statusUrl;
-
-                const name = document.createElement('strong');
-                name.textContent = period.name;
-                card.appendChild(name);
-
-                const dates = document.createElement('div');
-                dates.className = 'small text-muted mt-1';
-                dates.textContent = (period.teacherStart || '') + ' - ' + (period.studentEnd || '');
-                card.appendChild(dates);
-                list.appendChild(card);
-            });
-
-            column.appendChild(list);
-            kanbanRoot.appendChild(column);
-
-            if (window.Sortable) {
-                window.Sortable.create(list, {
-                    group: 'period-statuses',
-                    animation: 150,
-                    ghostClass: 'period-kanban-card--ghost',
-                    draggable: '.period-kanban-card',
-                    onEnd: function (event) {
-                        const card = event.item;
-                        const newStatus = event.to.dataset.status;
-                        if (card.dataset.status === newStatus) return;
-
-                        const form = document.createElement('form');
-                        form.method = 'post';
-                        form.action = card.dataset.statusUrl;
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'status';
-                        input.value = newStatus;
-                        form.appendChild(input);
-                        document.body.appendChild(form);
-                        form.submit();
-                    }
-                });
-            }
-        });
-    }
-
     function renderCalendar() {
         if (!window.FullCalendar) return;
         const locale = document.documentElement.lang === 'en' ? 'en' : 'vi';
@@ -157,8 +189,8 @@
     }
 
     function render() {
+        renderPeriodList();
         renderCalendar();
-        renderKanban();
     }
 
     window.addEventListener('app-language-changed', render);

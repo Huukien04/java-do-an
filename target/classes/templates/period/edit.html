@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main}">
 <head>
-    <title>Cập Nhật Đợt Đăng Ký</title>
+    <title data-i18n="period.editTitle">Cập Nhật Đợt Đăng Ký</title>
 </head>
 <body>
 <div layout:fragment="content">
@@ -17,7 +17,7 @@
             <div class="row g-3">
                 <div class="col-md-8">
                     <label for="name" class="form-label fw-medium" data-i18n="period.name">Tên Đợt Đăng Ký <span class="text-danger" data-required-marker>*</span></label>
-                    <input type="text" class="form-control" id="name" th:field="*{name}" th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''" placeholder="Ví dụ: Đợt Đăng ký Khóa luận Tốt nghiệp Học kỳ 1 (2026-2027)" required>
+                    <input type="text" class="form-control" id="name" th:field="*{name}" th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''" placeholder="Ví dụ: Đợt Đăng ký Khóa luận Tốt nghiệp Học kỳ 1 (2026-2027)" data-i18n-placeholder="period.namePlaceholder" required>
                 </div>
 
                 <div class="col-md-4">

@@ -12,12 +12,14 @@
     function translatePage() {
         const currentLanguage = localStorage.getItem('app-language') === 'en' ? 'en' : 'vi';
         document.documentElement.lang = currentLanguage;
-        const autoMessages = Object.assign({}, messages.auto || {}, messages.autoExtra || {});
+        const autoMessages = Object.assign({}, messages.auto || {}, messages.autoExtra || {}, messages.autoOverrides || {});
         const title = document.querySelector('title');
         if (title) {
             if (title._i18nSource === undefined) title._i18nSource = title.textContent;
             title.textContent = currentLanguage === 'en'
-                ? (autoMessages[title._i18nSource] || title._i18nSource)
+                ? (autoMessages[title._i18nSource] || title._i18nSource.split(' - ').map(function (part) {
+                    return autoMessages[part] || part;
+                }).join(' - '))
                 : title._i18nSource;
         }
         document.querySelectorAll('[data-i18n]').forEach(function (element) {
@@ -42,7 +44,16 @@
             if (textNode._i18nSource === undefined) textNode._i18nSource = textNode.nodeValue;
             const source = textNode._i18nSource;
             const trimmed = source.trim();
-            const translated = currentLanguage === 'en' ? autoMessages[trimmed] : null;
+            let translated = currentLanguage === 'en' ? autoMessages[trimmed] : null;
+            if (currentLanguage === 'en' && !translated) {
+                translated = Object.keys(autoMessages)
+                    .filter(function (key) { return key.endsWith(':') && trimmed.includes(key); })
+                    .sort(function (left, right) { return right.length - left.length; })
+                    .reduce(function (value, key) {
+                        return value.replaceAll(key, autoMessages[key]);
+                    }, trimmed);
+                if (translated === trimmed) translated = null;
+            }
             if (translated) {
                 textNode.nodeValue = source.replace(trimmed, translated);
             } else if (currentLanguage === 'vi') {
@@ -79,7 +90,9 @@
     }
 
     window.appTranslate = function (key) {
-        return lookup(key) || key;
+        return lookup(key) || messages.autoOverrides && messages.autoOverrides[key]
+            || messages.auto && messages.auto[key]
+            || messages.autoExtra && messages.autoExtra[key] || key;
     };
 
     async function setLanguage(value) {

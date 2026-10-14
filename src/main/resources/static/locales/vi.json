@@ -14,6 +14,9 @@
     "editTitle": "CẬP NHẬT ĐỢT ĐĂNG KÝ",
     "editDescription": "Chỉnh sửa thông tin và cấu hình đợt đăng ký đề tài",
     "name": "Tên đợt đăng ký",
+    "namePlaceholder": "Ví dụ: Đợt Đăng ký Khóa luận Tốt nghiệp Học kỳ 1 (2026-2027)",
+    "count": "đợt",
+    "showing": "Hiển thị {from}-{to} / {total}",
     "type": "Loại đợt đăng ký",
     "totalWindow": "Toàn đợt đăng ký:",
     "chooseWindow": "Chọn ngày bắt đầu GV và kết thúc SV",
@@ -47,6 +50,16 @@
     },
     "calendarTitle": "Lịch các giai đoạn",
     "kanbanTitle": "Kanban trạng thái đợt",
+    "picker": {
+      "dateDialog": "Chọn ngày và thời gian",
+      "previousMonth": "Tháng trước",
+      "nextMonth": "Tháng sau",
+      "month": "Tháng",
+      "year": "Năm",
+      "time": "Thời gian:",
+      "hour": "Giờ",
+      "minute": "Phút"
+    },
     "stage": {
       "teacher": "GV đăng ký",
       "approval": "Khoa duyệt",

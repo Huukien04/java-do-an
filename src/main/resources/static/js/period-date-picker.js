@@ -137,16 +137,25 @@
         }
 
         picker.daysGrid.innerHTML = days.join('');
-        picker.monthTrigger.textContent = 'Tháng ' + (month + 1);
+        const locale = document.documentElement.lang === 'en' ? 'en-US' : 'vi-VN';
+        picker.monthTrigger.textContent = new Intl.DateTimeFormat(locale, { month: 'long' })
+            .format(new Date(year, month, 1)).replace(/^./, function (letter) {
+                return letter.toLocaleUpperCase(locale);
+            });
         picker.yearTrigger.textContent = String(year);
     }
 
     function renderMonths(picker) {
+        const locale = document.documentElement.lang === 'en' ? 'en-US' : 'vi-VN';
         picker.overlay.className = 'period-date-picker__overlay is-months';
         picker.overlay.innerHTML = Array.from({ length: 12 }, function (_, month) {
+            const label = new Intl.DateTimeFormat(locale, { month: 'short' })
+                .format(new Date(2020, month, 1)).replace(/^./, function (letter) {
+                    return letter.toLocaleUpperCase(locale);
+                });
             return '<button type="button" class="period-date-picker__overlay-item'
                 + (month === picker.currentDate.getMonth() ? ' is-active' : '')
-                + '" data-month="' + month + '">Thg ' + (month + 1) + '</button>';
+                + '" data-month="' + month + '">' + label + '</button>';
         }).join('');
     }
 
@@ -174,6 +183,25 @@
         picker.currentDate = new Date(year, month, 1);
         picker.overlay.hidden = true;
         renderDays(picker);
+    }
+
+    function applyPickerLanguage(picker) {
+        const translate = window.appTranslate || function (key) { return key; };
+        const locale = document.documentElement.lang === 'en' ? 'en-US' : 'vi-VN';
+        picker.panel.setAttribute('aria-label', translate('period.picker.dateDialog'));
+        picker.previousButton.setAttribute('aria-label', translate('period.picker.previousMonth'));
+        picker.nextButton.setAttribute('aria-label', translate('period.picker.nextMonth'));
+        picker.monthTrigger.setAttribute('aria-label', translate('period.picker.month'));
+        picker.yearTrigger.setAttribute('aria-label', translate('period.picker.year'));
+        picker.timeLabel.textContent = translate('period.picker.time');
+        picker.hourInput.setAttribute('aria-label', translate('period.picker.hour'));
+        picker.minuteInput.setAttribute('aria-label', translate('period.picker.minute'));
+        picker.weekdays.innerHTML = Array.from({ length: 7 }, function (_, day) {
+            const date = new Date(2021, 7, 1 + day);
+            return '<span>' + new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(date) + '</span>';
+        }).join('');
+        renderDays(picker);
+        if (!picker.overlay.hidden && picker.overlay.classList.contains('is-months')) renderMonths(picker);
     }
 
     function createPicker(input) {
@@ -222,6 +250,10 @@
             monthTrigger: panel.querySelector('[data-action="month"]'),
             yearTrigger: panel.querySelector('[data-action="year"]'),
             overlay: panel.querySelector('.period-date-picker__overlay'),
+            previousButton: panel.querySelector('[data-action="previous"]'),
+            nextButton: panel.querySelector('[data-action="next"]'),
+            weekdays: panel.querySelector('.period-date-picker__weekdays'),
+            timeLabel: panel.querySelector('.period-date-picker__time label'),
             hourInput: panel.querySelector('[aria-label="Giờ"]'),
             minuteInput: panel.querySelector('[aria-label="Phút"]'),
             parts: null,
@@ -488,7 +520,7 @@
             });
         });
 
-        renderDays(picker);
+        applyPickerLanguage(picker);
         return picker;
     }
 
@@ -537,6 +569,9 @@
     }
 
     const pickers = Array.from(inputs, createPicker);
+    window.addEventListener('app-language-changed', function () {
+        pickers.forEach(applyPickerLanguage);
+    });
     window.addEventListener('resize', function () {
         if (activePicker) positionPicker(activePicker);
     });

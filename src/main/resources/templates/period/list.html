@@ -31,54 +31,24 @@
         .period-list-table .period-name {
             font-size: .86rem;
         }
-        #periodKanban {
-            overflow-x: auto;
-        }
-        .period-kanban-board {
+        .period-list-toolbar {
             display: grid;
-            grid-auto-columns: minmax(190px, 1fr);
-            grid-auto-flow: column;
-            gap: .75rem;
-            padding-bottom: .5rem;
+            grid-template-columns: minmax(220px, 1fr) minmax(180px, 220px) minmax(150px, 190px) auto;
+            gap: .65rem;
+            align-items: center;
         }
-        .period-kanban-column {
-            --period-column-color: var(--bs-primary);
-            min-height: 150px;
-            padding: .75rem;
-            border: 1px solid color-mix(in srgb, var(--period-column-color) 38%, var(--bs-border-color));
-            border-top: 4px solid var(--period-column-color);
-            border-radius: .5rem;
-            background: color-mix(in srgb, var(--period-column-color) 9%, var(--bs-body-bg));
+        .period-list-table .period-status-menu-floating {
+            position: fixed !important;
+            top: var(--period-menu-top) !important;
+            left: var(--period-menu-left) !important;
+            right: auto !important;
+            transform: none !important;
+            z-index: 1200;
         }
-        .period-kanban-heading {
-            min-height: 2.5rem;
-            font-size: .85rem;
-            font-weight: 700;
-            color: var(--period-column-color);
-        }
-        .period-kanban-card {
-            margin-top: .6rem;
-            padding: .65rem;
-            border: 1px solid color-mix(in srgb, var(--period-column-color) 30%, var(--bs-border-color));
-            border-left: 3px solid var(--period-column-color);
-            border-radius: .35rem;
-            background: var(--bs-body-bg);
-            overflow-wrap: anywhere;
-            cursor: grab;
-            user-select: none;
-        }
-        .period-kanban-card:active {
-            cursor: grabbing;
-        }
-        .period-kanban-card--ghost {
-            opacity: .35;
-        }
-        .period-kanban-items {
-            min-height: 100px;
-        }
-        .period-kanban-empty {
-            color: var(--bs-secondary-color);
-            font-size: .8rem;
+        @media (max-width: 767.98px) {
+            .period-list-toolbar {
+                grid-template-columns: 1fr 1fr;
+            }
         }
     </style>
     <link rel="stylesheet" th:href="@{/vendor/fullcalendar/skeleton.css}">
@@ -95,9 +65,36 @@
         </a>
     </div>
 
-    <div class="card card-custom overflow-hidden">
+    <section class="card card-custom p-3 mb-3">
+        <div class="period-list-toolbar">
+            <input id="periodSearch" type="search" class="form-control" placeholder="Tìm tên đợt..." aria-label="Tìm đợt đăng ký">
+            <select id="periodStatusFilter" class="form-select" aria-label="Lọc theo trạng thái">
+                <option value="active">Đợt đang mở / chưa hoàn tất</option>
+                <option value="all">Tất cả trạng thái</option>
+                <option value="DRAFT">Nháp</option>
+                <option value="PHASE1_TEACHER_REG">Giảng viên đăng ký</option>
+                <option value="PHASE1_DEAN_REVIEW">Khoa duyệt</option>
+                <option value="PUBLISHED_TOPICS">Đã công bố đề tài</option>
+                <option value="PHASE2_STUDENT_REG">Sinh viên đăng ký</option>
+                <option value="EXECUTION">Đang thực hiện</option>
+                <option value="DEFENSE_EVALUATION">Đang đánh giá</option>
+                <option value="COMPLETED">Đã hoàn thành</option>
+                <option value="CANCELLED">Đã hủy</option>
+            </select>
+            <select id="periodTypeFilter" class="form-select" aria-label="Lọc theo loại đợt">
+                <option value="all">Tất cả loại đề tài</option>
+                <option value="MON_HOC">Môn học</option>
+                <option value="NCKH">NCKH</option>
+                <option value="TLCN">TLCN</option>
+                <option value="KLTN">KLTN</option>
+            </select>
+            <span id="periodResultsCount" class="small text-muted text-nowrap" aria-live="polite"></span>
+        </div>
+    </section>
+
+    <div class="card card-custom">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 period-list-table">
+            <table id="periodListTable" class="table table-hover align-middle mb-0 period-list-table">
                 <thead class="table-primary">
                     <tr>
                         <th data-i18n="period.table.index">#</th>
@@ -115,8 +112,13 @@
                     <tr th:if="${periods.empty}">
                         <td colspan="9" class="text-center py-4 text-muted">Chưa có đợt đăng ký nào được tạo.</td>
                     </tr>
-                    <tr th:each="p, stat : ${periods}">
-                        <td th:text="${stat.count}">1</td>
+                    <tr id="periodNoResults" hidden>
+                        <td colspan="9" class="text-center py-4 text-muted">Không tìm thấy đợt đăng ký phù hợp.</td>
+                    </tr>
+                    <tr th:each="p, stat : ${periods}"
+                        data-period-row
+                        th:attr="data-status=${p.status.name()},data-type=${p.periodType.name()}">
+                        <td class="period-index" th:text="${stat.count}">1</td>
                         <td>
                             <strong class="period-name" th:text="${p.name}">Đợt 1</strong>
                         </td>
@@ -147,11 +149,11 @@
                             <a th:href="@{/admin/periods/{id}/edit(id=${p.id})}" class="btn btn-sm btn-outline-secondary me-1">
                                 <i class="bi bi-pencil"></i> Sửa
                             </a>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                            <div class="btn-group period-status-control">
+                                <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle period-status-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                     Đổi Trạng thái
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
+                                <ul class="dropdown-menu dropdown-menu-end period-status-menu">
                                     <li>
                                         <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
                                             <input type="hidden" name="status" value="PHASE1_TEACHER_REG">
@@ -195,6 +197,17 @@
                 </tbody>
             </table>
         </div>
+        <div class="d-flex justify-content-between align-items-center gap-3 border-top px-3 py-2">
+            <span id="periodPageInfo" class="small text-muted" aria-live="polite"></span>
+            <div class="btn-group btn-group-sm" aria-label="Phân trang danh sách đợt">
+                <button id="periodPreviousPage" type="button" class="btn btn-outline-secondary" aria-label="Trang trước">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button id="periodNextPage" type="button" class="btn btn-outline-secondary" aria-label="Trang sau">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <section class="card card-custom p-3 mt-4">
@@ -202,13 +215,8 @@
         <div id="periodCalendar"></div>
     </section>
 
-    <section class="card card-custom p-3 mt-4">
-        <h5 class="fw-bold mb-3" data-i18n="period.kanbanTitle">Kanban trạng thái đợt</h5>
-        <div id="periodKanban"></div>
-    </section>
-
     <div class="d-none" aria-hidden="true">
-           <div th:each="p : ${periods}" data-kanban-period
+           <div th:each="p : ${periods}" data-period-calendar
                th:attr="data-id=${p.id},data-status-url=@{/admin/periods/{id}/status(id=${p.id})},data-status=${p.status.name()},data-name=${p.name},data-teacher-start=${#temporals.format(p.teacherStartDate, 'yyyy-MM-dd')},data-teacher-end=${#temporals.format(p.teacherEndDate, 'yyyy-MM-dd')},data-approval-start=${p.approvalStartDate != null ? #temporals.format(p.approvalStartDate, 'yyyy-MM-dd') : ''},data-approval-end=${p.approvalEndDate != null ? #temporals.format(p.approvalEndDate, 'yyyy-MM-dd') : ''},data-student-start=${#temporals.format(p.studentStartDate, 'yyyy-MM-dd')},data-student-end=${#temporals.format(p.studentEndDate, 'yyyy-MM-dd')}"></div>
     </div>
 </div>
@@ -216,7 +224,6 @@
     <script th:src="@{/vendor/fullcalendar/all/global.js}"></script>
     <script th:src="@{/vendor/fullcalendar/themes/classic/global.js}"></script>
     <script th:src="@{/vendor/fullcalendar/locales-all/global.js}"></script>
-    <script th:src="@{/vendor/sortablejs/Sortable.min.js}"></script>
     <script th:src="@{/js/period-overview.js}"></script>
 </th:block>
 </body>
