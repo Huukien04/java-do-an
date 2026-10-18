@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Phân công GVPB</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div th:replace="~{fragments/components :: pageHeading('PHÂN CÔNG GVPB', ${topic.title})}"></div>
+    <div class="alert alert-warning" th:unless="${readyToScore}">
+        Đề tài chỉ đủ điều kiện phân công chấm sau khi nhóm được duyệt và đã nộp báo cáo.
+    </div>
+    <div class="card card-custom p-4">
+        <form method="post" th:action="@{/admin/reviewers/{id}(id=${topic.id})}">
+            <p>Chọn từ 1 đến 2 giảng viên phản biện. GVHD của đề tài không thể được chọn.</p>
+            <div class="form-check mb-2" th:each="teacher : ${teachers}">
+                <input class="form-check-input" type="checkbox" name="teacherIds"
+                       th:id="${'teacher-' + teacher.id}" th:value="${teacher.id}"
+                       th:checked="${selectedTeacherIds.contains(teacher.id)}">
+                <label class="form-check-label" th:for="${'teacher-' + teacher.id}"
+                       th:text="${teacher.user.fullName + ' (' + teacher.teacherCode + ')'}">Giảng viên</label>
+            </div>
+            <button class="btn btn-primary" type="submit" th:disabled="${!readyToScore}">Lưu phân công</button>
+            <a class="btn btn-outline-secondary" th:href="@{/topics}">Quay lại đề tài</a>
+        </form>
+    </div>
+</div>
+</body>
+</html>

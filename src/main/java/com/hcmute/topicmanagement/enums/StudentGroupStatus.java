@@ -6,6 +6,7 @@ public enum StudentGroupStatus {
     REGISTERED("Đã đăng ký đề tài"),
     APPROVED("Đã duyệt đề tài"),
     SUBMITTED("Đã nộp báo cáo"),
+    NOT_SUBMITTED("Chưa nộp báo cáo"),
     DEFENDED("Đã bảo vệ hội đồng");
 
     private final String displayName;

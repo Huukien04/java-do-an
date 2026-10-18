@@ -12,9 +12,27 @@
     </div>
 
     <div class="row g-4">
-        <th:block th:if="${councils.empty}">
+        <th:block th:if="${councils.empty && reviewerTopics.empty}">
             <div class="col-12" th:replace="~{fragments/components :: emptyState('bi-clipboard2', 'Bạn chưa được phân công vào Hội đồng phản biện nào.', 'Các hội đồng được phân công sẽ xuất hiện tại đây.')}"></div>
         </th:block>
+        <div class="col-12" th:if="${!reviewerTopics.empty}">
+            <div class="card card-custom p-3 mb-3">
+                <h5 class="fw-bold text-primary mb-3">Đề tài được phân công phản biện</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light"><tr><th>Đề tài</th><th>Đợt</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="topic : ${reviewerTopics}">
+                            <td th:text="${topic.title}">Đề tài</td>
+                            <td th:text="${topic.periodName}">Đợt</td>
+                            <td class="text-end"><a class="btn btn-sm btn-primary"
+                                                   th:href="@{/scoring/topic/{id}(id=${topic.id})}">Chấm điểm</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
         <div class="col-12" th:each="c : ${councils}">
             <div class="card card-custom p-3 mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-3">

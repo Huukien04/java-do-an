@@ -65,6 +65,9 @@
                     </div>
                     
                     <div sec:authorize="hasRole('ADMIN')" class="btn-group btn-group-sm">
+                        <a th:if="${t.status.name() == 'ASSIGNED' and t.periodType.name() != 'KLTN'}"
+                           th:href="@{/admin/reviewers/{id}(id=${t.id})}"
+                           class="btn btn-outline-primary me-1">Phân công GVPB</a>
                         <th:block th:if="${t.status.name() == 'PENDING_APPROVAL'}">
                             <form th:action="@{/topics/{id}/approve(id=${t.id})}" method="post" class="d-inline">
                                 <button type="submit" class="btn btn-success me-1"><i class="bi bi-check-lg"></i> Duyệt</button>

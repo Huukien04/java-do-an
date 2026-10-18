@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface NotificationReadRepository extends JpaRepository<NotificationRead, Long> {
 
     boolean existsByNotificationIdAndUserId(Long notificationId, Long userId);
+    boolean existsByUserId(Long userId);
     void deleteByNotificationId(Long notificationId);
 
     @Query("""

@@ -2,26 +2,27 @@
     const form = document.querySelector('[data-period-schedule]');
     if (!form) return;
 
-    const fields = [
-        'teacherStartDate',
-        'teacherEndDate',
-        'approvalStartDate',
-        'approvalEndDate',
-        'studentStartDate',
-        'studentEndDate'
-    ].map(function (id) { return document.getElementById(id); });
+    const windows = [
+        ['teacherStartDate', 'teacherEndDate'],
+        ['approvalStartDate', 'approvalEndDate'],
+        ['studentStartDate', 'studentEndDate']
+    ].map(function (ids) {
+        return ids.map(function (id) { return document.getElementById(id); });
+    });
+    const fields = windows.flat();
     const error = form.querySelector('[data-schedule-error]');
     const totalWindow = document.getElementById('periodTotalWindow');
     const periodType = document.getElementById('periodType');
+    const submissionDeadline = document.getElementById('submissionDeadline');
     const reviewDeadline = document.getElementById('reviewSubmissionDeadline');
     const councilDate = document.getElementById('councilReportDate');
-    const optionalDateFields = [reviewDeadline, councilDate];
+    const optionalDateFields = [submissionDeadline, reviewDeadline, councilDate];
     const allDateFields = fields.concat(optionalDateFields);
     const allFields = [document.getElementById('name'), periodType].concat(allDateFields);
     const touchedFields = new Set(allFields.filter(function (field) {
         return field.classList.contains('is-invalid');
     }));
-    const originalTeacherStart = window.periodDatePicker.toSubmissionValue(fields[0].value);
+    const originalTeacherStart = window.periodDatePicker.toSubmissionValue(windows[0][0].value);
     let submitted = false;
 
     function getDateValue(field) {
@@ -42,18 +43,10 @@
             + ' - ' + new Intl.DateTimeFormat(language, options).format(end.date);
     }
 
-    function nextCurrentMinute() {
-        const date = new Date();
-        date.setSeconds(0, 0);
-        date.setMinutes(date.getMinutes() + 1);
-        const pad = function (number) { return String(number).padStart(2, '0'); };
-        return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate())
-            + 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
-    }
-
     function updateTypeRequirements() {
         const type = periodType.value;
-        reviewDeadline.required = type === 'TLCN' || type === 'KLTN';
+        submissionDeadline.required = true;
+        reviewDeadline.required = true;
         councilDate.required = type === 'KLTN';
         optionalDateFields.forEach(function (field) {
             const marker = field.labels[0].querySelector('[data-required-marker]');
@@ -83,23 +76,34 @@
         });
         const teacherStart = parsedDates[0];
         const teacherStartChanged = teacherStart
-            && window.periodDatePicker.toSubmissionValue(fields[0].value) !== originalTeacherStart;
+            && window.periodDatePicker.toSubmissionValue(windows[0][0].value) !== originalTeacherStart;
         if (form.hasAttribute('data-period-create') || teacherStartChanged) {
-            if (teacherStart && getTimestamp(teacherStart) < new Date(nextCurrentMinute()).getTime()) {
-                markInvalid(fields[0], window.appTranslate('period.startMustBeFuture'));
+            if (teacherStart && getTimestamp(teacherStart) < Date.now()) {
+                markInvalid(windows[0][0], window.appTranslate('period.startMustBeFuture'));
             }
         }
 
-        fields.forEach(function (field, index) {
-            const currentDate = parsedDates[index];
-            const previousDate = index > 0 ? parsedDates[index - 1] : null;
-            if (index > 0 && currentDate && previousDate
-                    && getTimestamp(currentDate) <= getTimestamp(previousDate)) {
+        windows.forEach(function (periodWindow) {
+            const startIndex = fields.indexOf(periodWindow[0]);
+            const startDate = parsedDates[startIndex];
+            const endDate = parsedDates[startIndex + 1];
+            if (startDate && endDate
+                    && getTimestamp(startDate) >= getTimestamp(endDate)) {
                 const message = window.appTranslate('period.invalidSchedule');
-                markInvalid(fields[index - 1], message);
-                markInvalid(field, message);
+                markInvalid(periodWindow[0], message);
+                markInvalid(periodWindow[1], message);
             }
         });
+
+        for (let index = 1; index < parsedDates.length; index++) {
+            const previous = parsedDates[index - 1];
+            const current = parsedDates[index];
+            if (previous && current && getTimestamp(previous) >= getTimestamp(current)) {
+                const message = window.appTranslate('period.invalidSchedule');
+                markInvalid(allDateFields[index - 1], message);
+                markInvalid(allDateFields[index], message);
+            }
+        }
 
         allFields.forEach(function (field) {
             const isEmpty = !field.value || (field.id === 'name' && !field.value.trim());

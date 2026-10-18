@@ -29,6 +29,22 @@ public class ScoreDTO {
     @DecimalMax(value = "10.00", message = "Điểm tối đa là 10.0")
     private BigDecimal scoreValue;
 
+    @DecimalMin(value = "0.00", message = "Điểm nội dung tối thiểu là 0.0")
+    @DecimalMax(value = "10.00", message = "Điểm nội dung tối đa là 10.0")
+    private BigDecimal contentScore;
+
+    @DecimalMin(value = "0.00", message = "Điểm sản phẩm tối thiểu là 0.0")
+    @DecimalMax(value = "10.00", message = "Điểm sản phẩm tối đa là 10.0")
+    private BigDecimal productScore;
+
+    @DecimalMin(value = "0.00", message = "Điểm báo cáo tối thiểu là 0.0")
+    @DecimalMax(value = "10.00", message = "Điểm báo cáo tối đa là 10.0")
+    private BigDecimal reportScore;
+
+    @DecimalMin(value = "0.00", message = "Điểm trình bày tối thiểu là 0.0")
+    @DecimalMax(value = "10.00", message = "Điểm trình bày tối đa là 10.0")
+    private BigDecimal presentationScore;
+
     private String comments;
     private LocalDateTime scoredAt;
 }

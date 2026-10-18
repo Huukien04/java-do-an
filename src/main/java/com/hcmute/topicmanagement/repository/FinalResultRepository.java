@@ -11,5 +11,9 @@ import java.util.Optional;
 public interface FinalResultRepository extends JpaRepository<FinalResult, Long> {
     Optional<FinalResult> findByTopicId(Long topicId);
     List<FinalResult> findByIsPublishedTrue();
+    List<FinalResult> findByIsPublishedTrueOrderByTopicTitleAsc();
+    List<FinalResult> findByIsPublishedTrueAndTopicPeriodIdOrderByTopicTitleAsc(Long periodId);
+    List<FinalResult> findAllByOrderByTopicTitleAsc();
+    List<FinalResult> findByTopicPeriodIdOrderByTopicTitleAsc(Long periodId);
     boolean existsByTopicId(Long topicId);
 }

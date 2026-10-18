@@ -9,6 +9,7 @@ public interface StudentGroupService {
     StudentGroupDTO addMember(Long groupId, String studentCode, Long currentStudentId);
     void removeMember(Long groupId, Long memberStudentId, Long currentStudentId);
     StudentGroupDTO registerTopic(Long groupId, Long topicId, Long currentStudentId);
+    void disbandRejectedGroup(Long groupId, Long currentStudentId);
     void approveTopicRegistration(Long registrationId);
     void rejectTopicRegistration(Long registrationId, String reason);
     StudentGroupDTO getGroupById(Long groupId);

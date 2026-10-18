@@ -49,16 +49,15 @@ SV xem điểm
 
 # 2. Các loại tài khoản
 
-Hệ thống có 4 ROLE tài khoản chính:
+Ứng dụng hiện hỗ trợ 3 ROLE tài khoản:
 
 ```text
-ADMIN
-TRUONG_KHOA
-GIANG_VIEN
-SINH_VIEN
+ROLE_ADMIN
+ROLE_TEACHER
+ROLE_STUDENT
 ```
 
-Không nên tạo tài khoản riêng cho GVHD, GVPB, Chủ tịch hội đồng hoặc Thư ký hội đồng.
+Các quyền nghiệp vụ Trưởng khoa hiện được thực thi bằng `ROLE_ADMIN`; dự án chưa có ROLE_TRUONG_KHOA riêng. Không tạo tài khoản riêng cho GVHD, GVPB, Chủ tịch hội đồng hoặc Thư ký hội đồng.
 
 Các vai trò này là **vai trò nghiệp vụ** được gán cho tài khoản GIANG_VIEN tùy theo từng đề tài/hội đồng.
 
@@ -91,29 +90,21 @@ ADMIN có quyền:
 * Xem nhật ký hoạt động.
 * Quản lý bảo mật.
 
-## 3.3. ADMIN không xử lý nghiệp vụ chuyên môn
+## 3.3. Phân biệt mô hình và quyền đang chạy
 
-ADMIN không nên có quyền:
-
-* Phê duyệt đề tài.
-* Chấm điểm.
-* Phản biện đề tài.
-* Phân công GVHD theo nghiệp vụ.
-* Quyết định kết quả học tập.
-
-Các nghiệp vụ trên thuộc về Trưởng khoa và Giảng viên.
+Theo mô hình nghiệp vụ, quản trị tài khoản tách biệt với quyết định chuyên môn. Tuy nhiên ứng dụng hiện chưa có ROLE_TRUONG_KHOA; các màn hình duyệt, điều hành đợt, phân công và công bố hiện được bảo vệ bằng `ROLE_ADMIN`. Không cấp quyền này cho tài khoản không được phép quản lý nghiệp vụ.
 
 ---
 
-# 4. ROLE TRƯỞNG KHOA
+# 4. Quản trị nghiệp vụ (ROLE_ADMIN)
 
-Tên role:
+ROLE riêng chưa được tạo trong ứng dụng:
 
 ```text
-TRUONG_KHOA
+ROLE_TRUONG_KHOA
 ```
 
-Trưởng khoa là người quản lý nghiệp vụ chính của hệ thống.
+Các quyền mô tả trong phần này hiện do `ROLE_ADMIN` thực hiện.
 
 ---
 
@@ -134,10 +125,14 @@ Mỗi đợt đăng ký gồm:
 * Loại đợt.
 * Thời gian bắt đầu GV đăng ký.
 * Thời gian kết thúc GV đăng ký.
+* Thời gian bắt đầu và kết thúc duyệt đề tài.
 * Thời gian bắt đầu SV đăng ký.
 * Thời gian kết thúc SV đăng ký.
-* Hạn GVPB nộp điểm.
-* Ngày báo cáo hội đồng.
+* Hạn nhóm nộp báo cáo.
+* Hạn GVPB/thành viên hội đồng nộp điểm.
+* Ngày báo cáo hội đồng (chỉ KLTN).
+
+Các mốc phải theo thứ tự: kết thúc GV đăng ký < bắt đầu duyệt < kết thúc duyệt < bắt đầu SV đăng ký < kết thúc SV đăng ký < hạn nộp báo cáo < hạn nộp điểm < ngày hội đồng (nếu có). Mặc định trạng thái đợt tự chuyển theo các mốc thời gian. Trong menu thao tác, quản trị viên có thể chọn GV đăng ký đề tài, SV lập nhóm đăng ký đề tài, kết thúc nhận bài và tự công bố kết quả, hủy đợt hoặc quay lại tự động theo lịch. Chọn kết thúc nhận bài sẽ khóa nộp ngay; khi tất cả giảng viên liên quan đã chấm và (với KLTN) Chủ tịch đã xác nhận, hệ thống tự công bố kết quả và hoàn tất đợt. Nếu chưa đủ điều kiện chấm/công bố, đợt tiếp tục chờ; tới hạn đã cấu hình, luồng tự động vẫn xử lý chuyển sang giai đoạn chấm. Các thao tác này không yêu cầu nhập mốc thời gian hay kiểm tra trạng thái hiện tại.
 
 ---
 
@@ -154,14 +149,14 @@ KLTN
 
 Quy tắc:
 
-* Hạn GVPB nộp điểm chỉ thiết lập khi loại là TLCN hoặc KLTN.
+* Hạn nộp điểm được thiết lập cho mọi loại đợt.
 * Ngày báo cáo hội đồng chỉ thiết lập khi loại là KLTN.
 
 ---
 
 # 5. Quản lý đề tài
 
-Trưởng khoa có quyền:
+Trưởng khoa (hiện được ánh xạ vào `ROLE_ADMIN`) có quyền:
 
 * Xem danh sách đề tài.
 * Xem đề tài theo bộ môn.
@@ -218,6 +213,8 @@ Trưởng khoa có quyền:
 * Theo dõi tình trạng nộp điểm.
 * Theo dõi hạn nộp điểm.
 
+MON_HOC, NCKH, TLCN dùng 1–2 GVPB được phân công. KLTN dùng hội đồng 3–5 người; GVHD không được chấm đề tài mình hướng dẫn. Chỉ đề tài có nhóm được duyệt và đã nộp báo cáo mới được phân công/chấm.
+
 Business rule:
 
 ```text
@@ -239,6 +236,8 @@ Trưởng khoa có quyền:
 * Chỉ định Thư ký.
 * Chỉ định thành viên hội đồng.
 * Phân công đề tài cho hội đồng.
+
+Chỉ KLTN sử dụng hội đồng để chấm điểm. Không đưa đề tài chưa có báo cáo đã nộp vào hội đồng.
 
 Mỗi hội đồng:
 
@@ -270,13 +269,15 @@ Mỗi hội đồng phải có:
 
 Sau khi quá trình phản biện/chấm điểm hoàn tất:
 
-Trưởng khoa có quyền:
+ROLE_ADMIN có quyền:
 
 * Kiểm tra kết quả.
 * Kiểm tra điểm.
 * Kiểm tra nhận xét.
 * Công bố kết quả.
 * Cho phép sinh viên xem kết quả.
+
+Mỗi giảng viên nhập tiêu chí riêng (MON_HOC/NCKH/TLCN: nội dung, sản phẩm, báo cáo; KLTN thêm thuyết trình). Điểm của một giảng viên là trung bình các tiêu chí, làm tròn 1 chữ số; điểm cuối là trung bình điểm giảng viên, làm tròn 2 chữ số. Chưa được tổng hợp trước khi tất cả người chấm liên quan hoàn tất; sau hạn, hệ thống được tổng hợp phần điểm đã nộp và nhắc những người còn thiếu. Với KLTN, chỉ Chủ tịch được xác nhận kết quả. Chỉ công bố kết quả mới hiển thị cho sinh viên; điểm là điểm chung của nhóm/đề tài.
 
 Sau khi công bố:
 
@@ -544,6 +545,8 @@ NHOM_TRUONG
 CHỈ NHÓM TRƯỞNG ĐƯỢC NỘP BÁO CÁO
 ```
 
+Mỗi lần nộp tạo một phiên bản mới. Báo cáo nhận PDF/DOCX; MON_HOC bắt buộc nộp thêm source dạng ZIP. Chỉ nhóm trưởng nộp được, và chỉ thành viên nhóm, giảng viên được phân công liên quan hoặc ADMIN mới được xem/tải lịch sử và tệp.
+
 Sinh viên thành viên không được nộp báo cáo.
 
 ---
@@ -580,7 +583,7 @@ THANH_VIEN_NHOM
 # 21. Quy trình nghiệp vụ tổng thể
 
 ```text
-TRƯỞNG KHOA
+ROLE_ADMIN (nghiệp vụ Trưởng khoa)
     │
     ├── Tạo đợt đăng ký
     │
@@ -648,33 +651,22 @@ SINH VIÊN
 
 # 22. Bảng phân quyền tổng quát
 
-| Chức năng          | ADMIN | TRƯỞNG KHOA | GIẢNG VIÊN          | SINH VIÊN       |
-| ------------------ | ----- | ----------- | ------------------- | --------------- |
-| Quản lý tài khoản  | Có    | Không       | Không               | Không           |
-| Phân quyền         | Có    | Không       | Không               | Không           |
-| Tạo đợt đăng ký    | Không | Có          | Không               | Không           |
-| Sửa đợt đăng ký    | Không | Có          | Không               | Không           |
-| Mở/đóng đợt        | Không | Có          | Không               | Không           |
-| Tạo đề tài         | Không | Không       | Có                  | Không           |
-| Sửa đề tài         | Không | Có          | Có, đề tài của mình | Không           |
-| Duyệt đề tài       | Không | Có          | Không               | Không           |
-| Công bố đề tài     | Không | Có          | Không               | Không           |
-| Tạo nhóm           | Không | Không       | Không               | Có              |
-| Thêm thành viên    | Không | Không       | Không               | Nhóm trưởng     |
-| Đăng ký đề tài     | Không | Không       | Không               | Nhóm trưởng     |
-| Phân công GVHD     | Không | Có          | Không               | Không           |
-| Phân công GVPB     | Không | Có          | Không               | Không           |
-| Thành lập hội đồng | Không | Có          | Không               | Không           |
-| Hướng dẫn SV       | Không | Không       | GVHD                | Không           |
-| Xem báo cáo        | Có    | Có          | Theo phân công      | Thành viên nhóm |
-| Nộp báo cáo        | Không | Không       | Không               | Nhóm trưởng     |
-| Phản biện          | Không | Có thể xem  | GVPB/HĐ             | Không           |
-| Chấm điểm          | Không | Có thể xem  | GVPB/HĐ             | Không           |
-| Tổng hợp điểm      | Không | Có thể xem  | Chủ tịch HĐ         | Không           |
-| Công bố kết quả    | Không | Có          | Không               | Không           |
-| Xem điểm           | Có    | Có          | Theo phân công      | Có              |
-| Xem thông báo      | Có    | Có          | Có                  | Có              |
-| Quản lý thông báo  | Có    | Có          | Không               | Không           |
+| Chức năng | ADMIN (nghiệp vụ Trưởng khoa) | GIẢNG VIÊN | SINH VIÊN |
+| --- | --- | --- | --- |
+| Quản lý tài khoản/bộ môn | Có | Không | Không |
+| Tạo/sửa/gia hạn đợt | Có | Không | Không |
+| Duyệt/công bố đề tài | Có | Không | Không |
+| Tạo đề tài | Không | Có | Không |
+| Tạo nhóm | Không | Không | Có |
+| Thêm thành viên/đăng ký đề tài | Không | Không | Nhóm trưởng |
+| Phân công GVHD/GVPB/hội đồng | Có | Không | Không |
+| Hướng dẫn SV | Không | GVHD | Không |
+| Xem báo cáo | Có | Theo phân công | Thành viên nhóm |
+| Nộp báo cáo | Không | Không | Nhóm trưởng |
+| Chấm điểm | Không | GVPB/HĐ được phân công | Không |
+| Xác nhận điểm KLTN | Không | Chủ tịch HĐ | Không |
+| Công bố kết quả | Có | Không | Không |
+| Xem điểm đã công bố | Có | Theo phân công | Có, nếu là thành viên nhóm |
 
 ---
 
@@ -685,7 +677,7 @@ SINH VIÊN
 * Chỉ GV được đăng ký đề tài trong thời gian GV đăng ký.
 * Chỉ SV được đăng ký đề tài trong thời gian SV đăng ký.
 * GVPB phải nộp điểm trước hạn.
-* Hạn GVPB chỉ áp dụng cho TLCN/KLTN.
+* Hạn nộp điểm áp dụng cho mọi loại đợt.
 * Ngày báo cáo hội đồng chỉ áp dụng cho KLTN.
 
 ## 23.2. Đề tài
@@ -714,12 +706,16 @@ SINH VIÊN
 
 * Chỉ nhóm trưởng được nộp báo cáo.
 * Thành viên thường không được nộp báo cáo.
+* Mỗi lần nộp tạo phiên bản mới; báo cáo là PDF/DOCX, source ZIP bắt buộc với MON_HOC.
+* Nhóm trưởng có thể nộp lại đến hạn nộp hoặc đến khi quản trị viên chọn kết thúc đợt nhận bài; sau đó hệ thống từ chối cả nộp mới lẫn nộp phiên bản tiếp theo.
+* Chỉ bài nộp đúng hạn mới đủ điều kiện chấm điểm.
 
 ## 23.6. Điểm
 
-* Điểm cuối được tính bằng trung bình cộng các điểm thành phần.
-* Chủ tịch hội đồng chịu trách nhiệm tổng hợp kết quả.
-* Sau khi kết quả được công bố, sinh viên được xem điểm.
+* Mỗi giảng viên chấm đủ tiêu chí; điểm tiêu chí và điểm cuối được làm tròn lần lượt 1 và 2 chữ số.
+* Không tổng hợp trước khi đủ điểm; khi quá hạn, hệ thống nhắc người chấm còn thiếu và tổng hợp phần đã nộp đối với các đợt không phải KLTN.
+* Chủ tịch hội đồng xác nhận điểm KLTN; ADMIN công bố kết quả.
+* Chỉ sau khi công bố, sinh viên thuộc nhóm của đề tài mới xem được điểm chung và nhận xét.
 
 ---
 
@@ -732,11 +728,12 @@ Nên sử dụng:
 ```text
 ACCOUNT ROLES
 │
-├── ADMIN
-├── TRUONG_KHOA
-├── GIANG_VIEN
-└── SINH_VIEN
+├── ROLE_ADMIN
+├── ROLE_TEACHER
+└── ROLE_STUDENT
 ```
+
+`TRUONG_KHOA` là vai trò nghiệp vụ được hệ thống hiện tại ánh xạ vào `ROLE_ADMIN`, không phải ROLE đăng nhập riêng.
 
 Sau đó dùng nghiệp vụ/assignment:
 

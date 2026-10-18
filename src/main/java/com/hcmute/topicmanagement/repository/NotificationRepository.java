@@ -12,6 +12,8 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     List<Notification> findByPeriodIdOrderByCreatedAtDesc(Long periodId);
     List<Notification> findByRecipients_IdOrderByCreatedAtDesc(Long userId);
+    boolean existsByCreatedById(Long userId);
+    boolean existsByRecipients_Id(Long userId);
 
     @Query("SELECT n FROM Notification n WHERE n.targetRole = 'ALL' OR n.targetRole = :roleName ORDER BY n.createdAt DESC")
     List<Notification> findNotificationsByRole(@Param("roleName") String roleName);

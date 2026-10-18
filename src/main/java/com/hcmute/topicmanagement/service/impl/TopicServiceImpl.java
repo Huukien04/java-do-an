@@ -51,9 +51,13 @@ public class TopicServiceImpl implements TopicService {
         // Check timeline rule: GV chỉ được đăng ký đề tài trong thời gian đăng ký GV
         LocalDateTime now = LocalDateTime.now();
         if (period.getStatus() != PeriodStatus.PHASE1_TEACHER_REG
-            || now.isBefore(period.getTeacherStartDate())
-            || now.isAfter(period.getTeacherEndDate())) {
-            throw new BusinessException("Thời gian đăng ký đề tài của Giảng viên ngoài khung giờ quy định.");
+                && period.getStatus() != PeriodStatus.PHASE2_STUDENT_REG) {
+            throw new BusinessException("Giai đoạn đăng ký đề tài cho giảng viên chưa được mở.");
+        }
+        if (!period.isTeacherRegistrationManuallyOpened()
+                && (now.isBefore(period.getTeacherStartDate())
+                || now.isAfter(period.getTeacherEndDate()))) {
+            throw new BusinessException("Hiện tại đã ngoài khung giờ đăng ký đề tài của giảng viên.");
         }
 
         Topic topic = Topic.builder()
@@ -254,7 +258,8 @@ public class TopicServiceImpl implements TopicService {
     @Override
     @Transactional(readOnly = true)
     public List<TopicDTO> getApprovedTopicsByPeriod(Long periodId) {
-        return topicRepository.findByPeriodIdAndStatus(periodId, TopicStatus.APPROVED).stream()
+        return topicRepository.findByPeriodIdAndStatusIn(
+                        periodId, List.of(TopicStatus.APPROVED, TopicStatus.PUBLISHED)).stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -285,6 +290,7 @@ public class TopicServiceImpl implements TopicService {
                 .departmentName(topic.getDepartment().getName())
                 .periodId(topic.getPeriod().getId())
                 .periodName(topic.getPeriod().getName())
+                .periodType(topic.getPeriod().getPeriodType())
                 .status(topic.getStatus())
                 .createdByTeacherId(topic.getCreatedByTeacher().getId())
                 .createdByTeacherName(topic.getCreatedByTeacher().getUser().getFullName())

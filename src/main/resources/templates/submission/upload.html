@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Nộp kết quả đề tài</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div th:replace="~{fragments/components :: pageHeading('NỘP KẾT QUẢ ĐỀ TÀI', 'Chỉ nhóm trưởng được nộp; mỗi lần nộp sẽ tạo một phiên bản mới')}"></div>
+    <div class="card card-custom p-4 mb-4">
+        <form th:action="@{/submissions/upload}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="groupId" th:value="${groupId}">
+            <div class="mb-3">
+                <label for="file" class="form-label">Báo cáo PDF hoặc DOCX (bắt buộc, tối đa 50 MB)</label>
+                <input id="file" type="file" name="file" class="form-control" accept=".pdf,.docx" required>
+            </div>
+            <div class="mb-3">
+                <label for="sourceFile" class="form-label">Source code ZIP (bắt buộc với đợt môn học)</label>
+                <input id="sourceFile" type="file" name="sourceFile" class="form-control" accept=".zip">
+            </div>
+            <div class="mb-3">
+                <label for="demoUrl" class="form-label">Link demo (không bắt buộc)</label>
+                <input id="demoUrl" type="url" name="demoUrl" class="form-control" placeholder="https://...">
+            </div>
+            <div class="mb-3">
+                <label for="notes" class="form-label">Ghi chú</label>
+                <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">Nộp phiên bản mới</button>
+            <a class="btn btn-outline-secondary" th:href="@{/submissions/versions/{id}(id=${groupId})}">Xem lịch sử nộp</a>
+        </form>
+    </div>
+    <div th:replace="~{fragments/components :: pageHeading('LỊCH SỬ PHIÊN BẢN', '')}"></div>
+    <div th:replace="~{submission/versions :: versionTable(${submissions})}"></div>
+</div>
+</body>
+</html>

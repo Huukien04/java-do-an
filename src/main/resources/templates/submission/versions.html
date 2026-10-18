@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Lịch sử bài nộp</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div th:replace="~{fragments/components :: pageHeading('LỊCH SỬ BÀI NỘP', 'Bản mới nhất được người chấm sử dụng')}"></div>
+    <div th:replace="~{submission/versions :: versionTable(${submissions})}"></div>
+</div>
+<th:block th:fragment="versionTable(items)">
+    <div class="card card-custom p-3">
+        <div th:if="${items.empty}" class="text-center text-muted py-4">Nhóm chưa nộp báo cáo.</div>
+        <div class="table-responsive" th:unless="${items.empty}">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr><th>Phiên bản</th><th>Báo cáo</th><th>Source code</th><th>Link demo</th><th>Ghi chú</th><th>Người nộp / thời gian</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="submission : ${items}">
+                    <td>
+                        <span class="badge" th:classappend="${submission.versionNumber == items[0].versionNumber ? 'bg-success' : 'bg-secondary'}"
+                              th:text="${submission.versionNumber == items[0].versionNumber ? 'Mới nhất · v' + submission.versionNumber : 'v' + submission.versionNumber}">v1</span>
+                    </td>
+                    <td><a th:href="@{/submissions/download/{id}(id=${submission.id})}" th:text="${submission.fileName}">report.pdf</a></td>
+                    <td>
+                        <a th:if="${submission.sourceFilePath != null}"
+                           th:href="@{/submissions/download/{id}(id=${submission.id},source=true)}"
+                           th:text="${submission.sourceFileName}">source.zip</a>
+                        <span th:if="${submission.sourceFilePath == null}" class="text-muted">—</span>
+                    </td>
+                    <td><a th:if="${submission.demoUrl != null}" th:href="${submission.demoUrl}" target="_blank" rel="noopener" th:text="${submission.demoUrl}">Demo</a><span th:if="${submission.demoUrl == null}">—</span></td>
+                    <td th:text="${submission.notes == null ? '—' : submission.notes}">—</td>
+                    <td><span th:text="${submission.uploadedBy.user.fullName}">Nhóm trưởng</span><small class="d-block text-muted" th:text="${#temporals.format(submission.uploadedAt, 'dd/MM/yyyy HH:mm')}">Thời gian</small></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

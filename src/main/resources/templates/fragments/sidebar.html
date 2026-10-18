@@ -18,6 +18,12 @@
         <a class="nav-link" href="/admin/councils">
             <i class="bi bi-people"></i> Hội đồng phản biện
         </a>
+        <a class="nav-link" href="/admin/departments">
+            <i class="bi bi-diagram-3"></i> Quản lý bộ môn
+        </a>
+        <a class="nav-link" href="/admin/accounts">
+            <i class="bi bi-person-gear"></i> Quản lý tài khoản
+        </a>
     </div>
 
     <div sec:authorize="hasRole('TEACHER')">
@@ -33,6 +39,9 @@
         </a>
         <a class="nav-link" href="/scoring/teacher">
             <i class="bi bi-pencil-square"></i> Chấm điểm
+        </a>
+        <a class="nav-link" href="/scoring/results">
+            <i class="bi bi-award"></i> Bảng điểm
         </a>
     </div>
 

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Tổng hợp điểm hội đồng</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div th:replace="~{fragments/components :: pageHeading('TỔNG HỢP ĐIỂM HỘI ĐỒNG', 'Xem điểm thành phần, nhận xét và tiến độ từng đề tài')}"></div>
+    <div class="card card-custom p-3 mb-3" th:each="row : ${summaryTopics}">
+        <h5 class="fw-bold text-primary" th:text="${row.title}">Đề tài</h5>
+        <div class="alert alert-warning py-2" th:if="${!row.progress.complete}">
+            Tiến độ: <strong th:text="${row.progress.submittedCount + '/' + row.progress.requiredCount}">0/0</strong>.
+            Chưa chấm: <span th:text="${#strings.listJoin(row.progress.pendingTeacherNames, ', ')}">Tên GV</span>.
+            <span th:if="${row.progress.deadlinePassed}">Đã quá hạn, có thể xác nhận với số điểm hiện có.</span>
+        </div>
+        <div class="alert alert-danger py-2" th:if="${row.progress.scoreSpreadWarning}">
+            Chênh lệch điểm lớn hơn 3.0; cần kiểm tra trước khi xác nhận.
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                <tr><th>Giảng viên</th><th>Nội dung</th><th>Sản phẩm</th><th>Báo cáo</th><th>Trình bày</th><th>Điểm TB</th><th>Nhận xét</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="score : ${row.scores}">
+                    <td th:text="${score.teacherName}">GV</td>
+                    <td th:text="${score.contentScore}">0</td>
+                    <td th:text="${score.productScore}">0</td>
+                    <td th:text="${score.reportScore}">0</td>
+                    <td th:text="${score.presentationScore == null ? '—' : score.presentationScore}">—</td>
+                    <td class="fw-bold" th:text="${score.scoreValue}">0.0</td>
+                    <td th:text="${score.comments == null || score.comments.isBlank() ? 'Chưa có nhận xét' : score.comments}">Nhận xét</td>
+                </tr>
+                <tr th:if="${row.scores.empty}"><td colspan="7" class="text-center text-muted">Chưa có điểm.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${row.result != null}" class="alert alert-info">
+            Điểm cuối: <strong th:text="${row.result.finalScore}">0.00</strong>
+            <span th:text="${row.result.evaluationStatus.displayName}">Chưa đạt</span>
+        </div>
+        <form th:if="${row.canConfirm}" th:action="@{/scoring/chairman/confirm}" method="post">
+            <input type="hidden" name="topicId" th:value="${row.topicId}">
+            <label class="form-label" th:for="${'chairman-comments-' + row.topicId}">Nhận xét tổng hợp của Chủ tịch</label>
+            <textarea class="form-control mb-2" name="chairmanComments" rows="3"
+                      th:id="${'chairman-comments-' + row.topicId}"
+                      th:text="${row.result == null ? '' : row.result.chairmanComments}"></textarea>
+            <button class="btn btn-success" type="submit">Xác nhận kết quả đề tài</button>
+        </form>
+        <div th:if="${row.result != null && row.result.published}" class="text-success fw-semibold">
+            Kết quả đã công bố và điểm đã khóa.
+        </div>
+    </div>
+</div>
+</body>
+</html>

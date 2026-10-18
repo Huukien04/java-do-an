@@ -32,6 +32,18 @@ public class Score {
     @Column(name = "score_value", nullable = false, precision = 4, scale = 2)
     private BigDecimal scoreValue;
 
+    @Column(name = "content_score", precision = 4, scale = 2)
+    private BigDecimal contentScore;
+
+    @Column(name = "product_score", precision = 4, scale = 2)
+    private BigDecimal productScore;
+
+    @Column(name = "report_score", precision = 4, scale = 2)
+    private BigDecimal reportScore;
+
+    @Column(name = "presentation_score", precision = 4, scale = 2)
+    private BigDecimal presentationScore;
+
     @Column(columnDefinition = "TEXT")
     private String comments;
 

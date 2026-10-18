@@ -45,11 +45,45 @@ public class RegistrationPeriod {
     @Column(name = "student_end_date", nullable = false)
     private LocalDateTime studentEndDate;
 
+    @Column(name = "submission_deadline")
+    private LocalDateTime submissionDeadline;
+
     @Column(name = "review_submission_deadline")
     private LocalDateTime reviewSubmissionDeadline; // Required for TLCN & KLTN
 
     @Column(name = "council_report_date")
     private LocalDateTime councilReportDate; // Required for KLTN
+
+    @Column(name = "teacher_extension_count", nullable = false)
+    @Builder.Default
+    private int teacherExtensionCount = 0;
+
+    @Column(name = "student_extension_count", nullable = false)
+    @Builder.Default
+    private int studentExtensionCount = 0;
+
+    @Column(name = "submission_extension_count", nullable = false)
+    @Builder.Default
+    private int submissionExtensionCount = 0;
+
+    @Column(name = "scoring_extension_count", nullable = false)
+    @Builder.Default
+    private int scoringExtensionCount = 0;
+
+    @Column(name = "scoring_reminder_sent_at")
+    private LocalDateTime scoringReminderSentAt;
+
+    @Column(name = "teacher_registration_manually_opened", nullable = false)
+    @Builder.Default
+    private boolean teacherRegistrationManuallyOpened = false;
+
+    @Column(name = "student_registration_manually_opened", nullable = false)
+    @Builder.Default
+    private boolean studentRegistrationManuallyOpened = false;
+
+    @Column(name = "status_manually_controlled", nullable = false)
+    @Builder.Default
+    private boolean statusManuallyControlled = false;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)

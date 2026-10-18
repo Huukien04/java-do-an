@@ -33,7 +33,7 @@
     "councilDate": "Ngày Báo cáo Hội đồng (Bắt buộc với KLTN)",
     "save": "Lưu đợt đăng ký",
     "update": "Cập nhật đợt",
-    "invalidSchedule": "Các mốc thời gian phải tăng dần, không được trùng hoặc chồng lấn.",
+    "invalidSchedule": "Trong từng giai đoạn, thời điểm kết thúc phải sau thời điểm bắt đầu. Các giai đoạn có thể chồng lấn.",
     "startMustBeFuture": "Thời gian bắt đầu GV đăng ký không được ở quá khứ.",
     "missingDate": "Vui lòng nhập đầy đủ các mốc thời gian bắt buộc.",
     "manageTitle": "QUẢN LÝ ĐỢT ĐĂNG KÝ",

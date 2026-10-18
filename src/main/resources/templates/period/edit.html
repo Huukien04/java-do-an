@@ -30,6 +30,7 @@
 
                 <div class="col-12">
                     <div class="small text-muted"><strong data-i18n="period.totalWindow">Toàn đợt đăng ký:</strong> <span id="periodTotalWindow" data-i18n="period.chooseWindow">Chọn ngày bắt đầu GV và kết thúc SV</span></div>
+                    <div class="small text-info mt-1">Các giai đoạn có thể diễn ra chồng lấn. Sinh viên chỉ được đăng ký khi ADMIN mở giai đoạn và đã có ít nhất một đề tài được Khoa phê duyệt. Có thể gia hạn thời gian GV/SV bằng cách cập nhật mốc kết thúc.</div>
                 </div>
 
                 <div class="col-12"><h5 class="mb-0" data-i18n="period.teacherWindow">Thời gian Giáo viên đăng ký đề tài</h5></div>
@@ -64,11 +65,19 @@
                     <input type="text" class="form-control period-date-input" th:classappend="${#fields.hasErrors('studentEndDate')} ? 'is-invalid' : ''" id="studentEndDate" name="studentEndDate" aria-label="Kết thúc SV đăng ký" th:value="${periodDTO.studentEndDate != null ? #temporals.format(periodDTO.studentEndDate, 'dd/MM/yyyy HH:mm') : ''}" data-period-date-picker autocomplete="off" required>
                 </div>
 
+                <div class="col-md-6">
+                    <label for="submissionDeadline" class="form-label fw-medium">Hạn nộp báo cáo của nhóm <span class="text-danger" data-required-marker>*</span></label>
+                    <input type="text" class="form-control period-date-input" id="submissionDeadline"
+                           name="submissionDeadline" aria-label="Hạn nộp báo cáo"
+                           th:value="${periodDTO.submissionDeadline != null ? #temporals.format(periodDTO.submissionDeadline, 'dd/MM/yyyy HH:mm') : ''}"
+                           data-period-date-picker autocomplete="off" required>
+                </div>
+
                 <!-- <div class="col-12"><div class="small text-danger" data-schedule-error role="alert" aria-live="polite"></div></div> -->
 
                 <div class="col-md-6">
-                    <label for="reviewSubmissionDeadline" class="form-label fw-medium" data-i18n="period.reviewDeadline">Hạn chót GVPB nộp điểm (Bắt buộc với TLCN &amp; KLTN) <span class="text-danger" data-required-marker hidden>*</span></label>
-                    <input type="text" class="form-control period-date-input" th:classappend="${#fields.hasErrors('reviewSubmissionDeadline')} ? 'is-invalid' : ''" id="reviewSubmissionDeadline" name="reviewSubmissionDeadline" aria-label="Hạn chót GVPB nộp điểm" th:value="${periodDTO.reviewSubmissionDeadline != null ? #temporals.format(periodDTO.reviewSubmissionDeadline, 'dd/MM/yyyy HH:mm') : ''}" data-period-date-picker autocomplete="off">
+                    <label for="reviewSubmissionDeadline" class="form-label fw-medium" data-i18n="period.reviewDeadline">Hạn chót GVPB nộp điểm <span class="text-danger" data-required-marker>*</span></label>
+                    <input type="text" class="form-control period-date-input" th:classappend="${#fields.hasErrors('reviewSubmissionDeadline')} ? 'is-invalid' : ''" id="reviewSubmissionDeadline" name="reviewSubmissionDeadline" aria-label="Hạn chót GVPB nộp điểm" th:value="${periodDTO.reviewSubmissionDeadline != null ? #temporals.format(periodDTO.reviewSubmissionDeadline, 'dd/MM/yyyy HH:mm') : ''}" data-period-date-picker autocomplete="off" required>
                 </div>
 
                 <div class="col-md-6">
@@ -88,7 +97,7 @@
 </div>
 <th:block layout:fragment="scripts">
     <script th:src="@{/js/period-date-picker.js(v=6)}"></script>
-    <script th:src="@{/js/period-schedule.js}"></script>
+    <script th:src="@{/js/period-schedule.js(v=2)}"></script>
 </th:block>
 </body>
 </html>

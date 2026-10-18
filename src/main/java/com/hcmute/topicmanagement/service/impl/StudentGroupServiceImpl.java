@@ -44,10 +44,17 @@ public class StudentGroupServiceImpl implements StudentGroupService {
 
         // Check timeline rule for student registration
         LocalDateTime now = LocalDateTime.now();
-        if (period.getStatus() != PeriodStatus.PHASE2_STUDENT_REG
-            || now.isBefore(period.getStudentStartDate())
-            || now.isAfter(period.getStudentEndDate())) {
-            throw new BusinessException("Hiện tại ngoài thời gian cho phép Sinh viên tạo nhóm / đăng ký đợt.");
+        if (period.getStatus() != PeriodStatus.PHASE2_STUDENT_REG) {
+            throw new BusinessException("Giai đoạn đăng ký đề tài của sinh viên chưa được mở.");
+        }
+        if (!period.isStudentRegistrationManuallyOpened()
+                && (now.isBefore(period.getStudentStartDate())
+                || now.isAfter(period.getStudentEndDate()))) {
+            throw new BusinessException("Hiện tại ngoài thời gian cho phép sinh viên tạo nhóm / đăng ký đợt.");
+        }
+        if (topicRepository.countByPeriodIdAndStatusIn(periodId,
+                List.of(TopicStatus.APPROVED, TopicStatus.PUBLISHED)) == 0) {
+            throw new BusinessException("Đợt này chưa có đề tài được Khoa phê duyệt nên chưa thể tạo nhóm đăng ký.");
         }
 
         // Rule: Each student can join ONLY 1 group per period
@@ -148,38 +155,66 @@ public class StudentGroupServiceImpl implements StudentGroupService {
         RegistrationPeriod period = group.getPeriod();
         LocalDateTime now = LocalDateTime.now();
         if (period.getStatus() != PeriodStatus.PHASE2_STUDENT_REG
-            || now.isBefore(period.getStudentStartDate())
-            || now.isAfter(period.getStudentEndDate())) {
+                || (!period.isStudentRegistrationManuallyOpened()
+                && (now.isBefore(period.getStudentStartDate())
+                || now.isAfter(period.getStudentEndDate())))) {
             throw new BusinessException("Thời gian đăng ký đề tài của Sinh viên đã kết thúc hoặc chưa bắt đầu.");
         }
 
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Đề tài", "id", topicId));
 
-        if (topic.getStatus() != TopicStatus.APPROVED) {
+        if (topic.getStatus() != TopicStatus.APPROVED && topic.getStatus() != TopicStatus.PUBLISHED) {
             throw new BusinessException("Đề tài này chưa được Khoa phê duyệt hoặc đã được phân công.");
         }
+        if (!topic.getPeriod().getId().equals(period.getId())) {
+            throw new BusinessException("Đề tài phải thuộc cùng đợt đăng ký với nhóm của bạn.");
+        }
 
-        // Rule: One group registers only 1 topic
-        if (registrationRepository.existsByGroupId(groupId)) {
+        Optional<TopicRegistration> existingRegistration = registrationRepository.findByGroupId(groupId);
+        if (existingRegistration.isPresent()
+                && existingRegistration.get().getStatus() != TopicRegistrationStatus.REJECTED) {
             throw new BusinessException("Nhóm của bạn đã đăng ký một đề tài trong đợt này rồi.");
         }
 
-        if (registrationRepository.existsByTopicId(topicId)) {
+        Optional<TopicRegistration> topicRegistration = registrationRepository.findByTopicId(topicId);
+        if (topicRegistration.isPresent()
+                && (existingRegistration.isEmpty()
+                || !topicRegistration.get().getId().equals(existingRegistration.get().getId()))) {
             throw new BusinessException("Đề tài này đã được một nhóm khác đăng ký.");
         }
 
-        TopicRegistration reg = TopicRegistration.builder()
+        TopicRegistration reg = existingRegistration.orElseGet(() -> TopicRegistration.builder()
                 .group(group)
-                .topic(topic)
-                .status(TopicRegistrationStatus.PENDING)
-                .build();
+                .build());
+        reg.setTopic(topic);
+        reg.setStatus(TopicRegistrationStatus.PENDING);
+        reg.setRejectionReason(null);
         registrationRepository.save(reg);
 
         group.setStatus(StudentGroupStatus.REGISTERED);
         groupRepository.save(group);
 
         return mapToDTO(group);
+    }
+
+    @Override
+    public void disbandRejectedGroup(Long groupId, Long currentStudentId) {
+        StudentGroup group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nhóm sinh viên", "id", groupId));
+
+        if (!group.getLeader().getId().equals(currentStudentId)) {
+            throw new BusinessException("Chỉ Nhóm trưởng mới có quyền giải tán nhóm.");
+        }
+
+        TopicRegistration registration = registrationRepository.findByGroupId(groupId)
+                .orElseThrow(() -> new BusinessException("Chỉ có thể giải tán nhóm khi đăng ký đề tài đã bị từ chối."));
+        if (registration.getStatus() != TopicRegistrationStatus.REJECTED) {
+            throw new BusinessException("Chỉ có thể giải tán nhóm khi đăng ký đề tài đã bị từ chối.");
+        }
+
+        registrationRepository.delete(registration);
+        groupRepository.delete(group);
     }
 
     @Override

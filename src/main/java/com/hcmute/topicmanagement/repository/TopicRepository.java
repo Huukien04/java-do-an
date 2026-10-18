@@ -12,9 +12,15 @@ import java.util.List;
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, Long> {
     List<Topic> findByPeriodId(Long periodId);
+    long countByPeriodId(Long periodId);
     List<Topic> findByPeriodIdAndStatus(Long periodId, TopicStatus status);
+    List<Topic> findByPeriodIdAndStatusIn(Long periodId, List<TopicStatus> statuses);
+    long countByPeriodIdAndStatus(Long periodId, TopicStatus status);
+    long countByPeriodIdAndStatusIn(Long periodId, List<TopicStatus> statuses);
     List<Topic> findByCreatedByTeacherId(Long teacherId);
     List<Topic> findByDepartmentIdAndPeriodId(Long departmentId, Long periodId);
+    boolean existsByDepartmentId(Long departmentId);
+    boolean existsByCreatedByTeacherId(Long teacherId);
 
     @Query("""
             SELECT topic

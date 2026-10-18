@@ -11,5 +11,6 @@ public interface TopicAdvisorRepository extends JpaRepository<TopicAdvisor, Long
     List<TopicAdvisor> findByTopicId(Long topicId);
     List<TopicAdvisor> findByTeacherId(Long teacherId);
     boolean existsByTopicIdAndTeacherId(Long topicId, Long teacherId);
+    boolean existsByTeacherId(Long teacherId);
     void deleteByTopicId(Long topicId);
 }

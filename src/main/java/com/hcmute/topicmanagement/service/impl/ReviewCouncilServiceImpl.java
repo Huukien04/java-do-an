@@ -4,6 +4,9 @@ import com.hcmute.topicmanagement.dto.ReviewCouncilDTO;
 import com.hcmute.topicmanagement.dto.TopicDTO;
 import com.hcmute.topicmanagement.entity.*;
 import com.hcmute.topicmanagement.enums.CouncilRole;
+import com.hcmute.topicmanagement.enums.PeriodType;
+import com.hcmute.topicmanagement.enums.StudentGroupStatus;
+import com.hcmute.topicmanagement.enums.TopicRegistrationStatus;
 import com.hcmute.topicmanagement.enums.TopicStatus;
 import com.hcmute.topicmanagement.exception.BusinessException;
 import com.hcmute.topicmanagement.exception.ResourceNotFoundException;
@@ -31,11 +34,17 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
     private final RegistrationPeriodRepository periodRepository;
     private final TeacherRepository teacherRepository;
     private final TopicRepository topicRepository;
+    private final TopicRegistrationRepository topicRegistrationRepository;
+    private final SubmissionRepository submissionRepository;
+    private final TopicAdvisorRepository topicAdvisorRepository;
 
     @Override
     public ReviewCouncilDTO createCouncil(ReviewCouncilDTO dto) {
         RegistrationPeriod period = periodRepository.findById(dto.getPeriodId())
                 .orElseThrow(() -> new ResourceNotFoundException("Đợt đăng ký", "id", dto.getPeriodId()));
+        if (period.getPeriodType() != PeriodType.KLTN) {
+            throw new BusinessException("Chỉ đợt KLTN mới bắt buộc thành lập hội đồng chấm.");
+        }
 
         validateCouncilMembers(dto);
 
@@ -78,6 +87,14 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
                 .orElseThrow(() -> new ResourceNotFoundException("Hội đồng", "id", id));
 
         validateCouncilMembers(dto);
+        for (CouncilTopic existingAssignment : councilTopicRepository.findByCouncilId(id)) {
+            for (Long teacherId : proposedTeacherIds(dto)) {
+                if (topicAdvisorRepository.existsByTopicIdAndTeacherId(
+                        existingAssignment.getTopic().getId(), teacherId)) {
+                    throw new BusinessException("Không thể phân công GVHD làm thành viên hội đồng chấm đề tài mình hướng dẫn.");
+                }
+            }
+        }
 
         council.setName(dto.getName());
         council.setDefenseDate(dto.getDefenseDate());
@@ -126,22 +143,43 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
                 .toList();
         for (Topic topic : topics) {
             if (topic.getStatus() != TopicStatus.ASSIGNED) {
-                throw new BusinessException("Chỉ được gán các đề tài đã được phân công cho nhóm.");
+                if (!(topic.getStatus() == TopicStatus.SCORING
+                        && councilTopicRepository.findByTopicId(topic.getId())
+                        .filter(existing -> existing.getCouncil().getId().equals(councilId)).isPresent())) {
+                    throw new BusinessException("Chỉ được gán đề tài đã được phân công cho nhóm.");
+                }
             }
             if (!topic.getPeriod().getId().equals(council.getPeriod().getId())) {
                 throw new BusinessException("Đề tài được gán phải thuộc cùng đợt đăng ký với Hội đồng.");
             }
-            if (councilTopicRepository.existsByTopicId(topic.getId())) {
+            TopicRegistration registration = topicRegistrationRepository.findByTopicId(topic.getId())
+                    .filter(item -> item.getStatus() == TopicRegistrationStatus.APPROVED)
+                    .orElseThrow(() -> new BusinessException("Nhóm phải được duyệt đăng ký đề tài trước khi phân công chấm."));
+            if (registration.getGroup().getStatus() != StudentGroupStatus.SUBMITTED
+                    || !submissionRepository.existsByGroupId(registration.getGroup().getId())) {
+                throw new BusinessException("Chỉ được đưa đề tài đã nộp báo cáo vào hội đồng chấm.");
+            }
+            if (councilMemberRepository.findByCouncilId(councilId).stream().anyMatch(member ->
+                    topicAdvisorRepository.existsByTopicIdAndTeacherId(topic.getId(), member.getTeacher().getId()))) {
+                throw new BusinessException("GVHD của đề tài không được là thành viên hội đồng chấm đề tài đó.");
+            }
+            var existingAssignment = councilTopicRepository.findByTopicId(topic.getId());
+            if (existingAssignment.isPresent() && !existingAssignment.get().getCouncil().getId().equals(councilId)) {
                 throw new BusinessException("Đề tài \"" + topic.getTitle() + "\" đã được gán cho Hội đồng khác.");
             }
         }
 
         for (Topic topic : topics) {
+            if (councilTopicRepository.findByTopicId(topic.getId()).isPresent()) {
+                continue;
+            }
             CouncilTopic councilTopic = CouncilTopic.builder()
                     .council(council)
                     .topic(topic)
                     .build();
             councilTopicRepository.save(councilTopic);
+            topic.setStatus(TopicStatus.SCORING);
+            topicRepository.save(topic);
         }
     }
 
@@ -198,6 +236,20 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
         if (totalMembers < 3 || totalMembers > 5) {
             throw new BusinessException("Mỗi Hội đồng phản biện phải có từ 03 đến 05 Giảng viên (hiện tại: " + totalMembers + ").");
         }
+    }
+
+    private Set<Long> proposedTeacherIds(ReviewCouncilDTO dto) {
+        Set<Long> ids = new HashSet<>();
+        if (dto.getChairmanTeacherId() != null) {
+            ids.add(dto.getChairmanTeacherId());
+        }
+        if (dto.getSecretaryTeacherId() != null) {
+            ids.add(dto.getSecretaryTeacherId());
+        }
+        if (dto.getMemberTeacherIds() != null) {
+            ids.addAll(dto.getMemberTeacherIds());
+        }
+        return ids;
     }
 
     private void saveMember(ReviewCouncil council, Long teacherId, CouncilRole role) {

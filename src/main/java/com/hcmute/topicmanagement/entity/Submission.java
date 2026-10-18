@@ -31,6 +31,18 @@ public class Submission {
     @Column(name = "file_size", nullable = false)
     private Long fileSize;
 
+    @Column(name = "source_file_name", length = 255)
+    private String sourceFileName;
+
+    @Column(name = "source_file_path", length = 500)
+    private String sourceFilePath;
+
+    @Column(name = "source_file_size")
+    private Long sourceFileSize;
+
+    @Column(name = "demo_url", length = 1000)
+    private String demoUrl;
+
     @Column(name = "version_number", nullable = false)
     @Builder.Default
     private Integer versionNumber = 1;

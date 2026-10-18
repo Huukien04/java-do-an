@@ -50,10 +50,17 @@ public class RegistrationPeriodDTO {
     private LocalDateTime studentEndDate;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @NotNull(message = "Hạn nộp báo cáo của nhóm không được để trống")
+    private LocalDateTime submissionDeadline;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @NotNull(message = "Hạn chót nộp điểm không được để trống")
     private LocalDateTime reviewSubmissionDeadline;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime councilReportDate;
 
     private PeriodStatus status;
+
+    private boolean statusManuallyControlled;
 }

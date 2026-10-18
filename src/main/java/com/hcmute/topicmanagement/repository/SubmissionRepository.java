@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     List<Submission> findByGroupIdOrderByVersionNumberDesc(Long groupId);
     Optional<Submission> findTopByGroupIdOrderByVersionNumberDesc(Long groupId);
+    boolean existsByUploadedBy_Id(Long studentId);
+    boolean existsByGroupId(Long groupId);
 
     @Query("SELECT COALESCE(MAX(s.versionNumber), 0) FROM Submission s WHERE s.group.id = :groupId")
     Integer findMaxVersionByGroupId(@Param("groupId") Long groupId);

@@ -12,6 +12,8 @@ import java.util.Optional;
 @Repository
 public interface StudentGroupRepository extends JpaRepository<StudentGroup, Long> {
     List<StudentGroup> findByPeriodId(Long periodId);
+    List<StudentGroup> findByPeriodIdAndStatus(Long periodId, com.hcmute.topicmanagement.enums.StudentGroupStatus status);
+    boolean existsByLeaderId(Long studentId);
     Optional<StudentGroup> findByLeaderIdAndPeriodId(Long studentId, Long periodId);
 
     @Query("SELECT g FROM StudentGroup g JOIN g.members m WHERE m.student.id = :studentId AND g.period.id = :periodId")

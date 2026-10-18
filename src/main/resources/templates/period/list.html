@@ -72,6 +72,7 @@
                 <option value="active">Đợt đang mở / chưa hoàn tất</option>
                 <option value="all">Tất cả trạng thái</option>
                 <option value="DRAFT">Nháp</option>
+                <option value="INSUFFICIENT_TOPICS">Thiếu đề tài</option>
                 <option value="PHASE1_TEACHER_REG">Giảng viên đăng ký</option>
                 <option value="PHASE1_DEAN_REVIEW">Khoa duyệt</option>
                 <option value="PUBLISHED_TOPICS">Đã công bố đề tài</option>
@@ -143,51 +144,47 @@
                             <small class="text-muted" th:text="${#temporals.format(p.studentEndDate, 'dd/MM/yyyy HH:mm')}">End</small>
                         </td>
                         <td>
-                            <span th:replace="~{fragments/components :: statusBadge(${p.status.displayName})}">DRAFT</span>
+                            <span class="d-block" th:replace="~{fragments/components :: statusBadge(${p.status.displayName})}">DRAFT</span>
+                            <small class="text-muted"
+                                   th:text="${p.statusManuallyControlled ? 'Đang khóa trạng thái' : 'Theo thời gian'}">
+                                Theo thời gian
+                            </small>
                         </td>
                         <td class="text-end">
                             <a th:href="@{/admin/periods/{id}/edit(id=${p.id})}" class="btn btn-sm btn-outline-secondary me-1">
                                 <i class="bi bi-pencil"></i> Sửa
                             </a>
                             <div class="btn-group period-status-control">
-                                <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle period-status-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Đổi Trạng thái
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end period-status-menu">
+                                <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle period-status-toggle"
+                                        data-bs-toggle="dropdown" aria-expanded="false">Thao tác</button>
+                                <ul class="dropdown-menu dropdown-menu-end period-status-menu p-2">
                                     <li>
                                         <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
                                             <input type="hidden" name="status" value="PHASE1_TEACHER_REG">
-                                            <button type="submit" class="dropdown-item">Mở Phase 1 (GV đăng ký)</button>
-                                        </form>
-                                    </li>
-                                    <li>
-                                        <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
-                                            <input type="hidden" name="status" value="PHASE1_DEAN_REVIEW">
-                                            <button type="submit" class="dropdown-item">Mở giai đoạn Khoa duyệt</button>
-                                        </form>
-                                    </li>
-                                    <li>
-                                        <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
-                                            <input type="hidden" name="status" value="PUBLISHED_TOPICS">
-                                            <button type="submit" class="dropdown-item">Công bố Danh sách Đề tài</button>
+                                            <button class="dropdown-item" type="submit">GV đăng ký đề tài</button>
                                         </form>
                                     </li>
                                     <li>
                                         <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
                                             <input type="hidden" name="status" value="PHASE2_STUDENT_REG">
-                                            <button type="submit" class="dropdown-item">Mở Phase 2 (SV đăng ký)</button>
+                                            <button class="dropdown-item" type="submit">SV lập nhóm đăng ký đề tài</button>
                                         </form>
                                     </li>
                                     <li>
                                         <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
-                                            <input type="hidden" name="status" value="DEFENSE_EVALUATION">
-                                            <button type="submit" class="dropdown-item">Bắt đầu Chấm Phản biện</button>
+                                            <input type="hidden" name="status" value="SUBMISSION_CLOSED">
+                                            <button class="dropdown-item" type="submit">Kết thúc nhận bài &amp; tự công bố kết quả</button>
                                         </form>
                                     </li>
                                     <li>
                                         <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
-                                            <input type="hidden" name="status" value="COMPLETED">
-                                            <button type="submit" class="dropdown-item text-success">Hoàn thành Đợt</button>
+                                            <input type="hidden" name="status" value="CANCELLED">
+                                            <button class="dropdown-item text-danger" type="submit">Hủy đợt</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form th:action="@{/admin/periods/{id}/automatic(id=${p.id})}" method="post">
+                                            <button class="dropdown-item" type="submit">Tự động theo lịch</button>
                                         </form>
                                     </li>
                                 </ul>

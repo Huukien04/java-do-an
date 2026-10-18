@@ -1,5 +1,6 @@
 package com.hcmute.topicmanagement.entity;
 
+import com.hcmute.topicmanagement.enums.AdvisorRole;
 import com.hcmute.topicmanagement.enums.TopicStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -61,5 +62,14 @@ public class Topic {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @Transient
+    public Teacher getPrimaryAdvisor() {
+        return advisors.stream()
+                .filter(advisor -> advisor.getAdvisorRole() == AdvisorRole.PRIMARY)
+                .map(TopicAdvisor::getTeacher)
+                .findFirst()
+                .orElse(null);
     }
 }

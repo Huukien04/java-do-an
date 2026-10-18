@@ -1,8 +1,10 @@
 package com.hcmute.topicmanagement.controller;
 
 import com.hcmute.topicmanagement.dto.RegistrationPeriodDTO;
+import com.hcmute.topicmanagement.enums.PeriodAction;
 import com.hcmute.topicmanagement.enums.PeriodStatus;
 import com.hcmute.topicmanagement.enums.PeriodType;
+import com.hcmute.topicmanagement.exception.BusinessException;
 import com.hcmute.topicmanagement.service.RegistrationPeriodService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,8 @@ public class RegistrationPeriodController {
 
     @GetMapping
     public String listPeriods(Model model) {
-        model.addAttribute("periods", periodService.getAllPeriods());
+        var periods = periodService.getAllPeriods();
+        model.addAttribute("periods", periods);
         return "period/list";
     }
 
@@ -88,8 +91,44 @@ public class RegistrationPeriodController {
     public String changeStatus(@PathVariable Long id,
                                @RequestParam PeriodStatus status,
                                RedirectAttributes redirectAttributes) {
-        periodService.changeStatus(id, status);
-        redirectAttributes.addFlashAttribute("successMessage", "Cập nhật trạng thái đợt thành thành công: " + status.getDisplayName());
+        try {
+            periodService.changeStatus(id, status);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đã chuyển đợt sang trạng thái \"" + status.getDisplayName() + "\".");
+        } catch (BusinessException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/periods";
+    }
+
+    @PostMapping("/{id}/automatic")
+    public String resumeAutomaticStatus(@PathVariable Long id,
+                                        RedirectAttributes redirectAttributes) {
+        try {
+            periodService.resumeAutomaticStatus(id);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đợt đăng ký sẽ tiếp tục chuyển trạng thái theo lịch đã thiết lập.");
+        } catch (BusinessException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/periods";
+    }
+
+    @PostMapping("/{id}/action")
+    public String performAction(@PathVariable Long id,
+                                @RequestParam PeriodAction action,
+                                @RequestParam(required = false)
+                                @org.springframework.format.annotation.DateTimeFormat(
+                                        pattern = "yyyy-MM-dd'T'HH:mm") java.time.LocalDateTime newEndDate,
+                                @org.springframework.security.core.annotation.AuthenticationPrincipal
+                                com.hcmute.topicmanagement.security.CustomUserDetails userDetails,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            periodService.performAction(id, action, newEndDate, userDetails.getUserId());
+            redirectAttributes.addFlashAttribute("successMessage", "Đã thực hiện thao tác cho đợt đăng ký.");
+        } catch (BusinessException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
         return "redirect:/admin/periods";
     }
 }

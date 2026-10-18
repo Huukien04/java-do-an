@@ -29,7 +29,7 @@
     "councilDate": "Council presentation date (Required for KLTN)",
     "save": "Save period",
     "update": "Update period",
-    "invalidSchedule": "Dates must be in strictly increasing order and must not overlap.",
+    "invalidSchedule": "Each phase must end after it starts. Different phases may overlap.",
     "startMustBeFuture": "Teacher registration must not start in the past.",
     "missingDate": "Please enter all required dates.",
     "manageTitle": "REGISTRATION PERIODS",

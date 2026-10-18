@@ -12,6 +12,7 @@ import java.util.List;
 public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> {
     List<GroupMember> findByGroupId(Long groupId);
     boolean existsByGroupIdAndStudentId(Long groupId, Long studentId);
+    boolean existsByStudentId(Long studentId);
 
     @Query("SELECT COUNT(m) > 0 FROM GroupMember m WHERE m.student.id = :studentId AND m.group.period.id = :periodId")
     boolean isStudentInAnyGroupInPeriod(@Param("studentId") Long studentId, @Param("periodId") Long periodId);

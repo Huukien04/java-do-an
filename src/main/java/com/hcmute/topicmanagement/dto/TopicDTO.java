@@ -1,6 +1,7 @@
 package com.hcmute.topicmanagement.dto;
 
 import com.hcmute.topicmanagement.enums.TopicStatus;
+import com.hcmute.topicmanagement.enums.PeriodType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -32,6 +33,7 @@ public class TopicDTO {
     @NotNull(message = "Vui lòng chọn Đợt đăng ký")
     private Long periodId;
     private String periodName;
+    private PeriodType periodType;
 
     private TopicStatus status;
 

@@ -9,26 +9,27 @@
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <div th:replace="~{fragments/components :: pageHeading('TRA CỨU ĐIỂM & KẾT QUẢ ĐÁNH GIÁ', 'Danh sách kết quả bảo vệ đề tài (Môn học / NCKH / KLTN) đã được công bố')}"></div>
+            <div th:replace="~{fragments/components :: pageHeading('TRA CỨU ĐIỂM & KẾT QUẢ ĐÁNH GIÁ', 'Kết quả tổng hợp theo đề tài và đợt đăng ký')}"></div>
         </div>
     </div>
 
     <!-- Search & Filter Card -->
     <div class="card card-custom p-3 mb-4">
-        <div class="row g-3">
+        <form class="row g-3" th:action="@{/scoring/results}" method="get">
             <div class="col-md-8">
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" id="searchInput" onkeyup="filterResults()" class="form-control bg-light border-start-0" placeholder="Tìm kiếm theo Tên đề tài, Mã đề tài...">
+                    <input type="text" id="searchInput" onkeyup="filterResults()" class="form-control bg-light border-start-0" placeholder="Tìm kiếm theo Tên đề tài...">
                 </div>
             </div>
             <div class="col-md-4">
-                <select id="periodFilter" onchange="filterResults()" class="form-select bg-light">
+                <select id="periodFilter" name="periodId" class="form-select bg-light" onchange="this.form.submit()">
                     <option value="">-- Tất cả Đợt đăng ký --</option>
-                    <option th:each="p : ${periods}" th:value="${p.name}" th:text="${p.name}">Đợt 1</option>
+                    <option th:each="p : ${periods}" th:value="${p.id}" th:text="${p.name}"
+                            th:selected="${p.id == selectedPeriodId}">Đợt 1</option>
                 </select>
             </div>
-        </div>
+        </form>
     </div>
 
     <!-- Results Table Card -->
@@ -46,10 +47,10 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:if="${results == null || results.empty}">
+                <tr th:if="${results == null || results.empty}" id="emptyResults">
                     <td colspan="6" class="text-center text-muted py-5">
                         <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
-                        Hiện chưa có kết quả điểm nào được công bố.
+                        <span th:text="${isAdminOrTeacher ? 'Chưa có kết quả nào được tổng hợp trong đợt này.' : 'Hiện chưa có kết quả điểm nào được công bố trong đợt này.'}">Chưa có kết quả.</span>
                     </td>
                 </tr>
                 <tr th:each="r, iter : ${results}">
@@ -67,13 +68,14 @@
                     </td>
                     <td class="text-center">
                         <span class="fs-5 fw-bold"
-                              th:classappend="${r.finalScore >= 8.0 ? 'text-primary' : (r.finalScore >= 5.0 ? 'text-success' : 'text-danger')}"
-                              th:text="${#numbers.formatDecimal(r.finalScore, 1, 2)}">8.50</span>
+                              th:classappend="${r.finalScore == null ? 'text-muted' : (r.finalScore >= 8.0 ? 'text-primary' : (r.finalScore >= 5.0 ? 'text-success' : 'text-danger'))}"
+                              th:text="${r.finalScore == null ? '—' : #numbers.formatDecimal(r.finalScore, 1, 2)}">8.50</span>
                     </td>
                     <td class="text-center">
-                        <span class="badge px-3 py-2 rounded-pill"
+                        <span th:if="${r.evaluationStatus != null}" class="badge px-3 py-2 rounded-pill"
                               th:classappend="${r.evaluationStatus.name() == 'PASSED' ? 'bg-success' : 'bg-danger'}"
                               th:text="${r.evaluationStatus.displayName}">ĐẠT</span>
+                        <span th:if="${r.evaluationStatus == null}" class="badge bg-secondary">Chưa tổng hợp</span>
                     </td>
                     <td>
                         <span class="small text-muted" th:text="${r.chairmanComments != null && !r.chairmanComments.empty ? r.chairmanComments : 'Chưa có nhận xét'}">Nhận xét...</span>
@@ -89,21 +91,17 @@
     <script>
         function filterResults() {
             let searchInput = document.getElementById("searchInput").value.toLowerCase();
-            let periodFilter = document.getElementById("periodFilter").value.toLowerCase();
             let table = document.getElementById("resultsTable");
             let rows = table.getElementsByTagName("tr");
 
-            for (let i = 1; i < rows.length; i++) {
+            for (let i = 0; i < rows.length; i++) {
                 let row = rows[i];
                 if (row.getElementsByTagName("td").length < 6) continue;
 
                 let titleText = row.getElementsByTagName("td")[1].textContent.toLowerCase();
-                let periodText = row.getElementsByTagName("td")[2].textContent.toLowerCase();
-
                 let matchesSearch = titleText.includes(searchInput);
-                let matchesPeriod = periodFilter === "" || periodText.includes(periodFilter);
 
-                if (matchesSearch && matchesPeriod) {
+                if (matchesSearch) {
                     row.style.display = "";
                 } else {
                     row.style.display = "none";

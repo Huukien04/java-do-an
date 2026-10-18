@@ -11,6 +11,8 @@
     <div class="mb-4">
         <a sec:authorize="hasRole('TEACHER')" href="/scoring/teacher" class="btn btn-sm btn-outline-secondary mb-2"><i class="bi bi-arrow-left"></i> Quay lại Danh sách</a>
         <a sec:authorize="hasRole('ADMIN')" href="/admin/councils" class="btn btn-sm btn-outline-secondary mb-2"><i class="bi bi-arrow-left"></i> Quay lại Hội đồng</a>
+        <a th:if="${isChairman && councilId != null}" th:href="@{/scoring/council/{id}/summary(id=${councilId})}"
+           class="btn btn-sm btn-outline-primary mb-2"><i class="bi bi-table"></i> Bảng tổng hợp hội đồng</a>
         <div th:replace="~{fragments/components :: pageHeading(${topic.title}, ${'Bộ môn: ' + topic.departmentName + ' | GVHD: ' + topic.primaryAdvisorName})}"></div>
     </div>
 
@@ -29,18 +31,34 @@
         <!-- Score Input Form (If not advisor) -->
         <div class="col-md-6" th:if="${canSubmitScore}">
             <div class="card card-custom p-3">
-                <h5 class="fw-bold mb-3"><i class="bi bi-pencil-fill text-primary me-2"></i>Nhập Điểm Chấm Cá Nhân</h5>
-                <form th:action="@{/scoring/submit}" method="post">
-                    <input type="hidden" name="topicId" th:value="${topic.id}">
-                    
+                <h5 class="fw-bold mb-3"><i class="bi bi-pencil-fill text-primary me-2"></i>Chấm điểm đề tài / nhóm</h5>
+                <p class="small text-muted">Điểm chung của đề tài được áp dụng như nhau cho mọi thành viên trong nhóm.</p>
+                <form th:action="@{/scoring/topic/{id}(id=${topic.id})}" method="post">
                     <div class="mb-3">
-                        <label for="scoreValue" class="form-label fw-medium">Điểm số (Thang điểm 10.0) <span class="text-danger">*</span></label>
-                        <input type="number" step="0.25" min="0.0" max="10.0" class="form-control form-control-lg fw-bold text-primary" id="scoreValue" name="scoreValue" th:value="${scoreDTO.scoreValue}" placeholder="Vd: 8.5" required>
+                        <label for="contentScore" class="form-label fw-medium">Nội dung<span th:if="${criteriaCount == 4}"> &amp; tính khoa học</span> (0–10)</label>
+                        <input type="number" step="0.1" min="0" max="10" class="form-control" id="contentScore"
+                               name="contentScore" th:value="${scoreDTO.contentScore}" required>
                     </div>
-
+                    <div class="mb-3">
+                        <label for="productScore" class="form-label fw-medium">Sản phẩm / ứng dụng thực tế (0–10)</label>
+                        <input type="number" step="0.1" min="0" max="10" class="form-control" id="productScore"
+                               name="productScore" th:value="${scoreDTO.productScore}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reportScore" class="form-label fw-medium">Báo cáo văn bản (0–10)</label>
+                        <input type="number" step="0.1" min="0" max="10" class="form-control" id="reportScore"
+                               name="reportScore" th:value="${scoreDTO.reportScore}" required>
+                    </div>
+                    <div class="mb-3" th:if="${criteriaCount == 4}">
+                        <label for="presentationScore" class="form-label fw-medium">Trình bày &amp; trả lời phản biện (0–10)</label>
+                        <input type="number" step="0.1" min="0" max="10" class="form-control" id="presentationScore"
+                               name="presentationScore" th:value="${scoreDTO.presentationScore}" required>
+                    </div>
                     <div class="mb-4">
                         <label for="comments" class="form-label fw-medium">Nhận xét / Đánh giá Đề tài</label>
-                        <textarea class="form-control" id="comments" name="comments" rows="4" placeholder="Nhận xét về nội dung, phương pháp, kết quả đạt được..." th:text="${scoreDTO.comments}"></textarea>
+                        <textarea class="form-control" id="comments" name="comments" rows="4"
+                                  placeholder="Nhận xét về nội dung, phương pháp, kết quả đạt được..."
+                                  th:text="${scoreDTO.comments}"></textarea>
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
@@ -53,7 +71,23 @@
         <!-- Submitted Scores List & Chairman Summary -->
         <div class="col-md-6" th:classappend="${isAdvisor ? 'col-md-12' : ''}">
             <div class="card card-custom p-3 mb-4">
-                <h5 class="fw-bold mb-3"><i class="bi bi-list-stars text-warning me-2"></i>Bảng Tổng hợp Điểm Thành viên Hội đồng</h5>
+                <h5 class="fw-bold mb-3"><i class="bi bi-list-stars text-warning me-2"></i>Bảng tổng hợp điểm người chấm</h5>
+                <div class="alert alert-warning py-2" th:if="${!scoringProgress.complete}">
+                    Đã chấm <strong th:text="${scoringProgress.submittedCount}">0</strong>/<strong th:text="${scoringProgress.requiredCount}">0</strong> giảng viên.
+                    <span th:if="${scoringProgress.requiredCount == 0}">Đề tài chưa được gán hội đồng chấm điểm.</span>
+                    <span th:if="${!scoringProgress.pendingTeacherNames.empty}">
+                        Đang chờ: <span th:text="${#strings.listJoin(scoringProgress.pendingTeacherNames, ', ')}"></span>.
+                    </span>
+                    <span th:if="${scoringProgress.deadlinePassed}">Đã hết hạn; Chủ tịch có thể xác nhận với số điểm hiện có.</span>
+                </div>
+                <div class="alert alert-danger py-2" th:if="${scoringProgress.scoreSpreadWarning}">
+                    Cảnh báo: chênh lệch điểm giữa các giảng viên lớn hơn 3.0 điểm; đề nghị Chủ tịch kiểm tra lại.
+                </div>
+                <div th:if="${finalResult != null}" class="alert alert-info py-2">
+                    Điểm trung bình hiện tại: <strong th:text="${#numbers.formatDecimal(finalResult.finalScore, 1, 2)}">8.50</strong>/10
+                    (<span th:text="${scoreCount}">0</span> giảng viên đã chấm).
+                    <span th:if="${!finalResult.published}">Điểm chưa được công bố.</span>
+                </div>
                 <th:block th:if="${existingScores.empty}">
                     <div th:replace="~{fragments/components :: emptyState('bi-clipboard2-data', 'Chưa có thành viên nào nhập điểm.', 'Điểm từ các thành viên hội đồng sẽ xuất hiện tại đây.')}"></div>
                 </th:block>
@@ -63,7 +97,9 @@
                         <tr>
                             <th>#</th>
                             <th>Giảng viên Chấm</th>
-                            <th>Điểm số</th>
+                            <th>Điểm TB cá nhân</th>
+                            <th>Tiêu chí</th>
+                            <th>Nhận xét / Đánh giá</th>
                             <th>Thời gian</th>
                         </tr>
                     </thead>
@@ -72,6 +108,15 @@
                             <td th:text="${stat.count}">1</td>
                             <td th:text="${s.teacherName}">GV A</td>
                             <td><strong class="text-primary fs-5" th:text="${s.scoreValue}">8.5</strong>/10</td>
+                            <td class="small">
+                                Nội dung: <span th:text="${s.contentScore}">8</span>;
+                                sản phẩm: <span th:text="${s.productScore}">8</span>;
+                                báo cáo: <span th:text="${s.reportScore}">8</span>
+                                <span th:if="${s.presentationScore != null}">
+                                    ; trình bày: <span th:text="${s.presentationScore}">8</span>
+                                </span>
+                            </td>
+                            <td class="small" th:text="${s.comments == null || s.comments.isBlank() ? 'Chưa có nhận xét' : s.comments}">Nhận xét</td>
                             <td class="small text-muted" th:text="${#temporals.format(s.scoredAt, 'dd/MM HH:mm')}">Date</td>
                         </tr>
                     </tbody>
@@ -79,15 +124,16 @@
             </div>
 
             <!-- Chairman Confirmation Section -->
-            <div sec:authorize="hasAnyRole('TEACHER', 'ADMIN')" class="card card-custom p-3 bg-light border">
+            <div sec:authorize="hasRole('TEACHER')" th:if="${isChairman}" class="card card-custom p-3 bg-light border">
                 <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-award me-2"></i>Xác nhận Kết quả Cuối cùng (Chủ tịch Hội đồng)</h5>
                 <form th:action="@{/scoring/chairman/confirm}" method="post">
                     <input type="hidden" name="topicId" th:value="${topic.id}">
                     <div class="mb-3">
                         <label for="chairmanComments" class="form-label fw-medium">Nhận xét Tổng hợp của Chủ tịch Hội đồng</label>
-                        <textarea class="form-control" id="chairmanComments" name="chairmanComments" rows="3" placeholder="Nhận xét tổng quan về buổi bảo vệ của sinh viên..."></textarea>
+                        <textarea class="form-control" id="chairmanComments" name="chairmanComments" rows="3" placeholder="Nhận xét tổng quan về buổi bảo vệ của sinh viên..."
+                                  th:text="${finalResult != null ? finalResult.chairmanComments : ''}"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-success w-100">
+                    <button type="submit" class="btn btn-success w-100" th:disabled="${!canConfirmResult}">
                         <i class="bi bi-calculator me-1"></i> Tính Điểm Trung Bình & Xác nhận Kết quả
                     </button>
                 </form>

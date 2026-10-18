@@ -38,6 +38,10 @@ public class FinalResult {
     @Builder.Default
     private boolean isPublished = false;
 
+    @Column(name = "chairman_confirmed", nullable = false)
+    @Builder.Default
+    private boolean chairmanConfirmed = false;
+
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 }

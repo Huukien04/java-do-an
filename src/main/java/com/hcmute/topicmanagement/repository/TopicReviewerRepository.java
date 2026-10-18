@@ -11,5 +11,6 @@ public interface TopicReviewerRepository extends JpaRepository<TopicReviewer, Lo
     List<TopicReviewer> findByTopicId(Long topicId);
     List<TopicReviewer> findByTeacherId(Long teacherId);
     boolean existsByTopicIdAndTeacherId(Long topicId, Long teacherId);
+    boolean existsByTeacherId(Long teacherId);
     void deleteByTopicId(Long topicId);
 }

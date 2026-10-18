@@ -29,11 +29,11 @@ Quyền được kiểm tra ở controller bằng Spring Security; một số th
 
 ### 3.2. Quản lý đợt đăng ký
 
-ADMIN tạo, xem, chỉnh sửa và đổi trạng thái đợt tại `/admin/periods`. Đợt lưu loại đề tài cùng các mốc đăng ký của giảng viên, giai đoạn duyệt, đăng ký của sinh viên, hạn nộp điểm và ngày báo cáo hội đồng.
+ADMIN tạo, xem, chỉnh sửa và đổi trạng thái đợt tại `/admin/periods`. Đợt lưu loại đề tài cùng các khung đăng ký của giảng viên, giai đoạn duyệt, đăng ký của sinh viên, hạn nộp điểm và ngày báo cáo hội đồng.
 
-Khi tạo hoặc cập nhật, hệ thống kiểm tra các mốc theo thứ tự: giảng viên đăng ký → giai đoạn duyệt → sinh viên đăng ký. Với loại TLCN/KLTN phải có hạn nộp điểm; riêng KLTN phải có ngày báo cáo hội đồng. Đợt mới bắt đầu ở trạng thái `DRAFT`; ADMIN đổi trạng thái để mở giai đoạn phù hợp.
+Khi tạo hoặc cập nhật, hệ thống kiểm tra riêng từng khung thời gian (thời điểm bắt đầu phải trước thời điểm kết thúc); các giai đoạn có thể chồng lấn để SV đăng ký sớm khi đã có đề tài được duyệt. Với loại TLCN/KLTN phải có hạn nộp điểm; riêng KLTN phải có ngày báo cáo hội đồng. Đợt mới bắt đầu ở trạng thái `DRAFT`; ADMIN chuyển trạng thái theo quy trình. Không thể chuyển sang duyệt nếu chưa có đề tài GV gửi, hoặc công bố/mở đăng ký SV nếu chưa có đề tài được duyệt. Khi hết hạn mà chưa có đề tài, ADMIN có thể gia hạn mốc kết thúc GV rồi mở lại giai đoạn; hoặc hủy/hoãn đợt.
 
-Giảng viên chỉ tạo đề tài trong trạng thái `PHASE1_TEACHER_REG` và trong khung giờ đăng ký giảng viên. Sinh viên chỉ tạo nhóm/đăng ký trong trạng thái `PHASE2_STUDENT_REG` và trong khung giờ đăng ký sinh viên.
+Giảng viên tạo đề tài trong trạng thái `PHASE1_TEACHER_REG` hoặc `PHASE2_STUDENT_REG` khi còn trong khung giờ GV; nhờ vậy khung GV và SV có thể chồng lấn. Sinh viên chỉ tạo nhóm/đăng ký trong trạng thái `PHASE2_STUDENT_REG`, trong khung giờ SV và khi có đề tài được Khoa phê duyệt. Hạn SV đã qua thì phải cập nhật lịch trước khi mở/gia hạn lại.
 
 ### 3.3. Quản lý đề tài
 
@@ -45,7 +45,7 @@ Giảng viên không thể chỉnh sửa/xóa đề tài đã được duyệt h
 
 ### 3.4. Quản lý nhóm sinh viên
 
-Trong đợt đang mở đăng ký, sinh viên tạo nhóm tại `/student/group`. Người tạo là nhóm trưởng và cũng là thành viên đầu tiên. Nhóm trưởng có thể thêm thành viên bằng mã sinh viên; nhóm tối đa ba người. Một sinh viên không thể tham gia nhiều nhóm trong cùng một đợt.
+Trong đợt đang mở đăng ký và còn đề tài được duyệt để chọn, sinh viên tạo nhóm tại `/student/group`. Người tạo là nhóm trưởng và cũng là thành viên đầu tiên. Nhóm trưởng có thể thêm thành viên bằng mã sinh viên; nhóm tối đa ba người. Một sinh viên không thể tham gia nhiều nhóm trong cùng một đợt.
 
 Chỉ nhóm trưởng được đăng ký đề tài cho nhóm. Danh sách lựa chọn chỉ gồm đề tài đã được duyệt của đợt; mỗi nhóm chỉ đăng ký một đề tài và một đề tài không thể được đăng ký bởi nhiều nhóm.
 

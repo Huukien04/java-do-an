@@ -7,6 +7,9 @@ public enum TopicStatus {
     PUBLISHED("Đã công bố"),
     REJECTED("Khoa từ chối"),
     ASSIGNED("Đã được nhóm SV đăng ký"),
+    SCORING("Đang chấm điểm"),
+    SCORED("Đã có điểm"),
+    RESULT_PUBLISHED("Đã công bố kết quả"),
     COMPLETED("Đã hoàn thành");
 
     private final String displayName;

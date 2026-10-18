@@ -1,7 +1,7 @@
 package com.hcmute.topicmanagement.controller;
 
 import com.hcmute.topicmanagement.dto.StudentGroupDTO;
-import com.hcmute.topicmanagement.repository.TopicRegistrationRepository;
+import com.hcmute.topicmanagement.enums.PeriodStatus;
 import com.hcmute.topicmanagement.security.CustomUserDetails;
 import com.hcmute.topicmanagement.service.RegistrationPeriodService;
 import com.hcmute.topicmanagement.service.StudentGroupService;
@@ -14,6 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
+
 @Controller
 @RequestMapping("/student/group")
 @RequiredArgsConstructor
@@ -22,23 +24,39 @@ public class StudentGroupController {
     private final StudentGroupService groupService;
     private final RegistrationPeriodService periodService;
     private final TopicService topicService;
-    private final TopicRegistrationRepository registrationRepository;
-
     @GetMapping
     @PreAuthorize("hasRole('STUDENT')")
     public String myGroup(@AuthenticationPrincipal CustomUserDetails userDetails,
                           @RequestParam(required = false) Long periodId,
                           Model model) {
         Long studentId = userDetails.getStudent().getId();
-        var activePeriods = periodService.getActivePeriodsForStudent();
+        var activePeriods = periodService.getPeriodsForStudentGroupManagement();
         model.addAttribute("activePeriods", activePeriods);
 
         Long selectedPeriodId = (periodId != null) ? periodId : (!activePeriods.isEmpty() ? activePeriods.get(0).getId() : null);
         model.addAttribute("selectedPeriodId", selectedPeriodId);
+        model.addAttribute("selectedPeriodStatus", "");
+        model.addAttribute("canSubmit", false);
 
         if (selectedPeriodId != null) {
             StudentGroupDTO myGroup = groupService.getMyGroupByPeriod(studentId, selectedPeriodId);
             model.addAttribute("myGroup", myGroup);
+            model.addAttribute("isGroupLeader",
+                    myGroup != null && myGroup.getLeaderStudentId().equals(studentId));
+            var selectedPeriod = activePeriods.stream()
+                    .filter(period -> period.getId().equals(selectedPeriodId))
+                    .findFirst().orElse(null);
+            model.addAttribute("selectedPeriodType",
+                    selectedPeriod == null ? "" : selectedPeriod.getPeriodType().name());
+            model.addAttribute("selectedPeriodStatus",
+                    selectedPeriod == null ? "" : selectedPeriod.getStatus().name());
+            boolean submissionPhase = selectedPeriod != null
+                    && (selectedPeriod.getStatus() == PeriodStatus.PHASE2_STUDENT_REG
+                    || selectedPeriod.getStatus() == PeriodStatus.EXECUTION);
+            boolean beforeDeadline = selectedPeriod == null
+                    || selectedPeriod.getSubmissionDeadline() == null
+                    || LocalDateTime.now().isBefore(selectedPeriod.getSubmissionDeadline());
+            model.addAttribute("canSubmit", submissionPhase && beforeDeadline);
             model.addAttribute("availableTopics", topicService.getApprovedTopicsByPeriod(selectedPeriodId));
         }
 
@@ -51,15 +69,22 @@ public class StudentGroupController {
                                     @RequestParam(required = false) Long periodId,
                                     Model model) {
         Long studentId = userDetails.getStudent().getId();
-        var activePeriods = periodService.getActivePeriodsForStudent();
+        var activePeriods = periodService.getPeriodsForStudentGroupManagement();
         model.addAttribute("activePeriods", activePeriods);
 
         Long selectedPeriodId = (periodId != null) ? periodId : (!activePeriods.isEmpty() ? activePeriods.get(0).getId() : null);
         model.addAttribute("selectedPeriodId", selectedPeriodId);
+        model.addAttribute("selectedPeriodStatus", "");
 
         if (selectedPeriodId != null) {
             StudentGroupDTO myGroup = groupService.getMyGroupByPeriod(studentId, selectedPeriodId);
             model.addAttribute("myGroup", myGroup);
+            model.addAttribute("isGroupLeader",
+                    myGroup != null && myGroup.getLeaderStudentId().equals(studentId));
+            model.addAttribute("selectedPeriodStatus", activePeriods.stream()
+                    .filter(period -> period.getId().equals(selectedPeriodId))
+                    .map(period -> period.getStatus().name())
+                    .findFirst().orElse(""));
             model.addAttribute("availableTopics", topicService.getApprovedTopicsByPeriod(selectedPeriodId));
         }
 
@@ -113,5 +138,21 @@ public class StudentGroupController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/student/group";
+    }
+
+    @PostMapping("/disband")
+    @PreAuthorize("hasRole('STUDENT')")
+    public String disbandRejectedGroup(@RequestParam Long groupId,
+                                       @RequestParam Long periodId,
+                                       @AuthenticationPrincipal CustomUserDetails userDetails,
+                                       RedirectAttributes redirectAttributes) {
+        try {
+            groupService.disbandRejectedGroup(groupId, userDetails.getStudent().getId());
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đã giải tán nhóm bị từ chối. Các thành viên có thể tạo hoặc tham gia nhóm khác.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/student/group?periodId=" + periodId;
     }
 }
