@@ -48,6 +48,12 @@ public class EmailServiceImpl implements EmailService {
     @Value("${app.mail.password:}")
     private String password;
 
+    // Dia chi hien thi o muc Nguoi gui. Voi Gmail SMTP thi de trong (dung luon username);
+    // voi cac dich vu relay nhu Brevo thi day la email da xac thuc nguoi gui, con username
+    // chi la tai khoan dang nhap SMTP.
+    @Value("${app.mail.from:}")
+    private String from;
+
     @Async
     @Override
     public void notifyResultsPublished(Long periodId) {
@@ -81,7 +87,7 @@ public class EmailServiceImpl implements EmailService {
                 for (Map.Entry<String, String> recipient : recipients.entrySet()) {
                     try {
                         SimpleMailMessage message = new SimpleMailMessage();
-                        message.setFrom(username);
+                        message.setFrom(from != null && !from.isBlank() ? from : username);
                         message.setTo(recipient.getKey());
                         message.setSubject("[Khoa CNTT] Kết quả đề tài đã được công bố - " + periodName);
                         message.setText(buildBody(recipient.getValue(), periodName, group.getGroupCode(), result));
