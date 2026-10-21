@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -103,16 +105,38 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
         council.setDefenseDate(dto.getDefenseDate());
         council.setLocation(dto.getLocation());
 
-        // Rebuild members
-        councilMemberRepository.deleteByCouncilId(council.getId());
-        council.getMembers().clear();
-
-        saveMember(council, dto.getChairmanTeacherId(), CouncilRole.CHAIRMAN);
-        saveMember(council, dto.getSecretaryTeacherId(), CouncilRole.SECRETARY);
-
+        // Cap nhat thanh vien theo kieu doi soat, KHONG xoa het roi insert lai:
+        // - GV van o lai hoi dong: giu nguyen dong, chi cap nhat role neu thay doi.
+        // - GV bi loai khoi hoi dong: xoa dong cua ho.
+        // - GV moi: insert dong moi.
+        // Nho vay khong bao gio insert trung khoa duy nhat (council_id, teacher_id).
+        Map<Long, CouncilRole> desiredMembers = new LinkedHashMap<>();
+        desiredMembers.put(dto.getChairmanTeacherId(), CouncilRole.CHAIRMAN);
+        desiredMembers.put(dto.getSecretaryTeacherId(), CouncilRole.SECRETARY);
         if (dto.getMemberTeacherIds() != null) {
             for (Long teacherId : dto.getMemberTeacherIds()) {
-                saveMember(council, teacherId, CouncilRole.MEMBER);
+                desiredMembers.put(teacherId, CouncilRole.MEMBER);
+            }
+        }
+
+        Set<Long> existingTeacherIds = new HashSet<>();
+        for (CouncilMember existing : councilMemberRepository.findByCouncilId(council.getId())) {
+            Long existingTeacherId = existing.getTeacher().getId();
+            existingTeacherIds.add(existingTeacherId);
+            CouncilRole desiredRole = desiredMembers.get(existingTeacherId);
+            if (desiredRole == null) {
+                councilMemberRepository.delete(existing);
+                council.getMembers().remove(existing);
+            } else if (existing.getRole() != desiredRole) {
+                existing.setRole(desiredRole);
+                councilMemberRepository.save(existing);
+            }
+        }
+        councilMemberRepository.flush();
+
+        for (Map.Entry<Long, CouncilRole> entry : desiredMembers.entrySet()) {
+            if (!existingTeacherIds.contains(entry.getKey())) {
+                saveMember(council, entry.getKey(), entry.getValue());
             }
         }
 

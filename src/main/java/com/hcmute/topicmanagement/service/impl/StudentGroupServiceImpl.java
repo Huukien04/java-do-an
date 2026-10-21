@@ -98,7 +98,7 @@ public class StudentGroupServiceImpl implements StudentGroupService {
             throw new BusinessException("Nhóm đã đạt số lượng tối đa 03 thành viên.");
         }
 
-        Student student = studentRepository.findByStudentCode(studentCode)
+        Student student = studentRepository.findByUserUsername(studentCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Sinh viên", "mã SV", studentCode));
 
         if (memberRepository.isStudentInAnyGroupInPeriod(student.getId(), group.getPeriod().getId())) {

@@ -31,7 +31,7 @@
                         <span class="text-muted small fw-semibold me-2 text-nowrap" style="font-size: 0.8rem;">ĐỢT ĐĂNG
                             KÝ:</span>
                         <select name="periodId"
-                            class="form-select border-0 bg-transparent fw-bold text-primary py-0 ps-1 small"
+                            class="form-select border-0 bg-transparent fw-bold text-primary py-0 ps-1 pe-4 small"
                             style="cursor: pointer; font-size: 0.85rem;" onchange="this.form.submit()">
                             <option th:each="p : ${activePeriods}" th:value="${p.id}" th:text="${p.name}"
                                 th:selected="${p.id == selectedPeriodId}"></option>
@@ -156,7 +156,7 @@
                                 <h6 class="fw-bold mb-1 small">Nhóm Chưa Đăng Ký Đề Tài</h6>
                                 <p class="text-muted extra-small mb-3">Vui lòng truy cập trang Đăng ký Đề tài để lựa
                                     chọn đề tài phù hợp.</p>
-                                <a href="/student/group/register"
+                                <a th:href="@{/student/group/register(periodId=${selectedPeriodId})}"
                                     class="btn btn-success btn-sm rounded-pill px-3 shadow-sm">
                                     <i class="bi bi-arrow-right-circle me-1"></i> Chọn & Đăng ký Đề tài Ngay
                                 </a>
