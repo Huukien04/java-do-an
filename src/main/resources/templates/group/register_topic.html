@@ -31,7 +31,7 @@
                         <span class="text-muted small fw-semibold me-2 text-nowrap" style="font-size: 0.8rem;">ĐỢT ĐĂNG
                             KÝ:</span>
                         <select name="periodId"
-                            class="form-select border-0 bg-transparent fw-bold text-primary py-0 ps-1 small"
+                            class="form-select border-0 bg-transparent fw-bold text-primary py-0 ps-1 pe-4 small"
                             style="cursor: pointer; font-size: 0.85rem;" onchange="this.form.submit()">
                             <option th:each="p : ${activePeriods}" th:value="${p.id}" th:text="${p.name}"
                                 th:selected="${p.id == selectedPeriodId}"></option>
@@ -56,7 +56,7 @@
                     </div>
                     <h5 class="fw-bold mb-1">Bạn Chưa Thuộc Nhóm Nào Trong Đợt Này</h5>
                     <p class="text-muted small mb-3 mx-auto" style="max-width: 500px;">
-                        Để đăng ký đề tài đồ án, trước tiên bạn cần lập nhóm (tối đa 3 sinh viên) hoặc gia nhập vào một
+                        Để đăng ký đề tài đồ án, trước tiên bạn cần lập nhóm (từ 3 đến 5 sinh viên) hoặc gia nhập vào một
                         nhóm có sẵn.
                     </p>
 
@@ -125,7 +125,7 @@
                         </div>
                         <h5 class="fw-bold text-primary mb-0" th:text="${myGroup.registeredTopicTitle}">Tên Đề Tài</h5>
                         <p class="text-muted small mb-0"
-                            th:text="${'Số thành viên: ' + myGroup.members.size() + '/3 sinh viên'}">Member count</p>
+                            th:text="${'Số thành viên: ' + myGroup.members.size() + '/5 sinh viên'}">Member count</p>
                     </div>
                     <div>
                         <span class="badge bg-warning text-dark small px-3 py-2 rounded-pill shadow-sm"

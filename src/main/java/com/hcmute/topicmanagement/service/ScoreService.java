@@ -21,6 +21,8 @@ public interface ScoreService {
     void publishResults(Long periodId);
     boolean publishResultsIfReady(Long periodId);
     void unpublishResults(Long periodId);
+
+    byte[] exportResultsExcel(Long periodId);
     FinalResult getFinalResultByTopic(Long topicId);
     List<FinalResult> getPublishedFinalResults();
     List<FinalResult> getPublishedFinalResultsByPeriod(Long periodId);

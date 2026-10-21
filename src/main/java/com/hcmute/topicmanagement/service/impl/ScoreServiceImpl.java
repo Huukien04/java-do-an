@@ -17,15 +17,24 @@ import com.hcmute.topicmanagement.exception.ResourceNotFoundException;
 import com.hcmute.topicmanagement.repository.*;
 import com.hcmute.topicmanagement.service.ScoreService;
 import com.hcmute.topicmanagement.service.NotificationService;
+import com.hcmute.topicmanagement.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import java.math.BigDecimal;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -49,6 +58,7 @@ public class ScoreServiceImpl implements ScoreService {
     private final UserRepository userRepository;
     private final RegistrationPeriodRepository registrationPeriodRepository;
     private final NotificationService notificationService;
+    private final EmailService emailService;
 
     @Override
     public ScoreDTO submitScore(ScoreDTO dto, Long currentTeacherId) {
@@ -212,6 +222,10 @@ public class ScoreServiceImpl implements ScoreService {
             topic.setStatus(TopicStatus.RESULT_PUBLISHED);
             topicRepository.save(topic);
         }
+
+        // Gui email thong bao cho tung SV trong cac nhom (chay ngam, loi gui mail
+        // khong lam hong giao dich cong bo).
+        emailService.notifyResultsPublished(periodId);
     }
 
     @Override
@@ -532,5 +546,57 @@ public class ScoreServiceImpl implements ScoreService {
                 .comments(score.getComments())
                 .scoredAt(score.getScoredAt())
                 .build();
+    }
+
+    @Override
+    public byte[] exportResultsExcel(Long periodId) {
+        List<FinalResult> results = periodId == null
+                ? finalResultRepository.findAllByOrderByTopicTitleAsc()
+                : finalResultRepository.findByTopicPeriodIdOrderByTopicTitleAsc(periodId);
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Ket qua");
+            String[] headers = {"STT", "Mã nhóm", "Tên đề tài", "Giảng viên hướng dẫn",
+                    "Điểm tổng kết", "Kết quả", "Trạng thái công bố", "Ngày công bố"};
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                headerRow.createCell(i).setCellValue(headers[i]);
+            }
+            int rowIdx = 1;
+            for (FinalResult result : results) {
+                Row row = sheet.createRow(rowIdx);
+                row.createCell(0).setCellValue(rowIdx);
+                row.createCell(1).setCellValue(groupCodeOf(result));
+                row.createCell(2).setCellValue(result.getTopic().getTitle());
+                row.createCell(3).setCellValue(advisorNamesOf(result));
+                row.createCell(4).setCellValue(result.getFinalScore() == null ? ""
+                        : result.getFinalScore().setScale(2, RoundingMode.HALF_UP).toPlainString());
+                row.createCell(5).setCellValue(result.getEvaluationStatus() == null ? ""
+                        : result.getEvaluationStatus().getDisplayName());
+                row.createCell(6).setCellValue(result.isPublished() ? "Đã công bố" : "Chưa công bố");
+                row.createCell(7).setCellValue(result.getPublishedAt() == null ? ""
+                        : result.getPublishedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                rowIdx++;
+            }
+            int[] widths = {6, 12, 60, 30, 14, 12, 16, 18};
+            for (int i = 0; i < widths.length; i++) {
+                sheet.setColumnWidth(i, widths[i] * 256);
+            }
+            workbook.write(out);
+            return out.toByteArray();
+        } catch (IOException e) {
+            throw new BusinessException("Không xuất được báo cáo kết quả: " + e.getMessage());
+        }
+    }
+
+    private String groupCodeOf(FinalResult result) {
+        return topicRegistrationRepository.findByTopicId(result.getTopic().getId())
+                .map(registration -> registration.getGroup().getGroupCode())
+                .orElse("");
+    }
+
+    private String advisorNamesOf(FinalResult result) {
+        return topicAdvisorRepository.findByTopicId(result.getTopic().getId()).stream()
+                .map(advisor -> advisor.getTeacher().getUser().getFullName())
+                .collect(Collectors.joining(", "));
     }
 }

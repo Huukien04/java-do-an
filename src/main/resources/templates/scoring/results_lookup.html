@@ -11,6 +11,11 @@
         <div>
             <div th:replace="~{fragments/components :: pageHeading('TRA CỨU ĐIỂM & KẾT QUẢ ĐÁNH GIÁ', 'Kết quả tổng hợp theo đề tài và đợt đăng ký')}"></div>
         </div>
+        <a th:if="${isAdminOrTeacher}"
+           th:href="@{/scoring/results/export(periodId=${selectedPeriodId})}"
+           class="btn btn-success rounded-pill px-3 shadow-sm">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Xuất báo cáo Excel
+        </a>
     </div>
 
     <!-- Search & Filter Card -->
@@ -33,10 +38,10 @@
     </div>
 
     <!-- Results Table Card -->
-    <div class="card card-custom overflow-hidden">
+    <div class="card card-custom p-3">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" id="resultsTable">
-                <thead class="table-primary">
+                <thead class="table-light">
                 <tr>
                     <th style="width: 5%;">#</th>
                     <th style="width: 35%;">Tên Đề tài</th>

@@ -94,8 +94,8 @@ public class StudentGroupServiceImpl implements StudentGroupService {
             throw new BusinessException("Chỉ Nhóm trưởng mới có quyền thêm thành viên vào nhóm.");
         }
 
-        if (group.getMembers().size() >= 3) {
-            throw new BusinessException("Nhóm đã đạt số lượng tối đa 03 thành viên.");
+        if (group.getMembers().size() >= 5) {
+            throw new BusinessException("Nhóm đã đạt số lượng tối đa 05 thành viên.");
         }
 
         Student student = studentRepository.findByUserUsername(studentCode)
@@ -133,6 +133,13 @@ public class StudentGroupServiceImpl implements StudentGroupService {
             throw new BusinessException("Không thể xóa Nhóm trưởng khỏi nhóm.");
         }
 
+        // Nhom da dang ky de tai (chua bi tu choi) thi khong doi duoc si so nua
+        Optional<TopicRegistration> activeRegistration = registrationRepository.findByGroupId(groupId);
+        if (activeRegistration.isPresent()
+                && activeRegistration.get().getStatus() != TopicRegistrationStatus.REJECTED) {
+            throw new BusinessException("Nhóm đã đăng ký đề tài, không thể xóa thành viên.");
+        }
+
         GroupMember member = group.getMembers().stream()
                 .filter(m -> m.getStudent().getId().equals(memberStudentId))
                 .findFirst()
@@ -150,6 +157,12 @@ public class StudentGroupServiceImpl implements StudentGroupService {
         // Rule: Only Leader can register topic
         if (!group.getLeader().getId().equals(currentStudentId)) {
             throw new BusinessException("Chỉ Nhóm trưởng mới được phép đăng ký đề tài cho nhóm.");
+        }
+
+        // Rule: A group must have 3-5 members to register a topic
+        if (group.getMembers().size() < 3) {
+            throw new BusinessException("Nhóm cần tối thiểu 03 thành viên mới được đăng ký đề tài (hiện có "
+                    + group.getMembers().size() + " thành viên).");
         }
 
         RegistrationPeriod period = group.getPeriod();

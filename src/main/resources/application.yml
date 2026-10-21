@@ -42,6 +42,15 @@ spring:
 app:
   upload:
     dir: ${user.home}/uploads/hcmute-topics/
+  # Gui email thong bao khi cong bo ket qua (Gmail SMTP).
+  # Chua cau hinh MAIL_USERNAME/MAIL_PASSWORD thi he thong bo qua buoc gui mail,
+  # cac chuc nang khac van chay binh thuong.
+  mail:
+    enabled: ${MAIL_ENABLED:false}
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
 
 logging:
   level:

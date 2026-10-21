@@ -24,6 +24,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -271,6 +274,17 @@ public class ScoreController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/admin/periods";
+    }
+
+    @GetMapping("/results/export")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public ResponseEntity<byte[]> exportResults(@RequestParam(required = false) Long periodId) {
+        byte[] data = scoreService.exportResultsExcel(periodId);
+        String filename = periodId == null ? "ket-qua-tat-ca-dot.xlsx" : "ket-qua-dot-" + periodId + ".xlsx";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(data);
     }
 
     public record CouncilSummaryTopic(Long topicId, String title, List<ScoreDTO> scores,
