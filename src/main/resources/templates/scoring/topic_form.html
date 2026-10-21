@@ -27,6 +27,23 @@
         </div>
     </div>
 
+    <!-- Group submission files: latest report + source + demo + version history -->
+    <div th:if="${latestSubmission != null}" class="card card-custom p-3 mb-4">
+        <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>Báo cáo của nhóm</h5>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <span>Bản mới nhất (v<span th:text="${latestSubmission.versionNumber}">1</span>):
+                <a th:href="@{/submissions/download/{id}(id=${latestSubmission.id})}" th:text="${latestSubmission.fileName}">baocao.pdf</a>
+                <small class="text-muted">— <span th:text="${latestSubmission.uploadedBy.user.fullName}">Sinh viên</span>,
+                    <span th:text="${#temporals.format(latestSubmission.uploadedAt, 'dd/MM/yyyy HH:mm')}">thời gian nộp</span></small>
+            </span>
+            <a th:if="${latestSubmission.sourceFileName != null}" class="btn btn-sm btn-outline-secondary"
+               th:href="@{/submissions/download/{id}(id=${latestSubmission.id}, source=true)}"><i class="bi bi-file-zip"></i> Source code</a>
+            <a th:if="${latestSubmission.demoUrl != null}" class="btn btn-sm btn-outline-info" target="_blank"
+               th:href="${latestSubmission.demoUrl}"><i class="bi bi-play-circle"></i> Demo</a>
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/submissions/versions/{gid}(gid=${submissionGroupId})}"><i class="bi bi-clock-history"></i> Lịch sử bài nộp</a>
+        </div>
+    </div>
+
     <div class="row g-4">
         <!-- Score Input Form (If not advisor) -->
         <div class="col-md-6" th:if="${canSubmitScore}">

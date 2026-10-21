@@ -37,6 +37,8 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
     private final TopicRegistrationRepository topicRegistrationRepository;
     private final SubmissionRepository submissionRepository;
     private final TopicAdvisorRepository topicAdvisorRepository;
+    private final ScoreRepository scoreRepository;
+    private final FinalResultRepository finalResultRepository;
 
     @Override
     public ReviewCouncilDTO createCouncil(ReviewCouncilDTO dto) {
@@ -86,6 +88,7 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
         ReviewCouncil council = councilRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hội đồng", "id", id));
 
+        ensureCouncilHasNoScores(id);
         validateCouncilMembers(dto);
         for (CouncilTopic existingAssignment : councilTopicRepository.findByCouncilId(id)) {
             for (Long teacherId : proposedTeacherIds(dto)) {
@@ -124,7 +127,21 @@ public class ReviewCouncilServiceImpl implements ReviewCouncilService {
     public void deleteCouncil(Long id) {
         ReviewCouncil council = councilRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hội đồng", "id", id));
+        ensureCouncilHasNoScores(id);
         councilRepository.delete(council);
+    }
+
+    // Hội đồng đã có đề tài được chấm điểm (hoặc đã tổng hợp kết quả) thì không được
+    // đổi thành viên hay xóa, tránh làm mất căn cứ của điểm đã ghi.
+    private void ensureCouncilHasNoScores(Long councilId) {
+        for (CouncilTopic assignment : councilTopicRepository.findByCouncilId(councilId)) {
+            Long topicId = assignment.getTopic().getId();
+            if (!scoreRepository.findByTopicId(topicId).isEmpty()
+                    || finalResultRepository.existsByTopicId(topicId)) {
+                throw new BusinessException("Hội đồng đã có đề tài được chấm điểm hoặc đã tổng hợp kết quả; "
+                        + "không thể sửa thành viên hay xóa hội đồng.");
+            }
+        }
     }
 
     @Override

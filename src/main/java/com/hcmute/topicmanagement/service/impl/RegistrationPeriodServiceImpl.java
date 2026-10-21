@@ -92,10 +92,14 @@ public class RegistrationPeriodServiceImpl implements RegistrationPeriodService 
         if (period.getStatus() != PeriodStatus.DRAFT && scheduleChanged(period, dto)) {
             throw new BusinessException("Sau khi mở đợt, chỉ được thay đổi thời gian bằng thao tác gia hạn trong menu trạng thái.");
         }
+        PeriodType requestedType = dto.getPeriodType() != null ? dto.getPeriodType() : period.getPeriodType();
+        if (period.getStatus() != PeriodStatus.DRAFT && requestedType != period.getPeriodType()) {
+            throw new BusinessException("Không thể đổi loại đợt sau khi đợt đã rời trạng thái Nháp (DRAFT).");
+        }
         validatePeriodRules(dto, !dto.getTeacherStartDate().equals(period.getTeacherStartDate()));
 
         period.setName(dto.getName());
-        period.setPeriodType(dto.getPeriodType());
+        period.setPeriodType(requestedType);
         period.setTeacherStartDate(dto.getTeacherStartDate());
         period.setTeacherEndDate(dto.getTeacherEndDate());
         period.setApprovalStartDate(dto.getApprovalStartDate());
@@ -259,7 +263,7 @@ public class RegistrationPeriodServiceImpl implements RegistrationPeriodService 
                         + "\" đã được gia hạn đến " + newEndDate.format(NOTICE_DATE_FORMAT) + ".";
             }
             case PUBLISH_RESULTS -> {
-                requireStatus(period, PeriodStatus.DEFENSE_EVALUATION);
+                requireStatus(period, PeriodStatus.SUBMISSION_CLOSED, PeriodStatus.DEFENSE_EVALUATION);
                 scoreService.publishResults(id);
                 period.setStatus(PeriodStatus.COMPLETED);
                 notificationRole = "ROLE_STUDENT";

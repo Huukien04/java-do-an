@@ -25,6 +25,40 @@
     const originalTeacherStart = window.periodDatePicker.toSubmissionValue(windows[0][0].value);
     let submitted = false;
 
+    // Cascade: khi dời một mốc, các mốc phía sau tự dời theo cùng khoảng delta để giữ
+    // nguyên thứ tự thời gian (không chồng lấn), thay vì báo lỗi cả hai trường như trước.
+    let lastTimestamps = allDateFields.map(function (field) {
+        const parsed = getDateValue(field);
+        return parsed ? getTimestamp(parsed) : null;
+    });
+
+    function formatTimestamp(timestamp) {
+        const d = new Date(timestamp);
+        const p = function (n) { return String(n).padStart(2, '0'); };
+        return p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + String(d.getFullYear()).padStart(4, '0')
+            + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+    }
+
+    function cascadeFrom(index) {
+        const parsed = getDateValue(allDateFields[index]);
+        if (!parsed) {
+            lastTimestamps[index] = null;
+            return;
+        }
+        const newTimestamp = getTimestamp(parsed);
+        const oldTimestamp = lastTimestamps[index];
+        lastTimestamps[index] = newTimestamp;
+        if (oldTimestamp === null || oldTimestamp === newTimestamp) return;
+        const delta = newTimestamp - oldTimestamp;
+        for (let j = index + 1; j < allDateFields.length; j++) {
+            const later = getDateValue(allDateFields[j]);
+            if (!later) continue;
+            const shifted = getTimestamp(later) + delta;
+            allDateFields[j].value = formatTimestamp(shifted);
+            lastTimestamps[j] = shifted;
+        }
+    }
+
     function getDateValue(field) {
         return field.value ? window.periodDatePicker.parseValue(field.value) : null;
     }
@@ -147,6 +181,8 @@
         });
         field.addEventListener('change', function () {
             touchedFields.add(field);
+            const dateIndex = allDateFields.indexOf(field);
+            if (dateIndex >= 0) cascadeFrom(dateIndex);
             validate();
         });
         field.addEventListener('blur', function () { validate(true); });

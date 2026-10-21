@@ -18,6 +18,13 @@
                 </span>
             </span>
         </header>
+        <div class="d-flex gap-2 mt-3">
+            <a th:href="@{/admin/councils/{id}/edit(id=${council.id})}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa Hội đồng</a>
+            <form th:action="@{/admin/councils/{id}/delete(id=${council.id})}" method="post" class="d-inline"
+                  onsubmit="return confirm('Xóa hội đồng này? Thao tác không thể hoàn tác.');">
+                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Xóa Hội đồng</button>
+            </form>
+        </div>
     </div>
 
     <div class="row g-4">

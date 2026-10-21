@@ -22,15 +22,18 @@
 
                 <div class="col-md-4">
                     <label for="periodType" class="form-label fw-medium" data-i18n="period.type">Loại Đợt Đăng Ký <span class="text-danger" data-required-marker>*</span></label>
-                    <select class="form-select" id="periodType" th:field="*{periodType}" th:classappend="${#fields.hasErrors('periodType')} ? 'is-invalid' : ''" required>
+                    <select class="form-select" id="periodType" th:field="*{periodType}" th:classappend="${#fields.hasErrors('periodType')} ? 'is-invalid' : ''" required
+                            th:disabled="${periodDTO.status != null and periodDTO.status.name() != 'DRAFT'}">
                         <option value="" data-i18n="common.selectType">-- Chọn loại hình --</option>
                         <option th:each="type : ${periodTypes}" th:value="${type}" th:text="${type.displayName}"></option>
                     </select>
+                    <input type="hidden" name="periodType" th:value="${periodDTO.periodType}" th:if="${periodDTO.status != null and periodDTO.status.name() != 'DRAFT'}">
+                    <small class="text-muted d-block" th:if="${periodDTO.status != null and periodDTO.status.name() != 'DRAFT'}">Loại đợt bị khóa sau khi đợt rời trạng thái Nháp.</small>
                 </div>
 
                 <div class="col-12">
                     <div class="small text-muted"><strong data-i18n="period.totalWindow">Toàn đợt đăng ký:</strong> <span id="periodTotalWindow" data-i18n="period.chooseWindow">Chọn ngày bắt đầu GV và kết thúc SV</span></div>
-                    <div class="small text-info mt-1">Các giai đoạn có thể diễn ra chồng lấn. Sinh viên chỉ được đăng ký khi ADMIN mở giai đoạn và đã có ít nhất một đề tài được Khoa phê duyệt. Có thể gia hạn thời gian GV/SV bằng cách cập nhật mốc kết thúc.</div>
+                    <div class="small text-info mt-1">Các giai đoạn diễn ra theo thứ tự thời gian, không chồng lấn. Khi dời một mốc, các mốc phía sau sẽ tự dời theo cùng khoảng để giữ nguyên thứ tự. Sinh viên chỉ được đăng ký khi ADMIN mở giai đoạn và đã có ít nhất một đề tài được Khoa phê duyệt.</div>
                 </div>
 
                 <div class="col-12"><h5 class="mb-0" data-i18n="period.teacherWindow">Thời gian Giáo viên đăng ký đề tài</h5></div>

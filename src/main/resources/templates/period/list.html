@@ -173,13 +173,25 @@
                                     <li>
                                         <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
                                             <input type="hidden" name="status" value="SUBMISSION_CLOSED">
-                                            <button class="dropdown-item" type="submit">Kết thúc nhận bài &amp; tự công bố kết quả</button>
+                                            <button class="dropdown-item" type="submit">Kết thúc nhận bài</button>
                                         </form>
                                     </li>
                                     <li>
                                         <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
                                             <input type="hidden" name="status" value="CANCELLED">
                                             <button class="dropdown-item text-danger" type="submit">Hủy đợt</button>
+                                        </form>
+                                    </li>
+                                    <li th:if="${p.status.name() == 'SUBMISSION_CLOSED' or p.status.name() == 'DEFENSE_EVALUATION'}">
+                                        <form th:action="@{/scoring/admin/publish}" method="post">
+                                            <input type="hidden" name="periodId" th:value="${p.id}">
+                                            <button class="dropdown-item" type="submit">Công bố kết quả</button>
+                                        </form>
+                                    </li>
+                                    <li th:if="${p.status.name() == 'COMPLETED'}">
+                                        <form th:action="@{/scoring/admin/unpublish}" method="post">
+                                            <input type="hidden" name="periodId" th:value="${p.id}">
+                                            <button class="dropdown-item text-warning" type="submit">Hủy công bố kết quả</button>
                                         </form>
                                     </li>
                                     <li>

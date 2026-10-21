@@ -7,6 +7,7 @@ import com.hcmute.topicmanagement.entity.FinalResult;
 import com.hcmute.topicmanagement.enums.CouncilRole;
 import com.hcmute.topicmanagement.enums.PeriodType;
 import com.hcmute.topicmanagement.enums.RoleName;
+import com.hcmute.topicmanagement.enums.TopicRegistrationStatus;
 import com.hcmute.topicmanagement.exception.BusinessException;
 import com.hcmute.topicmanagement.exception.ResourceNotFoundException;
 import com.hcmute.topicmanagement.repository.CouncilMemberRepository;
@@ -17,6 +18,7 @@ import com.hcmute.topicmanagement.security.CustomUserDetails;
 import com.hcmute.topicmanagement.service.RegistrationPeriodService;
 import com.hcmute.topicmanagement.service.ReviewCouncilService;
 import com.hcmute.topicmanagement.service.ScoreService;
+import com.hcmute.topicmanagement.service.SubmissionService;
 import com.hcmute.topicmanagement.service.TopicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,6 +45,7 @@ public class ScoreController {
     private final RegistrationPeriodService periodService;
     private final FinalResultRepository finalResultRepository;
     private final TopicRegistrationRepository topicRegistrationRepository;
+    private final SubmissionService submissionService;
     private final CouncilTopicRepository councilTopicRepository;
     private final CouncilMemberRepository councilMemberRepository;
 
@@ -126,6 +129,16 @@ public class ScoreController {
                         .orElse(ScoreDTO.builder().topicId(topicId).teacherId(teacherId).build());
 
         model.addAttribute("scoreDTO", myScore);
+
+        // Báo cáo mới nhất của nhóm thực hiện đề tài, để GV xem/tải ngay tại trang chấm
+        // (quyền tải xuống vẫn do SubmissionService kiểm tra theo vai trò người dùng).
+        topicRegistrationRepository.findByTopicId(topicId)
+                .filter(reg -> reg.getStatus() == TopicRegistrationStatus.APPROVED)
+                .ifPresent(reg -> {
+                    model.addAttribute("submissionGroupId", reg.getGroup().getId());
+                    model.addAttribute("latestSubmission",
+                            submissionService.getLatestSubmissionByGroup(reg.getGroup().getId()));
+                });
         boolean isChairman = teacherId != null && scoreService.isChairman(topicId, teacherId);
         model.addAttribute("isChairman", isChairman);
         model.addAttribute("canConfirmResult", isChairman

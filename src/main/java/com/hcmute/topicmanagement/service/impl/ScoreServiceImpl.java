@@ -369,30 +369,8 @@ public class ScoreServiceImpl implements ScoreService {
             period.setScoringReminderSentAt(now);
             registrationPeriodRepository.save(period);
         }
-        publishReadyPeriodsAutomatically();
-    }
-
-    private void publishReadyPeriodsAutomatically() {
-        for (RegistrationPeriod period : registrationPeriodRepository.findByStatusIn(
-                List.of(PeriodStatus.SUBMISSION_CLOSED, PeriodStatus.DEFENSE_EVALUATION))) {
-            if (!publishResultsIfReady(period.getId())) {
-                continue;
-            }
-            period.setStatus(PeriodStatus.COMPLETED);
-            period.setStatusManuallyControlled(false);
-            registrationPeriodRepository.save(period);
-            User admin = userRepository.findFirstByRole_NameOrderByIdAsc(RoleName.ROLE_ADMIN)
-                    .orElseThrow(() -> new BusinessException(
-                            "Không tìm thấy tài khoản quản trị để thông báo công bố kết quả."));
-            notificationService.createNotification(NotificationDTO.builder()
-                    .title("Kết quả đề tài đã được công bố")
-                    .content("Kết quả đợt \"" + period.getName()
-                            + "\" đã được tự động công bố khi hoàn tất chấm điểm.")
-                    .type(NotificationType.RESULT)
-                    .targetRole("ROLE_STUDENT")
-                    .periodId(period.getId())
-                    .build(), admin.getId());
-        }
+        // Không tự động công bố nữa: kết quả chỉ được công bố khi Trưởng khoa thực hiện
+        // thao tác PUBLISH_RESULTS (nút "Công bố kết quả" ở danh sách Đợt đăng ký).
     }
 
     private List<Topic> getTopicsToPublish(Long periodId) {
@@ -519,7 +497,9 @@ public class ScoreServiceImpl implements ScoreService {
         if (count == 4) {
             sum = sum.add(dto.getPresentationScore());
         }
-        return sum.divide(BigDecimal.valueOf(count), 1, RoundingMode.HALF_UP);
+        // Spec: điểm của từng người chấm làm tròn 2 chữ số thập phân như điểm cuối.
+        // Trước đây làm tròn 1 chữ số (7.75 -> 7.8) khiến điểm tổng kết bị lệch (8.20 thay vì 8.17).
+        return sum.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
     }
 
     private boolean scoreSpreadExceedsThreshold(List<Score> scores) {

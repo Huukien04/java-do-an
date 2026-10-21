@@ -78,9 +78,33 @@ public class DashboardController {
             List<RegistrationPeriodDTO> activePeriods = periodService.getActivePeriodsForStudent();
             model.addAttribute("activePeriods", activePeriods);
 
-            if (studentId != null && !activePeriods.isEmpty()) {
-                Long periodId = activePeriods.get(0).getId();
-                StudentGroupDTO myGroup = groupService.getMyGroupByPeriod(studentId, periodId);
+            if (studentId != null) {
+                // Tìm nhóm đã đăng ký đề tài của SV trên tất cả các đợt (ưu tiên đợt đang
+                // active trước, rồi tới các đợt đã hoàn tất) để khối "Kết quả Đánh giá"
+                // hiển thị đúng cả khi đợt chứa nhóm không còn active. Trước đây chỉ xét
+                // đợt active đầu tiên nên SV không bao giờ thấy kết quả đã công bố.
+                StudentGroupDTO myGroup = null;
+                List<RegistrationPeriodDTO> periodsToCheck = new java.util.ArrayList<>(activePeriods);
+                for (RegistrationPeriodDTO p : periodService.getAllPeriods()) {
+                    if (periodsToCheck.stream().noneMatch(ap -> ap.getId().equals(p.getId()))) {
+                        periodsToCheck.add(p);
+                    }
+                }
+                for (RegistrationPeriodDTO p : periodsToCheck) {
+                    StudentGroupDTO candidate = groupService.getMyGroupByPeriod(studentId, p.getId());
+                    if (candidate != null && candidate.getRegisteredTopicId() != null) {
+                        if (myGroup == null) {
+                            myGroup = candidate;
+                        }
+                        if (scoreService.getFinalResultByTopic(candidate.getRegisteredTopicId()) != null) {
+                            myGroup = candidate;
+                            break;
+                        }
+                    }
+                }
+                if (myGroup == null && !activePeriods.isEmpty()) {
+                    myGroup = groupService.getMyGroupByPeriod(studentId, activePeriods.get(0).getId());
+                }
                 model.addAttribute("myGroup", myGroup);
 
                 if (myGroup != null && myGroup.getRegisteredTopicId() != null) {
