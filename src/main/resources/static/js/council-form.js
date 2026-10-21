@@ -5,7 +5,10 @@
     const nameInput = document.getElementById('name');
     const codeInput = document.getElementById('councilCode');
     const periodSelect = document.getElementById('periodId');
-    const topicsSelect = document.getElementById('assignedTopicIds');
+    const topicsList = document.getElementById('assignedTopicsList');
+    const topicItems = topicsList ? Array.from(topicsList.querySelectorAll('[data-period-id]')) : [];
+    const submitBtn = document.getElementById('councilSubmitBtn');
+    const noTopicsHint = document.getElementById('noTopicsHint');
     const defenseDate = document.getElementById('defenseDate');
 
     function updateCouncilCode() {
@@ -20,14 +23,28 @@
         codeInput.value = normalized;
     }
 
+    // Chi form tao hoi dong (data-require-topics): khong co de tai nao trong dot dang chon thi an nut Tao.
+    function updateSubmitVisibility(visibleTopics) {
+        if (!form.hasAttribute('data-require-topics') || !submitBtn) return;
+        const hasTopics = visibleTopics > 0;
+        submitBtn.classList.toggle('d-none', !hasTopics);
+        if (noTopicsHint) noTopicsHint.classList.toggle('d-none', hasTopics);
+    }
+
     function filterTopicsByPeriod() {
         const periodId = periodSelect.value;
-        Array.from(topicsSelect.options).forEach(function (option) {
-            const matches = !periodId || option.dataset.periodId === periodId;
-            option.hidden = !matches;
-            option.disabled = !matches;
-            if (!matches) option.selected = false;
+        let visibleTopics = 0;
+        topicItems.forEach(function (item) {
+            const matches = !periodId || item.dataset.periodId === periodId;
+            item.style.display = matches ? '' : 'none';
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                checkbox.disabled = !matches;
+                if (!matches) checkbox.checked = false;
+            }
+            if (matches) visibleTopics++;
         });
+        updateSubmitVisibility(visibleTopics);
     }
 
     nameInput.addEventListener('input', updateCouncilCode);

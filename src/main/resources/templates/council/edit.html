@@ -68,11 +68,15 @@
                 </div>
 
                 <div class="col-12">
-                    <label for="memberTeacherIds" class="form-label fw-medium">Các Ủy viên Hội đồng (Chọn từ 1 đến 3 Giảng viên khác)</label>
-                    <select class="form-select" id="memberTeacherIds" th:field="*{memberTeacherIds}" multiple style="height: 120px;">
-                        <option th:each="t : ${teachers}" th:value="${t.id}" th:text="${t.user.fullName + ' (' + t.teacherCode + ' - ' + t.department.name + ')'}"></option>
-                    </select>
-                    <small class="text-muted">Giữ phím Ctrl (hoặc Cmd trên Mac) để chọn nhiều Giảng viên.</small>
+                    <label class="form-label fw-medium">Các Ủy viên Hội đồng (Chọn từ 1 đến 3 Giảng viên khác)</label>
+                    <div class="border rounded p-2" id="memberTeachersList" style="max-height: 180px; overflow-y: auto;">
+                        <label class="d-flex align-items-center gap-2 py-1 px-2 mb-0" th:each="t : ${teachers}">
+                            <input class="form-check-input m-0" type="checkbox" th:field="*{memberTeacherIds}" th:value="${t.id}">
+                            <span th:text="${t.user.fullName + ' (' + t.teacherCode + ' - ' + t.department.name + ')'}"></span>
+                        </label>
+                        <p class="text-muted small mb-0 px-2" th:if="${#lists.isEmpty(teachers)}">Chưa có Giảng viên nào trong hệ thống.</p>
+                    </div>
+                    <small class="text-muted">Đánh dấu vào ô vuông phía trước tên Giảng viên để chọn Ủy viên.</small>
                 </div>
 
                 <hr class="my-4">
@@ -83,12 +87,14 @@
                 </p>
 
                 <div class="col-12">
-                    <select class="form-select" id="assignedTopicIds" th:field="*{assignedTopicIds}" multiple style="height: 120px;">
-                        <option th:each="top : ${assignedTopics}" th:value="${top.id}"
-                                th:attr="data-period-id=${top.period.id}"
-                                th:text="${top.title + ' (GVHD: ' + top.createdByTeacher.user.fullName + ')'}"></option>
-                    </select>
-                    <small class="form-text text-muted">Có thể chọn nhiều đề tài; giữ Ctrl (hoặc Cmd trên Mac) để chọn nhiều mục.</small>
+                    <div class="border rounded p-2" id="assignedTopicsList" style="max-height: 180px; overflow-y: auto;">
+                        <label class="d-flex align-items-start gap-2 py-1 px-2 mb-0" th:each="top : ${assignedTopics}" th:attr="data-period-id=${top.period.id}">
+                            <input class="form-check-input mt-1" type="checkbox" th:field="*{assignedTopicIds}" th:value="${top.id}">
+                            <span th:text="${top.title + ' (GVHD: ' + top.createdByTeacher.user.fullName + ')'}"></span>
+                        </label>
+                        <p class="text-muted small mb-0 px-2" th:if="${#lists.isEmpty(assignedTopics)}">Chưa có đề tài nào đủ điều kiện gán cho hội đồng.</p>
+                    </div>
+                    <small class="form-text text-muted">Đánh dấu vào ô vuông phía trước đề tài để gán cho hội đồng.</small>
                 </div>
             </div>
 

@@ -45,7 +45,7 @@
                         <a th:href="@{/admin/councils/{id}(id=${c.id})}" class="btn btn-sm btn-outline-primary">Xem Chi tiết</a>
                         <a th:href="@{/admin/councils/{id}/edit(id=${c.id})}" class="btn btn-sm btn-outline-secondary">Sửa</a>
                         <form th:action="@{/admin/councils/{id}/delete(id=${c.id})}" method="post" class="d-inline"
-                              onsubmit="return confirm('Xóa hội đồng này? Thao tác không thể hoàn tác.');">
+                              data-confirm="Bạn sắp xoá hội đồng này. Thao tác không thể hoàn tác." data-confirm-title="Xoá hội đồng" data-confirm-ok="Có, xoá luôn!">
                             <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
                         </form>
                     </span>

@@ -972,3 +972,27 @@ html[data-theme="light"] .ui-toast .btn-close { filter: none; }
     .ui-metric-card { min-height: 100px; padding: .85rem; }
     .ui-chart-widget__body { min-height: 190px; padding: .75rem; }
 }
+
+/* ===== Hop thoai xac nhan dung chung (appConfirm) ===== */
+.app-confirm-dialog { max-width: 430px; }
+.app-confirm-content {
+    border: 0;
+    border-radius: 20px;
+    padding: 30px 30px 26px;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(8, 15, 30, .35);
+}
+.app-confirm-icon { font-size: 3.2rem; line-height: 1; color: #dc3545; margin-bottom: 14px; }
+#appConfirmModal[data-variant="warning"] .app-confirm-icon { color: #fd7e14; }
+.app-confirm-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+.app-confirm-message { color: var(--bs-secondary-color); margin-bottom: 24px; }
+.app-confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.app-confirm-btn { border-radius: 10px; padding: 11px 10px; font-weight: 600; border: 1px solid transparent; }
+.app-confirm-btn-cancel { background: var(--bs-tertiary-bg); border-color: var(--bs-border-color); color: var(--bs-body-color); }
+.app-confirm-btn-cancel:hover { background: var(--bs-secondary-bg); color: var(--bs-body-color); }
+.app-confirm-btn-ok { background: #dc3545; color: #fff; }
+.app-confirm-btn-ok:hover, .app-confirm-btn-ok:focus { background: #bb2d3b; color: #fff; }
+#appConfirmModal[data-variant="warning"] .app-confirm-btn-ok { background: #fd7e14; }
+#appConfirmModal[data-variant="warning"] .app-confirm-btn-ok:hover,
+#appConfirmModal[data-variant="warning"] .app-confirm-btn-ok:focus { background: #e56b04; }
+@media (max-width: 575.98px) { .app-confirm-content { padding: 24px 18px 20px; } }

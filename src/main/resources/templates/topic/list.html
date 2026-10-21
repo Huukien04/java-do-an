@@ -72,12 +72,12 @@
                             <form th:action="@{/topics/{id}/approve(id=${t.id})}" method="post" class="d-inline">
                                 <button type="submit" class="btn btn-success me-1"><i class="bi bi-check-lg"></i> Duyệt</button>
                             </form>
-                            <form th:action="@{/topics/{id}/reject(id=${t.id})}" method="post" class="d-inline">
+                            <form th:action="@{/topics/{id}/reject(id=${t.id})}" method="post" class="d-inline" data-confirm="Bạn sắp từ chối đề tài này." data-confirm-title="Từ chối đề tài" data-confirm-ok="Có, từ chối!" data-confirm-cancel="Không, quay lại" data-confirm-variant="warning">
                                 <button type="submit" class="btn btn-danger me-1"><i class="bi bi-x-lg"></i> Từ chối</button>
                             </form>
                         </th:block>
                         <form th:action="@{/topics/{id}/delete(id=${t.id})}" method="post" class="d-inline"
-                              onsubmit="return confirm('Bạn có chắc muốn xóa đề tài này? Các đăng ký, điểm và phân công hội đồng liên quan cũng sẽ bị xóa.');">
+                              data-confirm="Bạn sắp xoá đề tài này. Các đăng ký, điểm và phân công hội đồng liên quan cũng sẽ bị xoá." data-confirm-title="Xoá đề tài" data-confirm-ok="Có, xoá luôn!">
                             <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i> Xóa</button>
                         </form>
                     </div>

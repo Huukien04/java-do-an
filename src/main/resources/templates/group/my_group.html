@@ -31,7 +31,7 @@
                         <span class="text-muted small fw-semibold me-2 text-nowrap" style="font-size: 0.8rem;">ĐỢT ĐĂNG
                             KÝ:</span>
                         <select name="periodId"
-                            class="form-select border-0 bg-transparent fw-bold text-primary py-0 ps-1 pe-4 small"
+                            class="form-select border-0 bg-transparent fw-bold text-primary py-0 ps-1 small"
                             style="cursor: pointer; font-size: 0.85rem;" onchange="this.form.submit()">
                             <option th:each="p : ${activePeriods}" th:value="${p.id}" th:text="${p.name}"
                                 th:selected="${p.id == selectedPeriodId}"></option>
@@ -184,11 +184,10 @@
                                         class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-arrow-repeat me-1"></i>Đăng ký lại đề tài
                                     </a>
-                                    <form th:if="${isGroupLeader}" th:action="@{/student/group/disband}" method="post">
+                                    <form th:if="${isGroupLeader}" th:action="@{/student/group/disband}" method="post" data-confirm="Giải tán nhóm sẽ cho phép tất cả thành viên tạo hoặc tham gia nhóm khác." data-confirm-title="Giải tán nhóm" data-confirm-ok="Có, giải tán!">
                                         <input type="hidden" name="groupId" th:value="${myGroup.id}">
                                         <input type="hidden" name="periodId" th:value="${selectedPeriodId}">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Giải tán nhóm sẽ cho phép tất cả thành viên tạo hoặc tham gia nhóm khác. Tiếp tục?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
                                             <i class="bi bi-trash me-1"></i>Giải tán nhóm
                                         </button>
                                     </form>

@@ -93,7 +93,7 @@
         </div>
     </section>
 
-    <div class="card card-custom">
+    <div class="card card-custom overflow-hidden">
         <div class="table-responsive">
             <table id="periodListTable" class="table table-hover align-middle mb-0 period-list-table">
                 <thead class="table-primary">
@@ -177,7 +177,7 @@
                                         </form>
                                     </li>
                                     <li>
-                                        <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post">
+                                        <form th:action="@{/admin/periods/{id}/status(id=${p.id})}" method="post" data-confirm="Bạn sắp hủy đợt đăng ký này. Đợt sẽ chuyển sang trạng thái Đã hủy." data-confirm-title="Hủy đợt đăng ký" data-confirm-ok="Có, hủy đợt!">
                                             <input type="hidden" name="status" value="CANCELLED">
                                             <button class="dropdown-item text-danger" type="submit">Hủy đợt</button>
                                         </form>
@@ -189,7 +189,7 @@
                                         </form>
                                     </li>
                                     <li th:if="${p.status.name() == 'COMPLETED'}">
-                                        <form th:action="@{/scoring/admin/unpublish}" method="post">
+                                        <form th:action="@{/scoring/admin/unpublish}" method="post" data-confirm="Kết quả đã công bố sẽ bị thu hồi. Sinh viên sẽ không xem được điểm của đợt này nữa." data-confirm-title="Hủy công bố kết quả" data-confirm-ok="Có, hủy công bố!" data-confirm-cancel="Không, quay lại" data-confirm-variant="warning">
                                             <input type="hidden" name="periodId" th:value="${p.id}">
                                             <button class="dropdown-item text-warning" type="submit">Hủy công bố kết quả</button>
                                         </form>
